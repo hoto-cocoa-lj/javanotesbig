@@ -1,0 +1,131 @@
+用tomcat测试发现，只要cookies里JSESSIONID一样，就会被服务器认为是同一个session。
+（session的地址一样，且对一个session设置attri，另一个id一样的session能访问该值。
+
+
+上下文的attri，任何访问都能看到
+
+
+====================================================================================================
+
+增强某个方法，有三种方法：
+1，知道方法的类。直接用继承重写；
+2，不知道类，知道接口且接口只有少数方法。用修饰器；
+3，用动态代理。下面的代码是用filter增强getParameter，使其解决utf8乱码
+
+public void doFilter(ServletRequest r1, ServletResponse s, FilterChain chain) throws IOException, ServletException {
+		HttpServletRequest r = (HttpServletRequest) r1;
+		HttpServletRequest r2 = (HttpServletRequest) Proxy.newProxyInstance(
+				r.getClass().getClassLoader(),
+				r.getClass().getInterfaces(), 
+				new InvocationHandler() {
+					@Override
+					public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+						if ("getParameter".equalsIgnoreCase(method.getName())) {
+							String m = r.getMethod();
+							if ("get".equalsIgnoreCase(m) || "post".equalsIgnoreCase(m)) {
+								String a = (String) method.invoke(r, args);
+								if (a != null) {
+									a = new String(a.getBytes("iso-8859-1"), "utf-8");
+									return a;
+								}
+							}
+						}
+						return method.invoke(r, args);
+					}
+				});
+
+		chain.doFilter(r2, s);
+	}
+
+
+====================================================================================================
+
+
+
+配置文件模板在
+资料\spring-framework-4.2.4.RELEASE-dist\spring-framework-4.2.4.RELEASE\docs\spring-framework-reference\html
+
+
+====================================================================================================
+
+
+07stores里有ajax中文乱码的解决方法
+
+bean里写了带参数的构造方法就一定要写无参的！！不然BeanListHandler无法构造bean，bug都找不到
+
+
+
+
+====================================================================================================
+
+
+
+
+
+default.properties在Web App Libraries/struts2-core-2.3.24.jar/org.apache.struts2/default.properties
+
+覆盖加载：
+
+方法1（推荐）：  在struts2.xml里设置	 ，比如：
+<constant name="struts.action.extension" value="action"></constant>
+
+
+方法2： 在web.xml的filter里设置init-param,比如：
+  <filter>
+  	<filter-name>struts2</filter-name>
+  	<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+  	<init-param>
+  		<param-name>struts.action.extension</param-name>
+  		<param-value>xyz</param-value>
+  	</init-param>
+  </filter>
+
+
+=============================================================================================================================
+
+	<package name="A" extends="struts-default" namespace="/">
+		<interceptors>
+			<interceptor name="i1" class="com.interception.I1"></interceptor>
+			<interceptor name="i2" class="com.interception.I2"></interceptor>			
+		</interceptors>		
+
+
+		<action name="a_*" class="com.action.A"  method="a{1}">
+			<result  name="login">/1.jsp</result>
+			<result name="zhucefailed">/WEB-INF/3.jsp</result>
+			<result name="zhucesuccess">/WEB-INF/3.jsp</result>			
+			<result name="index">/index.jsp</result>
+			<result name="fff">/WEB-INF/2.jsp</result>
+			<result type="redirectAction">a_f</result>
+
+			<interceptor-ref name="i1">
+				 <param name="excludeMethods">a1,a2</param>
+			</interceptor-ref>
+			<interceptor-ref name="i2"></interceptor-ref>
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+		</action>	
+	</package>
+  
+  直接使用redirect的方法无法访问web-inf下面的页面，可以用redirectAction重定向，
+  然后在相应的地方用请求转换的方法跳转web-inf下面的页面
+  
+  
+  
+====================================================================================================
+
+  
+ctrl+shift+L可以补全=左边的变量
+
+====================================================================================================
+
+
+在项目的hibernate的配置文件hibernate.cfg.xml里修改name为“hibernate.connection.url"的property的值为：
+          jdbc:mysql://localhost:3306/tdm?useUnicode=true&amp;characterEncoding=UTF-8，其中tdm为数据库的名称
+		  
+
+====================================================================================================
+
+
+
+=============================================================================================================================
+

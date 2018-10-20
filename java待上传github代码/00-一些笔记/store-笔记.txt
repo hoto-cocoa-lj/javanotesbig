@@ -1,0 +1,62 @@
+=============================================================================================================
+
+jsp和java似乎无法直接获取浏览器的地址栏里的地址，可以用$(location)[0].href获取
+
+=============================================================================================================
+
+使用filter拦截请求，被拦截的请求早请求转发或者重定向后必须return，否则可能出现奇怪的bug：
+Cannot call sendRedirect() after the response has been committed 。
+
+=============================================================================================================
+
+必须在bean里设置set方法，dbutils里面的beanhandler方法才能设置相应的值。
+
+=============================================================================================================
+
+redis可以直接用get和set保存获取json。比如用beanlisthandler从mysql获取的数据，用gson转成json后可以直接保存。
+因为json本身就是String
+
+=============================================================================================================
+
+a的aid是b的bid的外键，可以在javabean给a额外设置一个属性ab，类型b。dao里获取a后，再a.setAb即可获得b的属性。
+一A对多B的关系，例如类别对商品，可以在A里添加属性List<B> lb=new List<B>，然后在B里添加A a，
+这样需要跨表查数据时可以封装在一个对象里传输，不需要时不封装即可。多对多可以在类里封装对方的list
+
+=============================================================================================================
+
+设置a标签无效，
+href=""
+a.disabled {
+    pointer-events: none;
+}
+
+
+=============================================================================================================
+
+ 1. jQuery AJAX 请求,后台收到为乱码
+可以显式设置contentType的编码为utf-8, 后台一般都能正常解码例如：
+contentType: "application/x-www-form-urlencoded; charset=utf-8", 
+ 
+jQuery(form).ajaxSubmit({url: "doLogin?user=a",type: "post",dataType: "json",
+      contentType: "application/x-www-form-urlencoded; charset=utf-8",success: showLoginResponse});  
+
+如果不加contentType: "application/x-www-form-urlencoded; charset=UTF-8",  而使用escape(),则会出现
+post 主体包含的字节比内容长度指定的字节要少
+的错误.
+ 
+2.  jQuery AJAX 返回乱码
+你是否发现无论你怎么设置编码, 客户端收到的数据总是乱码呢, 请看下面的例子,你发现有什么问题吗?
+void saveTempKind(HttpServletRequest req, HttpServletResponse resp)            throws ServletException, IOException {  
+PrintWriter pw = resp.getWriter(); resp.setContentType("text/text;charset=GBK");  
+try {  //DO PROCESS   pw.write("成功"); }catch(Exception e){  pw.write("失败"); }}  
+问题在于resp.setContentType("text/text;charset=GBK");
+语句应该在
+PrintWriter pw = resp.getWriter();
+
+之前,而不是之后。如果象上例这样，无论你怎么设置response的编码，前端乱码的问题都依然如故。 可能的原因是pw在获得PriintWriter 之前,编码就已经确定了。
+所以编码的声明应该在获取PrintWriter对象之前。
+
+本文来自 hongweigg 的CSDN 博客 ，全文地址请点击：https://blog.csdn.net/hongweigg/article/details/6756278?utm_source=copy 
+
+
+=============================================================================================================
