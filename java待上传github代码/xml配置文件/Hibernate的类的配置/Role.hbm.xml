@@ -1,0 +1,33 @@
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+<hibernate-mapping> 
+	<class name="com.domain.Role" table="sys_role">
+		<id name="role_id" column="role_id">
+			<generator class="native"></generator>
+		</id>
+		
+		<property name="role_name"></property>
+		<property name="role_memo"></property>
+
+		
+		<!-- 配置多对多的关系 集合 对象是role
+		name：集合的名字，
+		table：中间表的名字
+
+		set：key：自己在中间表的外键字段名
+		set：class：对方的全限定名
+		set：column：对方在中间表的外键字段名
+		
+		role和user都会管理外键，只需要一个管理即可，设置被动的一方inverse=true放弃管理。
+		这时代码r1.getSu().add(u1);se.save(r1);表示保存r1时会因为cascade保存u1，
+		但由于不管理外键，所以中间表不会有数据，即相当于r1和u1没有建立外键关系。
+		由于设置了delete，删除某role会在user表删除其关联的所有user，并在中间表删除相关的所有数据。
+		 -->
+		<set name="su" table="sys_user_role" inverse="true"  cascade="save-update,delete">
+			<key column="wj_role_id"></key>
+			<many-to-many class="com.domain.User" column="wj_user_id"/>
+		</set>	
+	</class>
+</hibernate-mapping>

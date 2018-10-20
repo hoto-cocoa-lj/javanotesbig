@@ -1,0 +1,30 @@
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+<hibernate-mapping> 
+	<class name="com.domain.Customer" table="cst_customer1">
+		<id name="cust_id" column="cust_id">
+			<generator class="native"></generator>
+		</id>
+		
+		<property name="cust_name" column="cust_name"></property>
+		<property name="cust_source" column="cust_source"></property>
+		<property name= "cust_industry" column="cust_industry"></property>
+		<property name="cust_level"></property>
+		<property name="cust_address"></property>
+		<property name="cust_phone"></property>
+		
+		<!-- 配置一对多的关系 集合 对象是linkman -->	
+<!-- 		name：集合的名字，
+			设置inverse="true"使其放弃外键维护，否则会在设置外键时出现冗余sql代码
+			保存时先保存1再保存多，不然还是会出现update代码。
+			在一的一方设置cascade="save-update"，保存一的一方数据时会自动多方的数据
+		set：key：外键字段名
+		set：class：多的一方的全限定名 -->
+		<set name="slm" inverse="true" cascade="save-update">
+			<key column="wj_cust_id"></key>
+			<one-to-many class="com.domain.Linkman"/>
+		</set>	
+	</class>
+</hibernate-mapping>
