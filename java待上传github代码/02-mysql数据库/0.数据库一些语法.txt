@@ -1,0 +1,126 @@
+
+SET GLOBAL general_log = 'OFF'; 
+#是否保存数据库的执行日志，保存在下面那行的文件夹
+SHOW VARIABLES LIKE 'general%'; 
+
+SET SQL_SAFE_UPDATES = 0;
+
+
+
+#select unix_timestamp;					#获取当前时间戳10位
+
+#create database db297 charset utf8;	#创建数据库
+#create database db297;					#创建数据库	
+#drop database db297;					#删除数据库
+#select database();  					#查询正在使用数据库，基本不用
+#use t1;								#激活数据库t1，基本不用
+#show databases;						#查询所有数据库（的名字）
+
+
+
+#create table t2(id1 int(3) primary key,sname varchar(3),sage int default 3);	
+	#创建表,sage默认是3，添加数据如果设置sage为null则是null，如果没有设置sage字段则取默认值
+#drop table t2;							#删除表
+#desc t2;								#查看一个表的详细信息
+#show tables;							#查看当前数据库的所有表（的名字）
+#rename table t2 to t3;					#把表t2名字改成t3
+#alter table t2 rename t3;				#把表t2名字改成t3
+#alter table t3 add phone varchar(9);	#添加一列
+#alter table t3 drop phone ;			#删除一列
+#alter table t2 change ages age1 int;	#修改列ages名字成age1，并改成int类型
+#alter table t2 modify age1 varchar(9) unique not null;
+										#修改列的类型和约束
+										
+										
+
+#insert （into） t2 (id1,age1) value(3,"5");	
+				#插入新数据到t2，into可以省略，字符串也可以用单引号
+
+#insert  t2  value(0,'z','115');		#所有列都有数据输入的话，可以不写列名
+#insert t (sid,t5) value(null,2022),(null,2023),(null,2024);		#连续插入3行数据
+
+
+#delete from  t2  where id1=0;			#删除某些数据，去掉where部分的话会删除全表的数据
+
+
+#update t2 set sname=3 where id1=3;		#修改某些数据									
+#update b2 set  sprice =sprice +0.12;	#原地修改
+#update t2 set tname=concat(tname,?)  where tname like ?;		#字符串拼接
+										
+#set SQL_SAFE_updates=0;update t2 set sname=333 where id1 like "3%";
+				#使用非主键改查时会报错，需要设置权限。修改id1以3开头的数据的sname为333
+									
+							
+
+							
+									
+#select (distinct) cid from b2;			#查询，distinct表示去重
+#select * from  c where  length(c.sname)>2.9;		#取长度3于2.9的数据，utf8里一个汉字长度是3
+#select sprice/2 (as) fuck from b2;		
+		#讲查询结果/2再显示，fuck是新列名，as可以省略，不会修改数据库里的数据
+
+
+
+		#比较运算符：
+		#>	<	>=	<=	!=	<>	=				
+					#对int和double进行查询时，可以和字符串格式比较，mysql/workbench会自己转换类型
+					#例如select  * from b2 where sprice in ('7',9)
+		#between a and b						#包括a和b，可以是date
+		#in(set)								#包含在，例如in(100,200)
+		#like "a%_"								#%表示零个或者多个字符，_表示一个字符
+		#is null和is not null					
+		#逻辑运算符：			and or not								
+
+
+		#约束：
+		#主键约束primary key：unique，not null
+		#自动增长约束auto_increment：自动加1，必须修饰int，写入数据时可以写null，
+		#使用delete from删除表的数据后自动增长值不会重置，使用truncate (tablename)会重置
+		
+#排序sort by：
+#select * from b2  limit 0,5;==#select * from b2  limit 5;
+#select * from b2 order by price (desc) limit 0,5;		#查询并排序,只显示0到第4条（共5条）
+#select  * from b2 order by  sname ,cid ,sprice desc ;		#多重排序，以前面的为准	
+
+#聚合查询（自动忽略空值即null）：
+#count记录数，max/min最大/小值，avg平均值，sum求和
+#select count(*) from b2;
+#select count(sid) from b2;						#sid是null的数据不会被统计
+
+#分组查询group by（查询字段[指select后面的项]只能写分组字段[group by后面的项]或者聚合函数）：
+#select  count(*),avg(sprice) ,sname from b2 group by  sname;
+#select  count(*) as co,avg(sprice) ,sname from b2 group by  sname having co>7;
+												#分组后设置条件不能用where用having
+#select  count(*) as c,avg(sprice) ,sname from b2 where sprice<=2 group by  sname having c<=7;
+		#找出sprice<=2的所有数据，然后按sname分组，取数据量小于7的分组，获取count,avg等
+
+		
+
+
+#ALTER TABLE t add PRIMARY KEY(sid);			#添加primary key给sid
+#ALTER TABLE t DROP PRIMARY KEY;				#删除sid的primary key
+#ALTER TABLE t CHANGE COLUMN sid  sid INT not NULL unique auto_increment;
+		#有多种写法，需要用的话再查，别乱用
+		#设置成not null，unique和ai。添加和删除可以在workbench里操作，会显示代码
+		
+
+#新建表格分析：
+#1对多 （指数据1对多）：1是主表，2是，2需要一个外键，指向1的主键
+#多对多（指数据多对多）：3张表，第三张是中间表，需要两个外键，分别指向1和2的主键	
+
+#方法1：创建表格后创建外键
+#create table stu (sid int primary key auto_increment,sname varchar(20) unique);
+#create table cor (cid int primary key auto_increment,cname varchar(20) unique);
+#create table ii (iid int primary key auto_increment,ssid  int not null,ccid int not null);
+#alter table ii add constraint sidk foreign key(ssid) references stu(sid);
+#alter table ii add constraint cidk foreign key(ccid) references cor(cid);	
+#方法2：创建表格时创建外键
+#create table stu (sid int primary key auto_increment,sname varchar(20) unique);
+#create table cor (cid int primary key auto_increment,cname varchar(20) unique);
+#create table ii (iid int primary key auto_increment,sid  int not null,cid int not null,
+#constraint skey foreign key (sid) references stu(sid),
+#constraint ckey foreign key (cid) references cor(cid));
+
+
+#交叉查询
+#select * from stu as s,cor as c where s.sid=c.cid;

@@ -1,0 +1,217 @@
+案例一：省市联动
+
+		$(function(){
+			var cs=$('#city');
+			var ps=$('#province');
+			ps.change(function(){
+				var s="<option value=0>----请-选-择-市----</option>";
+				var index=this.selectedIndex;	
+				//获取select的option的索引可以用这个方法，这样不需要option的value值						
+				if(index>0){
+					a=cities[index-1];
+					$.each(a,function(i,e){
+						s+="<option value="+(1+i)+">"+a[i]+"</option>";
+					})
+				}
+				cs.html(s); 
+			})
+		})				
+	
+	需求：选择对应的省份，那么在右侧下拉选中可以实时选择对应省份的城市
+	技术分析：
+		jquery
+		遍历
+		文档操作
+		
+	步骤分析：
+		1.确认事件  change
+		2.获取省份下拉选中的value值
+		3.通过省份的value值获取对应的市的数组
+		4.遍历市的数组
+			把每一个市插入到市的下拉选中
+	////////////////////////
+	遍历：
+		js方式：
+			for(var i=0;i<ele.length,i++){
+				
+			}
+		jquery方式：[js对象1，js对象2，js对象3......]
+			1.
+			jquery对象.each(function(index,ele){
+				//this	  遍历后的结果   js对象
+				//ele     遍历后的结果   js对象
+				//index   索引
+			})
+			2.
+			$.each(jquery对象,function(index,ele){
+				//this	  遍历后的结果   js对象
+				//ele     遍历后的结果   js对象
+				//index   索引
+			})
+			
+	////////////////////////////
+	对value-html-text的操作
+		value：
+			获取：
+				jquery对象.val()
+			赋值：
+				jquery对象.val("值")
+		html：
+			获取：
+				jquery对象.html()
+			赋值：
+				jquery对象.html("值")
+		text：
+			获取：
+				jquery对象.text()
+			赋值：
+				jquery对象.text("值")
+				
+				
+		html和text设置值的区别：
+			html会把标签直接解析到页面上
+			text会把标签作为文本的形式展示到页面上
+		html和text获取值的区别：
+			html会把标签体中存在的html标签获取出来
+			text不会把标签体中存在的html标签获取出来
+			
+	////////////////////////////////
+	文档操作：
+		内部插入：
+			append:  a.append(c)    把c插入到a内部的后面
+			prepend:  a.prepend(c)  把c插入到a内部的前面
+			
+			appendTo:  a.appendTo(c)  将a插入到c内部的后面
+			prependTo; a.prependTo(c)  将a插入到c内部的前面
+		外部插入：
+			after： a.after(c)       把c插入到a外部的后面
+			before：  a.before(c)    把c插入到a外部的前面
+			
+			insertAfter： a.insertAfter(c)  将a插入到c外部的后面
+			insertBefore： a.insertBefore(c)  将a插入到c外部的前面
+		删除节点：
+			empty  清空
+			remove：移除
+案例二：左右选中
+	需求：点击第一个按钮，把选中的第一个数据移动到右侧
+		  点击第二个按钮，把选中的所有数据移动到右侧
+		  点击第三个按钮，把所有的数据都移动到右侧(不管选中没选中都会移动)
+		  
+	技术分析：
+			select
+				multiple="true"   可以让下拉选选中多个
+				size="10"   	  下拉选显示的个数   
+				
+			表单对象属性选择器：
+				:enabled   可用的
+				:disabled  不可用
+				:checked   选中  (单选和多选)
+				:selected  选中   (下拉选)
+	步骤分析：
+		1.确定事件  click
+		2.第一个按钮：获取左侧选中的第一个数据，并且把第一个数据移动到右侧的下拉选中
+		3.第二个按钮：获取左侧所有选中的数据，并且把选中的所有数据移动到右侧下拉选中
+		4.第三个按钮：获取左侧所有的数据(不管是否选中)，并且把所有的数据移动到右侧的下拉选中
+案例三：表单校验
+	需求：对表单数据进行校验
+	技术：jquery的校验器插件
+	
+	
+	
+	使用：
+		1.导入jquery.js文件
+		2.导入jquery-validate.js文件
+		3.导入messages_zh.js国际化文件
+		4.对表单进行校验
+			在页面加载成功后获取表单对象.validate({
+				rules:{},     //校验规则
+				messages:{}   //自定义提示信息
+			})
+		
+			rules写法：
+				要校验的name属性：{
+					校验器1：取值，
+					校验器2：取值
+				}
+				
+			注意：多个校验规则之间  使用,分割
+			message写法：
+				要校验的name属性：{
+					校验器1："自定义提示信息1"，
+					校验器2："自定义提示信息2"
+				}
+				
+		校验器：
+			required   true/false   必填校验
+			number     true/false   数字校验
+			min        数字          最小值
+			max        数字          最大值
+			range      数值区间       [最小值,最大值]
+			minLength|maxLength|rangLength   最小值|最大值|长度区间
+			email:  email           邮箱校验     *@*   1@x
+			equalTo:  jquery对象    重复性校验
+			
+			
+			
+	自定义校验器：
+		$.validator.addMethod("校验器的名称",function(value,ele,param){
+			value:用户录入的值
+			ele：当前录入的值所在的js对象
+			param：校验器的取值
+			
+			return true:  符合校验器规则
+			return false： 不符合校验器规则   (默认return false)
+		},"提示信息")
+		
+	正则的用法：
+		正则表达式.test(要匹配的值)
+			若匹配：true
+			不匹配：false
+			
+			
+
+//自定义身份正则表单验证
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+<script src="../js/jquery-1.8.3.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
+	<style>		
+	</style>
+	<body>
+		<form action="#" method="get" id="formid">
+			<input type="text" name="username" id="username"></td>
+		</form>
+		<script type="text/javascript">
+			console.log($('input').length);
+			$('form').validate({ 
+				rules:{
+					'username':{
+						required:true,
+						good:true,
+					}
+				}
+			})
+		$.validator.addMethod('good',function(value,ele,param){
+			//console.log(value+" "+ele+" "+param);
+			if(value.length==15){return  /\d{15}/.test(value)}
+			if(value.length==18){return /\d{17}[0-9xX]/.test(value)}
+		},'长度不对')	
+		</script>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

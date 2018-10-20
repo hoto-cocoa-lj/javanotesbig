@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<!--创建视口-->
+		<meta name="viewport" content="width=device-width, initial-scale=1">	
+		<title></title>
+		<!--导入jquery文件-->
+		<script type="text/javascript" src="../js/jquery-1.11.0.min.js" ></script>
+		<!--导入bootstrap.css文件-->
+		<link rel="stylesheet" href="../css/bootstrap.css" />
+		<!--导入bootstrap.js-->
+		<script type="text/javascript" src="../js/bootstrap.js" ></script>
+		
+	</head>
+	<body>
+		<!--创建布局容器-->
+		<div class="container-fluid">
+			<!--第一个div：存放logo信息  在中等屏幕每个占4份  在小屏幕和超小屏幕占12份-->
+			<div>
+				<!--嵌套三个div-->
+				<div class="col-md-4 col-sm-12 col-xs-12">
+					<img src="../img/logo2.png"/>
+				</div>
+				<div class="col-md-4 col-sm-12 col-xs-12">
+					<img src="../img/header.jpg"/>
+				</div>
+				<div class="col-md-4 col-sm-12 col-xs-12 text-center" style="padding-top: 20px;">
+					<a href="#">登录</a>
+					<a href="#">注册</a>
+					<a href="#">购物车</a>
+				</div>
+			</div>
+			<!--清除浮动-->
+			<div class="clearfix"></div>
+			<!--第二个div：存放导航条  不用控制响应式-->
+			<div>
+				<nav class="navbar navbar-inverse">
+				  <div class="container-fluid">
+				    <!-- Brand and toggle get grouped for better mobile display -->
+				    <div class="navbar-header">
+				      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+				        <span class="sr-only">Toggle navigation</span>
+				        <span class="icon-bar"></span>
+				        <span class="icon-bar"></span>
+				        <span class="icon-bar"></span>
+				      </button>
+				      <a class="navbar-brand" href="#">首页</a>
+				    </div>
+				
+				    <!-- Collect the nav links, forms, and other content for toggling -->
+				    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				      <ul class="nav navbar-nav">
+				        <li class="active"><a href="#">手机数码 <span class="sr-only">(current)</span></a></li>
+				        <li><a href="#">电子设备</a></li>
+				        <li class="dropdown">
+				          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">水果 <span class="caret"></span></a>
+				          <ul class="dropdown-menu">
+				            <li><a href="#">苹果</a></li>
+				            <li><a href="#">香蕉</a></li>
+				            <li><a href="#">大鸭梨</a></li>
+				            <li role="separator" class="divider"></li>
+				            <li><a href="#">榴莲</a></li>
+				            <li role="separator" class="divider"></li>
+				            <li><a href="#">芒果</a></li>
+				          </ul>
+				        </li>
+				      </ul>
+				      <form class="navbar-form navbar-left pull-right">
+				        <div class="form-group">
+				          <input type="text" class="form-control" placeholder="Search">
+				        </div>
+				        <button type="submit" class="btn btn-default">Submit</button>
+				      </form>
+				    </div><!-- /.navbar-collapse -->
+				  </div><!-- /.container-fluid -->
+				</nav>
+				
+			</div>
+			<!--第三个div：存放轮播图   不用控制响应式-->
+			<div>
+				<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+				  <!-- 控制圆点 -->
+				  <ol class="carousel-indicators">
+				    <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+				    <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+				    <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+				  </ol>
+				
+				  <!-- 控制图片 -->
+				  <div class="carousel-inner" role="listbox">
+				    <div class="item active">
+				      <img src="../img/1.jpg" alt="...">
+				      <div class="carousel-caption">
+				        ...
+				      </div>
+				    </div>
+				    <div class="item ">
+				      <img src="../img/2.jpg" alt="...">
+				      <div class="carousel-caption">
+				        ...
+				      </div>
+				    </div>
+				    
+				    <div class="item">
+				      <img src="../img/3.jpg" alt="...">
+				      <div class="carousel-caption">
+				        ...
+				      </div>
+				    </div>
+				  </div>
+				
+				  <!-- 控制左右箭头 -->
+				  <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+				    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+				    <span class="sr-only">Previous</span>
+				  </a>
+				  <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+				    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+				    <span class="sr-only">Next</span>
+				  </a>
+				</div>
+			</div>
+			<!--第四个div：存放热门商品-->
+			<div>
+				<!--上面的div-->
+				<div>
+					<span class="h2">热门商品</span>
+					<img src="../img/title2.jpg"/>
+				</div>
+				<!--下面的div-->
+				<div>
+					<!--左边的div-->
+					<div class="col-md-2 col-sm-12 hidden-xs">
+						<img src="../img/big01.jpg" width="190px" height="390px"/>
+					</div>
+					<!--右边的div-->
+					<div class="col-md-10 col-sm-12 col-xs-12">
+						<!--商品中的大图-->
+						<div class="col-md-6 hidden-sm hidden-xs">
+							<img src="../img/middle01.jpg" width="500px" height="190px"/>
+						</div>
+						<!--商品中的小图-->
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg" />
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--第五个div：存放图片 -->
+			<div>
+				<img src="../img/ad.jpg" width="100%"/>
+			</div>
+			<!--第六个div：存放热门商品-->
+			<div>
+				<!--上面的div-->
+				<div>
+					<span class="h2">热门商品</span>
+					<img src="../img/title2.jpg"/>
+				</div>
+				<!--下面的div-->
+				<div>
+					<!--左边的div-->
+					<div class="col-md-2 col-sm-12 hidden-xs">
+						<img src="../img/big01.jpg" width="190px" height="390px"/>
+					</div>
+					<!--右边的div-->
+					<div class="col-md-10 col-sm-12 col-xs-12">
+						<!--商品中的大图-->
+						<div class="col-md-6 hidden-sm hidden-xs">
+							<img src="../img/middle01.jpg" width="500px" height="190px"/>
+						</div>
+						<!--商品中的小图-->
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg"/>
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+						
+						<div class="col-md-2 col-sm-4 col-xs-6 text-center">
+							<img src="../img/small08.jpg" />
+							<p>
+								<a href="">电饭煲</a>
+							</p>
+							<p>
+								<font color="red">$999.99</font>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--第七个div：存放图片-->
+			<div style="margin-top: 40px;">
+				<img src="../img/footer.jpg" width="100%"/>
+			</div>
+			<!--第八个div：存放友情链接-->
+			<div class="text-center">
+				<ul class="list-inline">
+					<li><a href="">传智播客</a></li>
+					<li><a href="">传智播客</a></li>
+					<li><a href="">传智播客</a></li>
+					<li><a href="">传智播客</a></li>
+					<li><a href="">传智播客</a></li>
+					<li><a href="">传智播客</a></li>
+					<li><a href="">传智播客</a></li>
+				</ul>
+			</div>
+			<!--第九个div：存放版权信息-->
+			<div>
+				<p align="center">
+					Copyright © 2005-2016 传智商城 版权所有 
+				</p>
+			</div>
+		</div>
+	</body>
+</html>

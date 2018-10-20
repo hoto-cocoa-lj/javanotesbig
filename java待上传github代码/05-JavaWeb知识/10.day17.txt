@@ -1,0 +1,61 @@
+1.商品查询
+	需求：有一个页面上面有一个超链接[查询所有商品]，点击[查询所有商品],会把数据库中的所有商品信息查询出来，并且展示在表格中
+		
+	如何在一个servlet中判断执行哪个方法：
+		doGet(request,response){
+			//获取到method的值
+			//判断method
+			if("findAll".equals(method)){
+				//走查询方法
+			}else if("add".equals(method)){
+				//走添加方法
+			}
+		}
+		
+		
+		//定义查询方法
+		//定义增加方法
+		......
+		
+		
+		
+	步骤分析：
+		1.创建数据库和表结构
+		2.创建动态的web项目,创建包结构,导入项目需要的资源
+		3.创建一个首页，上面有一个'查询所有商品'的超链接,点击链接后向servlet发送请求    ${pageContext.request.contextPath}/findAll?method=findAll
+		4.servlet的操作
+			//获取method
+			//判断当前method是哪个请求(增删改查)
+			//编写具体请求的方法
+			//调用service和dao完成查询数据库所有商品的操作
+			//返回一个list结合
+			//把当前的list放入request域对象中
+			//请求转发到jsp解析
+2.增加商品
+	需求：在首页有个[增加商品]的超链接，点击超链接后，能把用户录入的数据保存到数据库
+	步骤分析：
+		1.在首页加一个[添加商品]的超链接 ${pageContext.request.contextPath}/product?method=addUI
+		2.点击超链接向servlet发送请求 (请求转发到product.jsp中  防止product.jsp直接暴露在地址栏中)
+		3.用户录入数据后点击增加按钮 向servlet发送请求     
+									${pageContext.request.contextPath}/product?method=add(有丢失参数的风险)
+						  解决方式：<input type="hidden" name="method" value="add">
+		4.在add方法中
+			//获取表单中的所有数据  map
+			//创建product
+			//把map中的数据拷贝到product中
+			//把pid(UUID)和pdate存放到Product中
+			//调用service和dao完成数据保存操作
+			//请求转发到查询所有的链接上   /product?method=findAll
+			//如果有异常需要请求转发到error.jsp页面
+3.修改商品
+	需求：点击列表中商品后面的修改按钮，就可以对当前商品信息进行修改，
+	跳转到修改的表单页面(数据是已经填写好的)，在此基础上进行修改，点击修改按钮后，在数据库中更新该条数据
+	
+	
+4.删除商品
+	需求：点击列表中商品后面的删除按钮，点击后，弹出[确认删除该条商品吗？]的提示,点击确认，则删除该条商品，点击取消，不执行删除
+5.批量删除商品
+
+6.模糊查询
+
+7.分页

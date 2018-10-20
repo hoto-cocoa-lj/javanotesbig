@@ -1,0 +1,93 @@
+1.批量删除商品
+	需求：根据数据前面的复选框选中情况，批量删除选中的数据
+	步骤分析：
+		1.拷贝day17  修改web
+		2.为表头和列表加上复选框，加上删除勾选的按钮
+		3.使用jquery实现全选全不选的功能
+			//导入jquery.js文件
+			//派发单击事件
+			//获取表头复选框的选中状态
+			//获取列表中所有复选框对象
+			//使列表中复选框状态和表头复选框状态保持一致
+		4.为列表复选框添加name属性和value  外面嵌套一个form表单  在点击删除勾选的时候派发一个click事件，让事件方法拥有提交form表单的功能
+		5.servlet的操作
+			//获取前台传递的id数组
+			//调用service
+		6.service操作
+			//开启事物
+			//遍历数组
+			//调用dao删除
+			//提交事物
+			//出现异常,回滚事物
+		7.dao操作
+			//获取QueryRunner对象
+			//编写sql
+			//执行sql(手动获取连接)
+		
+2.模糊查询
+	需求：在列表页面有按照名称和关键字查询的两个输入框，输入查询信息后，点击搜索按钮，那么在下面的列表中会显示出符合条件的数据
+	select * from product where pname like ? and pdesc like ?
+	select * from product where pname like ?
+	select * from product where pdesc like ?
+	select * from product
+	
+	StringBuffer sb = new StringBuffer("select * from where 1=1");
+	
+	//判断输入的搜索项是否为“”
+	if(name!=""){
+		sb.append( and pname like ?)
+	}
+	
+	if(kw!=""){
+		sb.append( and pdesc like ?)
+	}
+		
+	
+	
+3.分页
+
+	需求：针对于从数据库查询的多条数据，展示在一个页面上  分页数展示
+	作用：提高用户的体验度
+	
+	物理分页：用户需要看那一页的数据，那么就从数据库中查询出来当页的数据
+	逻辑分页：把数据库中的所有数据查询出来，保存到内存中，当用户需要看某一页的数据的时候，直接从内存中读取
+	
+	mysql数据库分页：
+		limit n,m  （n是查询的索引，m查询几个）
+		
+	第一页： 0 3
+	第二页： 3 3
+	第三页： 6 3
+	第n页：  (当前页-1)*m ,m
+	
+	
+	分页需要的数据：
+		1.页面展示的内容    select * from product limit (当前页-1)*m ,m
+		2.每页显示的条数    自己规定
+		3.当前页            从前台传递过去
+		4.总条数            select count(*) from product  
+		5.总页数            总条数/每页显示的条数  向上取整
+		
+	后台实现：
+	封装为PageBean
+		1.List list;   //页面展示的内容 select * from product limit (pageNumber-1)*pageSize ,pageSize
+		2.int pageSize;  //每页显示的条数    自己规定
+		3.int pageNumber  //当前页            从前台传递过去
+		4.int pageCount   //总条数 select count(*) from product 
+		5.int pageTotle   //总页数     (int)Math.ceil(pageCount*1.0/pageSize)
+		
+	前台实现：
+	[上一页]1 2 3 4 5 6 7[下一页]  第几页/共几页
+		
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
