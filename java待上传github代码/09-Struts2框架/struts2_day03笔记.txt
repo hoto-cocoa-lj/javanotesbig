@@ -1,0 +1,235 @@
+					
+					struts2_03
+
+
+今日内容:
+		值栈内容  
+		OGNL内容
+
+
+重点: 怎么将数据放在值栈中
+      怎么样在页面通过ognl获取值栈中存的数据
+	
+		 
+
+
+技术分析: OGNL内容
+	  
+	  ognl是一种功能强大的表达式语言  (el jstl)
+	
+	  ognl是一门单独的表达式语言 struts2看它强大 把它整合到自己里面,用它当成了自己的默认表达式语言
+	  
+	  总结: struts2的页面表达式语言就是 ognl
+
+
+	  作用:
+		 1 可以调用对象的方法(了解)
+		 2 可以调用类的静态属性(了解)
+		 3 可以调用类的静态方法(了解)
+				-------以上方式不是struts2要用的
+
+		 4 可以获取值栈中的数据(掌握)
+
+
+	OGNL通过演示了解方法进行快速入门:
+			条件: ognl表达式不能在struts2中单独使用,必须要嵌套进struts2内置标签中使用
+				    对于struts2内置标签:今天写了几个 会用几个就OK
+				    <s:property value="OGNL表达式"/>
+
+			<!-- 通过ognl表达式条用String的长度方法  -->
+			hello的长度是: <s:property value="'hello'.length()" /><br/>
+			<!-- 可以调用类的静态属性 条件:@全限定名@属性 -->
+			π的长度:<s:property value="@java.lang.Math@PI" /><br/>
+			<!-- 可以调用类的静态方法   
+			条件: @全限定名@方法 
+				 需要开启静态方法的使用 (默认struts2在ognl中对静态方法的执行是关闭的)
+			-->
+			随机数是: <s:property value="@java.lang.Math@ramdom()" />
+
+
+			<!-- 主要: <s:property value="获取值栈的数据" />  -->
+			
+			聊一聊值栈...
+	
+			
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+值栈内容:  
+
+    一:	什么是值栈?
+		值栈: ValueStack
+		struts2提供的一个接口:ValueStack
+		我们用的是它的实现类:OgnlValueStack (不是咱们创建,是struts2来创建)
+
+		在javaweb阶段,我们使用域来当成数据的中转站   数据--->域对象中--->页面(el,jstl)
+					域对象的底层结构:
+						     Map
+
+		在struts2中,我们使用值栈来当成数据的中转站  数据---->值栈对象中-->页面(ognl) ps:el同样可以获取到值栈中的数据
+					值栈对象的底层结构:
+						      里面有2块区域(root区域 context区域)
+						      root:list
+						      context:map
+
+
+			
+		结论: 值栈用来存数据
+
+		
+		问题: ValueStack是有谁创建的,又是什么时候创建的 ? 
+		    
+		     当浏览器访问action的是时候,会被前端控制器给拦截住(StrutsPrepareAndExecuteFilter)
+		     在前端控制器中,自动创建ValueStack对象(特点: 访问一次action,创建一次ValueStack对象)
+
+		     当值栈对象被创建出来之后,会将当前访问的action对象整个放在值栈
+		     还会将request,session,servletContext的底层用来封装数据的map集合也放在值栈中
+		     (特点:放的是地址引用)
+
+		     当整个action执行完毕后,action会销毁,值栈也跟着销毁
+		     下一次再访问,又是一个新的action对象和一个新的值栈对象
+		     所以:值栈的生命周期是伴随action一生的
+
+
+		
+     二: 值栈的内部结构?
+		 1 获取值栈打断点来看的
+		 2 通过struts2的内置标签可以将整个值栈结构的数据显示页面
+		
+		
+    
+    三: ActionContext与值栈的关系? (为什么就能通过ActionContext获取值栈对象)
+		 当浏览器访问action的时候,会创建值栈对象,还会创建ActionContext对象
+		 最后把整个值栈放在actionContext中,然后把整个actionContext与当前线程
+		 绑定
+		 
+		 问题:怎么保证action中获取的actionContext就是自己的 不是别人的?
+			将整个actionContext放在当前线程中 进行传递
+					threadLocal(当前线程,actionContext);
+		 
+
+    四:  值栈的获取方式? 
+		
+		ActionContext.getContext.getValueStack()
+
+			
+
+
+
+
+
+    五: 如何操作ValueStack?
+
+	   1 往ValueStack的root区域存数据  
+			      
+			      1 action的属性方式 (掌握) 99%
+						action的成员属性数据都会在root区域中
+						因为整个action都在值栈中
+
+				
+			      
+			      
+			      2  ValueStack的API的方式
+					push(Object obj) push对象   存对象 (掌握)
+					ValueStack.push();  对象用push  
+							 底层:
+								getRoot()  获证整个root区 (不用 理解的)
+								ValueStack.getRoot().push()
+					
+	  
+	  2  往ValueStack的context区域存数据   了解 
+
+		
+			
+
+
+	六: el也可以获取到值栈中的数据(了解)
+
+	<!-- el的方式来获取Context数据(了解) -->
+			${sessionScope.sessionmsg} --->${sessionmsg }<br/>
+			${applicationScope.contextmsg} --->${contextmsg }<br/>
+			${requestScope.requestmsg} ---${requestmsg }<br/>
+		el ${属性名} 以前依次从 pageContext,request,session,application查找
+			
+
+	
+	底层:
+		之前的el的${msg1} 
+			先调用pageContext.getAttribute(..)
+				获取到,立即返回
+				获取不到,继续调用
+					request.getAttribute(..)  struts2增强了
+						获取到,立即返回
+						获取不到,获取root区找,root区回去context区找
+						
+						如果都没找到 继续调用
+							session.getAttribute(..)
+								获取到,立即返回
+								获取不到,继续调用
+									application.getAttribute(..)
+										获取到,立即返回
+										获取不到,返回""
+										
+	
+	在struts的el的底层:装饰者模式
+		包装了request.对request.getAttribute方法进行了增强.
+			先依次以以前的方式查询
+			若都没有查询到,调用了 valueStack.findValue(..)从值栈中查找
+				
+		以前的: pageContext,request,session,application
+			struts包装以后
+			最终: pageContext,request,root区,context区,session,application
+
+
+
+
+总结: 作业:
+       数据-->root区域	------------------------------------------>ognl获取
+	        成员位置 (String int 对象 list...)
+		     :Property Name				<s:property value="Property Name">
+								
+		push 底层:add(0)				 ${Property Name}
+		     : 栈顶
+
+
+	context区域: 了解
+
+
+
+-----------------------------------------------------------------------------------------------
+
+
+ognl中的3个特殊符号:	#  %  $
+
+request
+
+
+#的作用:
+	  1 获取context区域中的数据 
+	
+	  2 可以手动构建一个集合(了解) (struts2提供了很多的页面UI)
+
+		<!-- 手动构建的list集合 -->
+		<s:iterator value="{'aa','bb','cc'}" var="ll">
+				<s:property value="#ll"/>
+		</s:iterator>
+		<!-- 手动构建的map集合 -->
+		<s:iterator value="#{'aa':'111','bb':'222','cc':'333'}" var="mm">
+					<s:property value="#mm.key"/>----><s:property value="#mm.value"/><br/>
+		</s:iterator>
+
+		<s:radio list="{'男','女'}" name="sex"></s:radio> 
+		<s:radio list="#{'1':'男','2':'女'}" name="sex"></s:radio>
+
+
+%的作用:
+	强制将标签内容转换成ognl表达式
+	<s:textfield value="%{#request.abcd}"></s:textfield>
+	
+
+
+$的作用:  ${值栈中的数据}
+	  可以在struts.xml配置文件中获取值栈的数据
+
+

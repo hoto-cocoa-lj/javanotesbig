@@ -1,0 +1,260 @@
+
+
+						
+ssh 
+	hibernate+struts2+spring
+
+ssm
+	mybatis+springMVC+spring
+						
+										
+						spring
+
+5天spring的学习介绍:
+			第一天: spring的入门(IOC入门)beanFactory (工厂+反射+配置文件)
+
+			第二天: spring的IOC注解开发
+
+			第三天: spring的AOP     动态代理(jdk的动态代理---有接口   cglib的动态代理--有类)
+
+			第四天: spring的声明式事务  (对比编程式)
+
+			第五天: SSH的整合(hibernate+struts2+spring)
+
+
+spring的3大知识点:
+			IOC+DI
+
+			AOP
+
+			声明式事务
+
+
+
+技术分析:  spring的入门
+
+
+
+		一: spring的概述
+
+			spring: 是java 分层的se/ee的full-stack(一站式) 开源框架
+			      
+				为EE的每一层都提供了解决技术:
+				 web: struts2  springMVC
+				 service: spring(IOC AOP 声明式事务)
+				 dao: hibernate  springJDBCTemplate
+
+
+			spring的作用	
+				解耦合
+				声明式事务
+				集成junit更加方便的进行分层测试
+				对优秀框架进行集成
+				.....
+
+			spring的体系结构:
+				 见图
+
+
+		二: spring的IOC快速入门
+			 
+			 IOC: 控制反转 
+			
+			      思想大白话: 把创建对象的权利交给spring了
+			      底层技术支持: 工厂+反射+配置文件 (spring都封装好了)
+			      解决的问题: 解耦合
+
+
+			spring的环境搭建:
+					1 导包:  
+						beans core context expression
+
+						spring在运行的过程中 会加载一个日志包 
+						commons-logging.jar  提供了日志功能 但是企业不用它记录日志
+
+						apache--log4j.jar   企业开发用的最多的是它记录日志
+								    log4j.properties
+
+						spring在加载的过程中会加载commons-logging.jar日志包
+						commons-logging.jar日志包的内部会看有没有apache--log4j.jar包
+						如果有 就是用commons-log4j.jar功能来记录日志
+						如果没有 就使用自己的 
+
+					
+					2 创建一个类 
+
+
+					3 在src下面有一个配置文件 建议用: applicationContext.xml
+							所有约束都抽出来放在一个html文件中
+							/spring-framework-4.2.4.RELEASE/docs/spring-framework-reference/html/xsd-configuration.html
+
+					4 测试
+
+		
+		
+		三: ioc的配置文件内容
+
+				bean标签: 指定要实例化的对象
+				   id属性: 唯一标识 可以为任意值 但是整个xml唯一
+				   class属性: 类的全限定名 就是通过它反射该类的实例对象
+				   scope属性: 范围
+					重点:
+					singleton: 单实例 默认值
+						 配置文件只要一加载 就会创建该实例对象 放在spring容器中 (Map<user,实例对象>)
+						 注意:只创建一次
+						 当每个人过来要的时候(getBean("user")) 从spring容器中获取的都是同一个实例对象
+					
+					prototype: 多实例
+						 配置文件只要一加载 不创建该实例对象 
+						 当所有人过来要的时候(getBean("user")) 才创建该实例对象 放在spring容器中
+						 注意:获取一次 创建一次 放在spring容器中
+				  
+				   了解:
+				   init-method属性: 指定初始化的方法
+				   destory-method属性:指定销毁的方法
+					 singleton:
+			 		 初始化:配置文件加载的时候 创建对象并且初始化
+			 		 销毁:容器销毁 对象跟着销毁
+				  
+					 prototype:
+					 初始化:当getbean()的时候  创建对象并且初始化
+			 	  	 销毁: 长时间不用 java垃圾回收自动回收
+
+
+
+			   import标签:导入外部的配置文件
+				   resource属性:外部配置文件的地址
+
+
+			
+			bean的三种创建方式
+				 1 无参构造器创建 (掌握) 99%
+					<bean id="user" class="cn.itcast.demo02.CarImpl"></bean>
+				 
+				  条件:需要先有个工厂
+				 2 静态工厂创建 (了解)
+					<bean id="user" class="cn.itcast.demo02.BeanFactory" factory-method="createCar"></bean>
+				 3 实例工厂创建 (了解)
+				        <bean id="factory" class="cn.itcast.demo02.BeanFactory"></bean>
+					<bean id="user" factory-bean="factory" factory-method="createCar2"></bean>
+
+
+		       spring的DI
+				DI: 属性的依赖注入
+
+			大白话: spring在通过ioc创建这个对象的时候,如果这个对象还有属性,就一并给赋值进去
+
+			DI是在IOC的基础上进行对象的属性注入的
+
+
+			DI的属性注入方式:
+				构造器属性注入(了解)
+					条件:得有有参构造器
+					<constructor-arg name="name" value="rose"></constructor-arg>
+				P名称空间属性注入(知道)
+					 条件:需要导入p的名称空间
+						xmlns:p="http://www.springframework.org/schema/p"
+					      底层用的还是set方式 属性需要有set方法
+						<bean p:属性名="肉丝" p:属性名-ref="car" >
+					
+					
+				
+				set属性注入(掌握)
+					条件:类的属性需要有set方法
+					<property name="name" value="jack"></property>
+				
+				基本类型和String  value
+				对象类型 ref
+				复杂(map,list []...)属性注入(掌握)
+					 set方式注入赋值属性值
+				<property name="ss">
+	   	 	 		<!-- 数组类型 -->
+	   	 	 		<list>
+	   	 	 			<value>aaa</value>
+	   	 	 			<value>bbb</value>
+	   	 	 			<value>ccc</value>
+	   	 	 		</list>
+				 </property>
+				 
+				 <property name="ll">
+						<!-- list类型  -->
+						<list>
+							<value>111</value>
+							<value>222</value>
+							<ref bean="car"/>
+						</list>
+				 </property>
+	   	 	 
+				 <property name="mm">
+					<!-- map -->
+					<map>
+						<entry key="k1" value="aaa"></entry>
+						<entry key="k2" value="bbbb"></entry>
+						<entry key="k3" value-ref="car"></entry>
+					</map>
+				 </property>
+				 
+				 <property name="properties">
+					<!-- properties类型 -->
+					<props>
+						<prop key="hibernate.username">root</prop>
+						<prop key="hibernate.password">1234</prop>
+					</props>
+				 </property>
+			 </bean>
+
+
+					
+			
+		
+		
+		
+		四: ioc的AIP内容
+			ApplicationContext:接口
+				2个常用的实现类:
+					ClassPathXmlApplicationContext
+							从src下加载配置文件
+					
+					FileSystemXmlApplicationContext
+							从磁盘路径下加载配置文件
+
+					
+					
+					默认情况:配置文件只要一加载 就创建对象
+					scope:singleton
+
+		
+		扩展: beanFactory接口下的实现类加载配置(过时了)--忘了吧
+
+				   beanFactory加载配置文件 
+				   默认情况下 配置文件被加载不会创建对象
+				   get的时候 才创建
+
+
+		BeanFactory factory = new XmlBeanFactory(new ClassPathResource("applicationContext.xml"));
+		User user1 =(User)factory.getBean("user");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+
+
+
+

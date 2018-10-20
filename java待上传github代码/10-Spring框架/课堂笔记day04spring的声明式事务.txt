@@ -1,0 +1,361 @@
+	
+spring的ioc和di
+	ioc:创建对象
+		 无参构造器方式
+		 <bean id=""  class="" ></bean>
+
+	di:给对象属性赋值
+		  有参构造器
+		 <constructor-arg></constructor-arg>
+		  set方式
+		  <property name="" value="" ref=""></property>
+		  name: 要赋值的属性名
+		  value:要赋的属性值 只针对基本类型和String
+		  ref: 要赋的属性值  针对的是对象类型 bean的id值
+		  复杂属性:
+				数组
+				list
+				    ------<list>
+    						<value></value>
+    					  </list>
+
+				map
+					---<map>
+    						<entry></entry>
+    					   </map>
+
+				properties
+					----<props>
+    						<prop key=""></prop>
+    					     </props>
+
+
+
+
+Spring的AOP
+	 底层:动态代理
+	 思想:将一些共性的内容进行抽取 在需要用到的地方以动态代理的形式进行插入
+	 在不修改源码的基础上 还能对源码进行前后的增强
+	
+底层:企业开发不会自己写 因为全都封装好了
+				
+继承   httpServletRequest request; 是tomcat帮你们创建出来的
+    缺点: 需要知道要继承的父类是谁	
+
+装饰者模式
+	缺点: 需要有接口  save()   100个方法
+	      这个接口下除了要增强的方法以外,别的方法也得实现
+
+动态代理
+	jdk的动态代理  save()   100个方法
+		  需要有接口 可以指定只增强这个接口下的哪个方法
+	
+	cglib的动态代理
+		 不需要有接口 也可以指定增强方法
+		 确定:代码写的多 
+
+
+
+AOP的回顾:
+	  1 导包
+		AOP联盟
+		spring-aop.jar
+		aspectj.jae
+		spring-aspects.jar
+
+	 2 编写
+		 1 确定目标类 (里面有切入点 要被增强的方法)
+
+		 2 确定切面类 (里面有通知/增强  有增强方法)
+
+		 3 织入的配置  (把增强方法指定在切入点之前,之后,环绕,异常,最终执行)
+
+			
+						
+						
+						Spring_04
+
+
+一: spring的 jdbcTemplate
+	jdbcTemplate是spring提供的dao层用来和数据库数据交互的技术
+ 
+回顾dao层操作数据库数据的技术:  
+	    1 jdbc+c3p0            任何代码要想操作数据库的数据都得遵循jdbc规范
+	    2 dbutils		   apache组织提供的对jdbc+c3p0的封装
+	    3 hibernate		   对jdbc+c3p0的封装
+	    4 jdbctemplate         spring对jdbc+c3p0的封装
+	    5 hibernateTemplate    spring对hibernate又封装一次
+	    6 mybatis		   对jdbc+c3p0的封装
+	    7 SqlMapClientTemplate sping对mybatis又封装一次
+
+A  mybatis
+B  dbutils
+c  hibernateTemplate
+
+		
+	   jdbctemplate -------- dbutils
+
+	dbutils:  apache
+		  QueryRunner qr=new QueryRunner();
+		  qr.setDataSource(连接池)
+		  String sql="crud"
+
+		  qr.update()
+		  qr.query()
+
+
+	jdbctemplate: spring
+		 jdbctemplate qr=new jdbctemplate();
+		  qr.setDataSource(连接池)
+		  String sql="crud"
+
+		  qr.update()
+		  qr.query()
+
+
+	jdbctemplate的开发步骤:
+		  1 导包
+			 spring-jdbc.jar
+			 spring-tx.jar 
+
+		  2 对数据库的数据进行crud操作
+
+		  3 作业: 在dao层使用jdbctempate对数据库数据进行crud操作
+				写2遍即可
+
+		 
+	jdbctemplate在dao层有2种注入方式:
+			 set方式注入  能使用注解
+			 继承的方式  让jdbctemplate继承JdbcDaoSupport 不能使用注解
+
+	hibernateTempalte也有这2中方式
+
+
+-----------------------------------------------------------------------------------------------------------
+
+
+二: spring的声明式事务
+
+		回顾事务: 面试题
+
+		事务有什么特性: ACID
+		原子性: 一件完成的事情,要不全部成功 要不全部失败
+			转账: 加钱 减钱
+		一致性: 事务的前后,数据总数不发生变化
+			jack 1000   rose 1000   2000
+			jack 500    rose 1500   2000
+		持久性: 只要事务已完成(提交),数据就会到数据库中
+
+		隔离性: 事务具备隔离性,如果没有隔离性,会发送读取数据的问题
+
+		不具备隔离性的话,会发生什么问题: 
+			 会发送读取数据的问题
+				脏读: 在一个事务中,读取到了另一个事务还没有提交的数据   必须杜绝的
+						ps:所有的数据库都自动避免的脏读
+				重复读:在一个事务中,2次读取到的数据内容不一致(update)    可以允许
+				虚读/幻读:在一个事务中,2次读取到的数据内容不一致(insert) 可以允许
+
+		可以通过调整数据库的隔离级别,避免以上问题的发生:
+			设置隔离级别
+					read uncommitted 效率最高 安全最低
+					read committed oracle
+					repeatable read mysql
+					serializable  安全最高 效率最低
+
+
+		事务的编写:
+			   1 获取连接
+			   2 通过连接开启事务 
+				  con.setAutoCommit(false)
+				  con.commit()
+				  con.rollback()
+
+
+			开启事务(spring提供的方法) 增强的方法
+		    save() 切入点
+			提交事务(spring提供的方法) 增强的方法
+
+
+	 我得让spring提供的事务方法在指定的save之前执行,在save之后执行 ------AOP
+
+			
+					
+
+以前的事务都得自己来编写操作,那spring给我们提供好了一套操作事务的封装,只要拿过来用即可
+
+spring给我们提供了2种操作事务的方式:
+
+API的方式 ---硬编码方式  可以将提供好的API以代码的方式进行事务的控制 (没人用)  纯编码方式
+
+		PlatformTransactionManager: 平台事务管理器  spring提供接口 封装事务的方法
+				 提交方法
+				 回滚方法
+				我们要用只能找这个接口的实现类来用:
+						DataSourceTransactionManager: dbutils jdbcTempalte  connnection
+							切面类	 提交方法 回滚方法  通知/增强
+						HibernateTransactionManager: hibernate hibernateTemplate session	
+
+		
+		TransactionDefinition:事务的定义信息对象
+			设定/获取:
+				  事务的隔离级别 (默认获取的就是数据库的隔离级别)
+				  事务的超时时间 (默认 time=-1 永不超时 )
+				  事务的是否只读 (默认 rederOnly=flse 可以做任何的crud操作)
+
+				  事务的传播行为:
+					     解决的事情: 事务嵌套事务的问题
+					   应用场景: service:  a() b() a方法有事务 b方法也有事务 在a方法中调用b方法 问:使用谁的事务
+
+					   REQUIRED(默认值): 查看当前是否有事务,如果有事务使用当前的事务,如果没事务给当前创建一个事务
+					    a方法调用b方法:
+						 b先看看a有没有事务,如果a没有事务,就为创建一个事务,大家一起玩
+								    如果a有事务,就放弃自己的事务,加入到a的事务中,一起玩
+
+					   让所有方法都在一个事务中
+
+					   SUPPORT: 查看当前是否有事务,如果有事务就使用当前的事务,如果没事务就使用非事务
+
+					   a方法调用b方法:
+						    b先看看a有没有事务,如果a有事务,加入到a的事务中一起玩
+									如果a没有事务,就全部放弃事务,使用非事务执行
+
+		TransactionStatus 运行状态对象
+				时时查看事务的运行状态信息
+				查看当前事务是否完成
+				查看是否为新的事务
+				查看是否回滚
+				....
+
+
+
+
+配置文件的方式 ---xml方式 (重点) 底层就是API的封装 直接以xml方式告诉给sping即可 xml配置的方式
+	
+需求: jack给rose转账
+
+		1 导包
+			spring-tx.jar
+		2 事务依赖aop
+			AOP联盟
+			spring-aop.jar
+			aspectj.jar
+			spring-aspects.jar
+
+		3 编码
+			1  确定目标类 (TranFerServiceImpl --tranfer)
+
+			2  确定切面类 (用人家的 因为spring有一个类,里面都是事务的方法)
+				DataSourceTransactionManager
+					     提交
+					     回滚
+			   增强方法:都是关于事务的
+			   细节: 得为配了这些事务增强方法的tanfer配置一些事务参数
+						    是否只读
+						    超时时间
+						    传播行为
+
+			3 配置织入 
+				 专门针对事务的标签
+				 指定那个事务用于那个切入点
+
+
+
+
+
+
+
+
+
+
+	    导包:
+		   spring-tx.jar
+
+	    
+	    配置在指定的方法前后用事务 (AOP)
+
+	   AOP导包:
+		     AOP联盟
+		     spring-aop.jar
+		     spring-aspets.jar
+		     aspectj.jar
+
+
+	   配置:
+		  1 目标类:tranFerService  里面有切入点 (tranfer)
+
+		  2 切面类  DataSourceTransactionManager   里面有事务的增强方法
+			细节1:为使用 DataSourceTransactionManager里面的事务方法配置一些事务的参数
+
+		  3 配置织入
+			细节2: 使用事务单独的标签来配置
+				<aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut1"/>
+		
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		注解配置: xml+注解(企业开发)
+				
+			   别人的 用xml
+
+			   自己的 用注解
+				<context:component-scan base-package="cn.itcast"></context:component-scan>
+
+			   事务的注解2步:
+					指定开启事务的注解 告诉spirng使用的事务方法是谁的方法
+						<tx:annotation-driven transaction-manager="PlatformTransactionManager"/>
+
+					在方法上或则是类上配置:
+						@Transactional
+
+
+
+注解的方式配置:
+	<tx:annotation-driven transaction-manager="platformTransactionManager"/>
+					告诉spring用的是谁的事务方法
+	
+	@Transactional(切入点)
+		   将platformTransactionManager里面的事务方法给该方法增强
+
+代替:
+<tx:advice transaction-manager="platformTransactionManager" id="txadvice">
+    	<tx:attributes>
+    		给使用事物的这个方法配置一些事务的参数
+    		<tx:method name="*" />
+    	</tx:attributes>
+    </tx:advice>
+    
+   	 配置织入过程 
+    <aop:config>
+    		配置方法和切入点 
+    		<aop:pointcut expression="execution(* cn.itcast.service.TransferServiceImpl.transfer(..))" id="pointcut1"/>
+    		<aop:advisor advice-ref="txadvice" pointcut-ref="pointcut1" />
+    </aop:config>
+
+
+
+
+全注解的方式配置事务(了解即可)
+		条件: 需要注解类
+
+		@EnableTransactionManagement 
+		// <tx:annotation-driven transaction-manager="platformTransactionManager"/>
+
+		@Qualifier("c3p0") DataSource ds:参数配置
+		
+
+
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			

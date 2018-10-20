@@ -1,0 +1,278 @@
+					
+					商城案例实现_01
+
+
+
+数据库和表关系的建立 都是有项目经理去完成 而我们的重点在于模块功能的实现
+	 熟悉项目:
+		  1 熟悉这个项目有多少个模块  熟悉模块功能 
+		  2 熟悉数据库(store)以及数据库的表(很多)
+		  3 熟悉每一个模块功能的数据CRUD都和那张表有关
+
+
+
+
+项目的实现---模块功能实现
+OA系统---一起开发
+	一个人开发一个模块,而一个模块中包含很多的功能
+
+
+分析网上商城项目需要做多少个模块?
+		用户模块
+			很多 比如:注册(state=0) 登录 发激活邮件(1) 判断登录有没激活(if(state=0)else())....
+			数据都保存在数据库(store)  user用户表
+		
+		
+		
+		
+		
+		分类模块
+		商品模块
+
+		购物车模块(难点)
+		
+		订单模块
+
+
+
+
+
+今日任务:  (用户模块)
+	1 用户注册
+		1 将用户的注册信息存到数据库
+		2 数据库存完数据,给该用户的email发送激活邮件
+		 
+	2 用户激活
+		1 打开邮箱,点击激活邮件
+		2 做激活功能
+	
+	3 用户登录
+		1 输入用户名和密码,如果错误了,还回到登录页面显示用户名或者密码错误
+		2 用户名和密码登录成功,还有判断是否激活
+		3 如果用户名和密码登录成功,而且激活成功了,将用户放在session域中,带到首页显示
+		
+	4 用户退出
+		将session的user数据给移除掉
+
+
+	涉及的表: User表
+
+			
+
+
+		
+		
+今日难点:
+	  自定义首页的好处
+
+	  web-inf下的资源访问问题 (不在jsp访问jsp)
+	
+	  servlet工具类的抽取(baseServlet)
+			在企业级开发中: 并不是一个功能一个servlet
+				而是一个模块一个servlet
+				一个serlvet中有这个模块下的所有功能
+						UserServlet  --用户模块
+						CategoryServlet ---分类模块
+						ProductServlet--商品模块
+						...
+		
+
+
+
+点击--serlvet(那数据封装到对象)---jsp页面获取
+///////////////////////
+
+
+
+
+
+1.数据库和表
+		create database store;
+		use store;
+
+用户表:
+		CREATE TABLE `user` (
+		  `uid` varchar(32) NOT NULL,   
+		  `username` varchar(20) DEFAULT NULL,
+		  `password` varchar(20) DEFAULT NULL,
+		  `name` varchar(20) DEFAULT NULL,
+		  `email` varchar(30) DEFAULT NULL,
+		  `telephone` varchar(20) DEFAULT NULL,
+		  `birthday` date DEFAULT NULL,
+		  `sex` varchar(10) DEFAULT NULL,
+
+		  `state` int(11) DEFAULT NULL,  // 0 未激活  1 已激活    
+		  `code` varchar(64) DEFAULT NULL,  // 激活码  UUID+UUID+UUID
+		  PRIMARY KEY (`uid`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+	
+
+
+
+
+servlet工具类的抽取:
+	之前编写的servlet的问题:
+		1.doget每次请求都会执行
+		2.用了大量 if else if 判断执行的是那个方法让方法执行
+			Method method = this.getClass().getMethod(mt, HttpServletRequest.class,HttpServletResponse.class);
+			method.invoke(this, request,response);
+		3.每个方法执行的结果无非就是请求转发或者重定向或者打印数据
+			让所有的方法都返回一个字符串
+				若最后的结果需要请求转发,就把转发的路径给返回
+				若最后的结果不需要请求转发,就返回一个null
+				
+				String path=method.invoke(this, request,response);
+				if(path != null){
+					request.getx(path).forward(...)
+				}
+		4.所有servlet的service中的代码都一样
+			向上继续抽取
+			编写一个BaseServlet,将之前方法中的代码复制过来即可,
+			然所有的servlet都继承baseservlet即可
+
+		
+
+/////////////////////////////////////////
+案例1-用户注册	
+需求:
+	在register.jsp上填写用户的信息,点击保存,将用户信息保存到数据库中
+
+
+
+步骤分析:
+		1 打开注册页面 填写表单数据 点击提交
+		2 serlvet端: 获取所有提交的数据 将map的数据封装给javabean 传递给service
+				 需要的jar包: beanUtils
+
+		3 service端: 直接带着对象调用dao
+
+		4 dao端: 带着对象的数据做添加操作  insert into user value(对象.get属性,对象.get属性,对象.get属性,对象.get属性...)
+				需要的jar包: 
+						dbutils
+						mysql驱动
+						c3p0包
+
+		5 发邮件
+			1 使用邮件工具类进行邮件的发送
+				    1 给谁发 
+				    2 发送的内容
+					  1 超链接 当人家去邮件里面激活 得写激活方法 地址
+							http://localhost:8080/stores/user?method=active
+					  
+					  2 需要传递参数 因为在写激活功能的时候 需要根据参数查该用户是否还在数据库中
+
+			MailUtils.sendMail(email, emailMsg);
+					email=user.getEmail=jack@heima297.com
+					emailMsg=active?code=user.getCode 
+							179ec77c5ac04cb8b914b78e5dab8aeb6d7ef3fdaef144f7a9504f88f55d5f6c
+
+
+
+		6 到页面展示成功信息
+
+
+
+
+
+		
+
+
+
+
+
+
+				
+
+	
+///////////////////////////////	
+案例2-用户激活	
+需求:
+	用户登录邮箱之后,点击邮箱中的连接,完成用户激活操作
+
+
+
+	用户激活:
+			1 根据激活码判断当前的用户是否还在数据库中(是否激活失效)
+				不在
+				     做提示消息: 重新注册
+				在
+				     修改state=1
+
+
+			2 如果激活成功,做提示消息:去登录
+
+
+
+
+
+步骤分析:
+	1.点击邮箱中的连接	,向商城userservlet发送一个请求
+		user?method=active&coed=xxxx
+	2.在userservlet中编写active方法
+		接受code
+		调用service完成激活 返回值:user
+		生成提示信息 转发
+	3.在service中编写激活方法
+		通过code获取用户
+			若没有找到:提示重新激活或者重新注册
+			若找到了 
+				设置激活状态 1
+				
+	4.在dao需要编写两个方法
+		getByCode
+		update
+///////////////////////////////////
+案例3-用户登录
+需求:
+	在一个登录页面上,输入用户名和密码,点击登录,完成登录操作
+
+
+ 用户登录
+		
+		1 在login.jsp上,有一个form表单,填写用户名和密码
+		2 当点击提交,将用户名和密码提交到servlet
+		3 在servlet端: 带着用户名和密码调用service
+		4 在service端: 带着用户名和密码调用dao
+		5 在dao端: 根据用户名和密码查询数据库
+		6 根据返回值,判断是否查询成功
+				没查到: 
+					还到login.jsp页面显示错误信息
+
+				查到了:
+					1 继续判断是否激活
+						没有:
+							提示还没有激活,不能登录,请先去邮箱激活
+						有:
+							将用户信息装到域对象中,带到首页展示用户信息
+							\
+		7 在首页上,通过el,jstl的判断来显示用户数据
+
+		
+		
+
+///////////////////////////////////
+///////////////////////////////////
+案例4-用户退出	
+需求:
+	点击 index.jsp上 退出连接,退出当前的用户,跳转index.jsp
+步骤分析:
+	1.点击 index.jsp上 退出 连接,向userservlet发送请求
+		/user?methode=logout
+	
+	2.在userservlet中编写logout方法
+		销毁session
+		重定向到index.jsp
+		
+			
+		
+///////////////////////////////////		
+///////////////////////////////////
+
+		
+		
+		
+		
+		
+		
+		
+		

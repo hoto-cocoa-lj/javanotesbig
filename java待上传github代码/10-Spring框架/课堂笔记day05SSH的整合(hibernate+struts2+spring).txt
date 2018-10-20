@@ -1,0 +1,173 @@
+					
+					Spring_SSH整合
+
+
+
+ 
+  1  原始版本 (过渡期)
+
+	       1 导包 
+
+			hibernate:  lib/required/*  c3p0 驱动包 日志包
+				xxx.hbm.xml
+				hibernate.cfg.xml
+				LOG4J.XML
+
+
+			struts2: apps/blank/lib/*
+				struts.xml
+				web.xml
+
+			
+			spring: 4个核心+2个日志+4个aop+jdbc+tx+test
+				applicationContext.xml
+
+
+			ps: 将重复有冲突的包进行删除
+					javassist-3.11.0.GA.jar
+
+
+
+	     2 测试
+			有一个表单,一提交,就把表单数据放在数据库中
+
+
+
+  2 XML的配置版本(知识点) ---重点
+
+		1 spring整合web应用
+
+				1 spring的容器什么时候加载.并且怎么样只加载一次?  监听器
+
+				这个监听器,spring给我们提供好了,只要服务器一启动就会加载spring的配置文件
+				而且是只加载一次 这个spring提供好的监听器在spring-web.jar这个包中 只要去配置即可
+				
+				 1 导包:spring-web.jar
+				 
+				 2 在web.xml下配置监听器
+				
+				 <listener>
+						<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+				  </listener>
+				  <context-param>
+						<param-name>contextConfigLocation</param-name>
+						<param-value>classpath:applicationContext.xml</param-value>
+				  </context-param>
+
+
+
+
+		2 spring整合struts2的2种方案
+
+				条件: struts-spring-plugin.jar
+
+				1 将action的创建交给spring管理(重点)
+						1 导入struts-spring-plugin.jar
+
+						2 在application中配置action以及action的属性
+
+						3 在struts2中开启action的创建交给容器
+								<constant name="struts.objectFactory" value="spring"></constant>
+
+						4 在action配置中.class不在是全限定名根据反射创建 而是去spring容器中根据action的id值获取
+
+						注意: 如果action是交给spring管理的情况下, action必须得配置scope="prototype" 多实例
+
+
+
+				2 让struts2的容器和spring的容器互通
+						action还是struts2创建,但是属性找spring容器注入
+
+						1 导入struts-spring-plugin.jar
+
+						2 什么都不需要指定  action还是会有struts2创建 但是属性找spring容器注入
+										struts.objectFactory.spring.autoWire = name
+
+
+		3 spring整合hibernate的2种方案
+				
+				导包: spring-orm.jar
+
+				1 spring整合hibernate带配置文件
+						1 方案一:(掌握)
+						配置sessionfactory
+
+						做aop的事务管理
+
+						2 方案二:(掌握)
+						配置hibernateTemplate
+
+						
+						3 方案三: (写不了注解)
+						继承hibernateDaoSupport
+						
+
+
+
+
+				2 spring整合hibernate不带配置文件
+						在spring容器中:
+						配置数据库信息
+						配置hibernate信息
+						配置映射文件加载信息
+
+
+			总结: xml的配置文件方式--final(必须写出来)
+
+
+  
+  
+  3 注解的配置版本(一半注解一半xml文件)--重点
+
+		以后企业开发:
+				都是半注解 半xml文件
+
+
+			applicationContext:
+						dao
+						service
+						action
+
+						事务配置
+
+
+			struts2:
+				 1 导包:struts2-convention-plugin-2.3.24.jar
+
+					@Scope("prototype")
+					@ParentPackage(value = "struts-default")
+					@Namespace(value = "/")
+					@Action(value="user_save",results={@Result(name="success",location="/success.jsp")})
+
+					
+					需要注意:struts2-convention-plugin-2.3.24.jar这个包下面配置的扫描注解只去 action,actions,struts,struts2
+							<init-param>
+									<param-name>struts.convention.package.locators</param-name>
+									<param-value>web</param-value>
+	  						</init-param>
+			
+			xxx.hbm.xml
+					在持久化类上用注解方式
+					在sessionFactory 不在加载配置文件了 而是扫描包下的注解
+					<property name="packagesToScan">
+							<list>
+								<value>cn.itcast.domain</value>
+							</list>
+					</property>
+
+
+
+	业务
+  ssh
+
+  ssm
+
+	db2--webseri--(IBM)
+
+	springmvc+spring+mybetis
+
+
+	
+	
+	
+	qing6929

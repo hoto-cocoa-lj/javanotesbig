@@ -1,0 +1,134 @@
+						struts2_04
+
+
+
+
+今日内容介绍:
+	 1 struts2的核心--拦截器 (自定义拦截器)
+
+	 2 注解
+
+
+今后的开发
+	 全xml方式
+	 
+	 注解+xml方式
+		
+
+
+
+
+技术分析: struts2的核心--拦截器
+
+	  拦截器: interceptor
+
+	  当浏览器访问action的时候.会被前端控制器拦截
+	  拦截之后再执行action之前 会首先调用一组默认的拦截器执行(defaultStack)
+	  这组默认的拦截器会帮助我们把共性的内容给执行了(封装数据(ModelDriver),文件上传等())
+	  处理完毕之后才会去处理自己的action
+
+	  演示
+	  
+
+	  
+          拦截器和过滤器的区别: 面试题
+
+		  1 过滤器属于web端的技术    /* 拦截所有资源  html 图片 jsp servlet...全部都拦
+
+		  2 拦截器属于struts2的技术  /* 只拦截action  html 图片 jsp 全部放行,不拦截
+
+		  拦截器和过滤器除了内部结构不用 思想是一致的
+
+	  
+	  
+	  拦截器的作用位置:
+			
+			在action之前以及action之后都会去拦截
+			
+			拦截器和过滤器除了内部结构不用 思想是一致的
+
+
+
+	 
+	 面试题: 整个struts2的执行流程 必须能回答上来
+
+	 简化版本:  
+		当浏览器访问action ----前端控制拦截 ---->执行一组拦截器把共性的内容给处理了(例如ModelDriven)
+                拦截器执行完毕共性的内容--->找struts2.xml配置文件实例化action--->执行action的默认方法(execute)
+		执行完毕后会返回一个逻辑视图名(别名)--->返回给正在访问的action配置(result)--->指定要访问页面(默认是请求转发)
+
+
+
+
+	 
+	 详细版本:  struts2的执行流程
+		当浏览器访问action的时候,会被前端控制器拦截住执行dofilter方法,
+		在dofilter方法中会判断访问是否是action.如果不是,放行
+		如果是,会往struts2核心程序里面走
+		在核心程序中,会创建action的代理对象,但是这个代理对象并不是真正干活的对象
+		因为在它里面又调用了一个别的对象的方法(invocation.invoke())
+		这个方法会获取所有的默认拦截器,一个一个的递归判断执行
+		执行完毕所有的默认拦截器 会执行自己的action方法
+		action执行完毕会返回一个逻辑视图名给配置文件
+		配置文件接收到指定的逻辑视图名会走指定的页面
+		
+		
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		自定义拦截器: 
+			 1 需要创建一个拦截器(javabean)
+					实现Interceptor
+					继承AbstractInterceptor
+			 2 为action声明这个创建好的拦截器
+			 3 定义一个拦截器组 组里面可以放1或多个拦截器 注意:组和组可以互相调用 拦截器可以出现在多个组中
+			 4 指定执行组中拦截器
+
+
+			ps(重点): 实现Interceptor 继承AbstractInterceptor 针对的都是action的所有方法
+			    如果要针对action的某一个方法 那就得用别的(工作中使用的)
+			    继承MethodFilterInterceptor:
+				特点:没有指定某个方法,默认是拦截action的所有方法
+
+
+demo案例
+
+
+
+	      	
+	
+
+
+2 注解
+	把action从配置文件的方式变成注解的方式
+	<package name="test1" extends="struts-default" namespace="/">
+		<action name="ad4" class="cn.itcast.action.ActionDemo4" >
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+			<result name="ok">/1.jsp</result>
+		</action>
+	</package>
+
+	注解代替以上的xml配置
+
+	直接在action类上就写提供好的注解代替配置文件
+
+
+		条件 1 导包  struts2-convention-plugin-2.3.24.jar
+		     2  需要规范编写包名  只去名字叫action actions struts struts2含有这些名称包名下去加载注解
+
+
+			@ParentPackage("struts-default") 定义在action类上的 指定继承的父包
+			@Namespace("/") 定义在action类上的 命名空间
+			
+			@Action(value="ad4") 定义在方法上的 指定该方法的访问路径
+			@Action(@Result(name="oko",location="/2.jsp")}) 定义在方法上 指定返回的逻辑视图名 根据逻辑视图到指定的页面
+			这2个注解可以合并写在一起
+
+	
+
+-----------------------------------------------------------------------------------------------------
+
+作业: 
+	 对客户的保存操作做权限拦截
+		     用户登录了 做保存
+		     用户没有登录 到登录页面做提示 要求登录

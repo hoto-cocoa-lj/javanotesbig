@@ -1,0 +1,248 @@
+
+
+					struts2_01
+
+
+struts2的4天内容介绍:
+
+		    第一天: struts2的环境搭建(怎么样访问到struts2)
+
+
+		    第二天: struts2接收并封装页面的数据(属性封装 模型封装)
+
+
+		    第三天:struts2如何封装结果数据(域对象 值栈)以及带到页面展示(el+jstl, ognl表达式)
+
+
+		    第四天: 注解 拦截器(Interceptor)
+		     
+
+		    
+
+案例驱动:展示所有的客户
+		List=select * from 表;
+		
+
+技术分析:
+	    struts2
+	    hibernate
+
+  
+
+struts2的概述:
+		
+		什么是struts2?	
+			struts2: 是web层的一个框架,对web层的功能进行了封装
+			
+
+		常见的web层框架:(了解)
+			struts1
+			webWork
+
+			struts2
+			     是以webWork为核心 可以被称为webWork的第二代产品
+			     和struts1的关系 只是沿用了一个名字 体系核心差别巨大
+			springMVC
+
+
+
+struts2框架在web层的执行原理:
+			
+			见图	
+			
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////			     
+
+
+struts2框架的入门案例:
+		1 搭建环境  		
+			apps	:Struts2提供一些项目案例。(关注点)
+			  docs	:Struts2提供的开发规范和文档
+			  lib	:Struts2提供的开发jar包
+			  src	:Struts2提供的源代码
+		
+		
+		关注点:  apps/struts2-blank.war项目
+		    原因: 这个项目是struts2最基本的环境搭建项目
+		    怎么玩:导入struts-2.3.24\apps\struts2-blank\WEB-INF\lib下面的所有jar包
+		    13个包 ---struts2的环境就搭建好了
+
+
+		2 测试:
+
+			1  有一个页面 页面有一个超链接
+
+			2  有一个javabean(action) 超链接要访问这个javabean
+
+			3  在web.xml中配置struts2提供的前端控制器 (StrutsPreparedAndExecuteFilter)
+
+			4  在src下面配置一个xml文件 名称叫做struts.xml文件
+			
+
+
+
+struts2的执行流程:
+	 简化版本
+		
+
+
+	 详细版本:(day04)
+
+
+	
+/////////////////////////////////////////////////////////////////////////////////////////
+
+struts2的前端控制器(StrutsPreparedAndExecuteFilter)的init方法:
+	init方法:服务器启动执行 执行一次
+	主要作用: 用来加载整个struts2的配置文件的 
+
+	按照顺序一个一个的加载:
+		     
+		     struts2自动写好的配置文件:
+		     
+		     1  default.properties         struts-core/org/apache/struts2/default.properties
+			          已经配置好的键值对信息(action的后缀名地址访问 上传文件的大小控制....)
+				 struts.action.extension = action,,
+		      
+		     2 struts-default.xml	   struts-core/struts-default.xml
+				  struts2的默认包:struts-default
+					 大量拦截器
+
+		     3 struts-plugin.xml  struts2整合spring需要用到的一个配置文件
+				暂时不用 到后面整合3大框架的时候 会导一个包 struts2-spring-plugin-2.3.24.jar    
+				这个配置文件就是struts2-spring-plugin-2.3.24.jar包里面的
+
+
+		     加载我们配置的:
+		
+		     4 struts.xml  action的浏览器访问路径配置文件
+			     struts.action.extension=abc
+
+		     5 struts.properties(企业从来不用)
+				struts.action.extension=bcd
+
+		     6 加载StrutsPrepareAndExecuteFilter的初始化参数值
+				<init-param>
+					<param-name>struts.action.extension</param-name>
+					<param-value>bbb</param-value>
+ 				</init-param>
+
+		
+
+	按照顺序加载这个配置文件的好处:
+		     
+		     如果前面的配置文件内容与后面的配置文件内容一致了
+		     以后面的配置文件内容为主,可以覆盖前面的内容
+
+	作业1: 我想让action的后缀名访问变成abc?
+
+
+
+-----------------------------------------------------------------------------------------------------
+
+1 配置文件的内容:
+		
+		标签:
+			1 constant标签 覆盖前面配置文件内容
+				name: key名
+				value: value值
+
+			
+			2 package 标签
+				name:包名 但是对于咱们意义不大  条件:在整个struts.xml配置文件中是唯一值 作用: 给别人继承的 好处:人家继承了之后就有了你包里的所有内容
+				extends: 咱们的包要继承哪个包   默认是: struts-default 好处:继承了它的 我们就有了它里面的所有内容 
+				namespace: 命名空间  作用:会和action标签的name属性组成浏览器的访问地址
+					1 可以不写
+					2 namespace="/"
+					3 模块命名方式   模块式唯一的  企业模块开发
+						namespace="/模块名"
+				abstract:为true代表抽象  不能有action 只能被继承
+
+
+			
+			3 action 标签
+				class属性: action的全限定名  会根据它反射出对象
+				name属性:  作用:会和package标签的namespace属性组成浏览器的访问地址
+				    注意:name属性的值不能是层级关系  hello/hello2
+				    针对是大部分的struts2的版本(待考证)
+				    企业开发不承认层级关系的
+
+				 method属性:要执行action里面的那个方法 默认是execute
+					    配哪个方法就执行哪个方法
+
+			
+			
+			4 result 标签
+				name属性 要和action返回的别名(逻辑视图名)进行匹配
+				标签体内容  要跳转的页面地址 
+				明天讲 type属性 设置是用重定向还是用请求转发
+					        默认是请求转发
+
+			
+			5 include 标签
+			       作用: 引入外部的action配置文件
+			       <include file="struts_user.xml"></include>
+
+
+			作业2:5个标签以及5个标签的属性 下去全部做一遍
+
+
+
+2 action(javabean)的内容:
+
+		1 action的3种编写方式 ( 继承actionsupport类 )
+
+			 1 普通方式 
+				既没有实现也没有继承
+
+
+			 2 实现方式
+				实现Action接口
+				Action的接口提供了5个常量 这5个常量可用可不用
+			
+
+		
+			特点:都是返回字符串 可用可不用
+			 *  * SUCCESS	        :成功   "success"
+			 *  * NONE		:不跳转  null
+			 *  * LOGIN		:用于用户登录失败页面跳转  "login"
+			 *  * INPUT		:表单出错情况下，页面跳转 "input"
+			 *  * ERROR		:错误页面 "error"
+
+		
+			
+			
+			3 继承的方式(工作中使用)
+				  继承actionsupport类 
+						actionsupport实现了action
+
+			actionsupport不止提供了5个常量 还有自己的方法
+		
+
+			 
+		2 action方法的三种访问方式: (通配符方式)
+				
+				1 普通方式 (method方式)(掌握)
+
+				2 通配符方式(重点掌握)
+
+				3 动态方法方式(理解)
+						条件:需要配置常量开启动态方法
+						     页面需要写user!方法名
+
+
+
+
+
+
+
+
+
+
+
+				
+
+
+
+	

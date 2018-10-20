@@ -1,0 +1,286 @@
+				    
+ 回顾:
+	 spirng整合连接池
+		把别人编写的类也交给spring管理
+
+		1 在外部创建一个jdbc.properties配置文件 这个里面配置各个数据库的信息
+
+		2 在spirng的配置文件中,加载外部的jdbc.properties文件
+			<context:property-placeholder location="classpath:jdbc.properties"/>
+	
+		3 通过spirng的ioc和di设定连接池的核心对象以及对象的核心属性
+			ps:${} 是spring提供的的表达式 针对的就是spring加载了properties之后的数据
+			<bean id="c3p0" class="com.mchange.v2.c3p0.ComboPooledDataSource"> 
+				<property name="driverClass" value="${jdbc.driver}"></property>
+				<property name="jdbcUrl" value="${jdbc.url}"></property>
+				<property name="user" value="${jdbc.username}"></property>
+				<property name="password" value="${jdbc.password}"></property>
+			</bean>
+
+
+
+	spring的IOC的注解配置
+		     别人的类还用xml
+		     自己的类都用注解
+
+	条件:
+		1 导包 spring-aop.jar
+		2 开启扫描器
+			<context:component-scan base-package="cn.itcast"></context:component-scan>
+
+
+		@Component("bean的id名称") 定义在类上 扫描到就会创建该类的实例对象
+			@Controller("bean的id名称") web层的类上
+			@service("bean的id名称")    service层的类上
+			@Repository("bean的id名称") dao层的类上
+
+
+		@Value("属性值")  定义在属性字段上的 针对的是基本类型和String类型
+				  set的方法可以省略掉
+
+
+		@Autowired	定义在属性字段上的 针对是对象类型
+				 set的方法可以省略掉
+				 会自动去spring容器中找该类的实例对象赋值
+		@Qualifier("指定的对象名称") 定义在属性字段上的 指定使用该类型下面的哪一个实体对象
+			必须要和@Autowired一起使用
+
+
+		@Scope("singleton获取prototype")
+
+
+
+全注解的配置: 
+	条件: 注解类
+	加载不是配置文件了 而是注解类
+	   理解
+
+
+
+spring整合junit:
+		1 导包
+			spring-test.jar
+			spring-aop.jar
+			junit.jar
+
+
+		2  告诉spirng配置文件的位置
+				@ContextConfiguration(value="classpath:applicationContext.xml")
+		3  告诉spirng谁记载配置文件
+				@RunWith(value =SpringJUnit4ClassRunner.class)
+
+				加载代码的重复编写
+
+		4 分层测试
+
+
+
+
+
+
+
+
+
+
+
+					    Spring_03
+
+
+技术分析:AOP
+
+
+
+
+	一: Spring的AOP概述
+			AOP: 面相切面编程思想
+			大白话: 将一些共性的内容进行抽取,在需要用到的地方,以动态代理的方式进行插入
+				在不修改源码的基础上,还能对源码进行前后的增强
+
+			底层的技术: 动态代理
+
+			spring就是把动态代理进行层层封装 诞生出了aop思想
+
+
+			AOP的应用:
+				 权限拦截
+				 日志的输出
+				 性能的检测
+				 事务管理
+				 .....
+
+
+			aop思想的底层技术: 动态代理
+				
+				目标对象 save
+				代理对象 对目标对象save方法进行增强
+
+				理解下
+				JDk动态代理 --不用导包,jdk提供好了
+					proxy
+					 
+					 条件: 目标类必须得有接口
+
+
+				CGLIB动态代理---第三方 单用它就必须导包
+					enhance
+					 条件: 只要有一个目标类即可增强
+
+				
+				spring使用的是:
+					 如果目标类有接口 会默认使用jdk的动态代理
+					 如果目标类没有接口 会默认使用CGLIB的动态代理
+
+
+		
+	二: Spring AOP快速入门(全xml配置)
+			
+			AOP的术语:
+				目标对象  要被增强的对象
+				代理对象  增强以后的对象
+
+				连接点: 可以被增强的方法
+					  例如:person里面的save() delete() update() find() 都可以被增强 统称为连接点
+
+				切入点: 要被增强的方法
+					  例如: person里面要开始增强delete方法了 那么delete方法就是切入点
+
+
+				通知/增强: 做了增强的那段代码方法
+					   只要在原有方法之前和之后进行了增强的代码方法,我们就可以把这些增强的代码方法称之为通知或者增强
+			
+				切面: 切入点+通知/增强=切面
+					里面有要被增强的方法+增强的方法
+
+
+				织入: 切入点集成到切面的这一个过程,就叫做织入过程
+					 
+
+
+		基于aspectj的AOP的快速入门:
+			     1 导包
+				   
+				   2 Spring-aop.jar(实现了AOP的一套规范)
+				   4 spring-aspects.jar (spring整合aspectj)
+								---核心包
+				   3 aspectj.jar(第三的--实现了AOP的一套规范)
+				   1 AOP联盟 (AOP的一套规范(接口))
+								---依赖包
+				  
+			
+			     2 开发步骤:
+					需求: 对person中的save方法进行增强
+
+				        1  确定目标类 (目标类中有切入点 ---要被增强的方法) 
+
+
+					2  确定切面类 (里面有通知/增强 ----增强的那段代码方法)
+
+
+					3  配置织入过程 (将增强方法和被增强方法进行结合)
+
+
+				
+				细节1 : 切入点语法表达式的抽取
+						<aop:pointcut expression="execution(void cn.itcast.domain.Person.save())" id="pointcut1"/>	
+
+				细节2 :  切入点语法表达式的书写
+						execution(void cn.itcast.domain.Person.save())
+
+						void      cn.itcast.domain.    Person.      save()
+					        返回值       包名/子包名	类名	    方法名
+						*: 代表所有
+						..:代表上一层或者是方法参数的全匹配
+
+						* cn.itcast.domain.Person.save(..)
+
+						* cn.itcast.domain.Person.sa*(..)
+
+						* cn.itcast.domain.*.*(..)
+
+						* cn.itcast..*.*(..)
+
+						
+				细节3 :  通知类型
+					      前置通知  在之前增强  权限拦截
+					      后置通知  在之后增强  日志输出 
+					      环绕通知  在之前和之后都增强  性能检测
+					      异常通知  catch{}
+					      最终通知  finally {}
+
+
+
+
+
+
+	
+	三: Spring AOP的注解方式(半xml和半注解的方式)
+			  1 别人类用xml
+			  2 自己的类用注解
+
+	条件: 
+		1  导包 spring-aop.jar
+		2  开启注解扫描器
+
+		自己的类:
+			 Person    @Componect("person") 目标类
+			 MyAspect  @Componect("myAspect") 切面类
+
+		想用注解替代aop织入的xml配置
+			1 确定谁是切面类  @Aspect
+
+			2 切面类下面的增强方法就能使用注解来配置了
+				条件:先开启动态代理的注解方式
+
+
+	
+	全注解:
+		得有一个注解类
+
+		@Configuration // 当前类是注解类
+		@ComponentScan(basePackages="cn.itcast") //<context:component-scan base-package="cn.itcast"></context:component-scan>
+		@EnableAspectJAutoProxy   //<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+		public class SpringConfig {
+
+		}
+
+
+ 1 spring的AOP概述
+		理解
+		jdk的动态代理
+		cglib的动态代理
+
+-----------------------------------------------------------------
+ 2 spring的AOP的xml配置 (重点)
+		条件:4个包
+		
+		配置:
+			1 确定目标类
+ 
+			2 确定切面类
+
+			3 配置织入 (将目标中的被增强方法和切面类中的增强方法进行结合)
+				前置通知
+				后置通知
+				环绕通知
+				异常通知
+				最终通知
+
+
+
+ 3 spring的半xml和半注解的配置 (重点)
+-----------------------------------------------------------------			
+
+
+ 4 spring的AOP全注解(理解)
+
+
+
+
+
+
+
+
+
+
+
+			

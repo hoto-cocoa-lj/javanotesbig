@@ -1,0 +1,260 @@
+					商城案例实现
+						
+
+今日内容 (购物车模块  订单模块)
+	 
+	 购物车
+	 
+	 生成订单
+
+
+
+
+案例1-添加到购物车
+
+需求:
+	在商品的详情页面,输入购买数量,点击加入购物车,将该商品添加到购物车了
+
+
+
+技术分析:  购物车
+
+		购物车里面放的都是用户临时选择的商品
+		购物车的数据不再数据库中 因为要频繁的操作数据库
+		当购物车数据生成一个订单时候, 这个数据才在数据库中
+
+
+		商品加入购物车--不登录
+		购物车商品变成订单提交到数据库的时候---登录
+				  获取当前登录用户的id 存订单数据的时候 把当前用户的id也存进去
+				  好处: 想查任何人的订单 只需要去这张订单表里根据用户id来查 就能拿到任何人的订单
+
+
+
+
+
+		怎样添加商品到购物车?
+
+		现实: 一个用户--购物车--商品
+		java: 一个用户--Cart---商品
+
+
+
+购物车  --------------------------------------------------- Cart
+	商品图片					     {
+	商品名称						商品图片属性
+	商品价格						商品名称属性
+	商品小计						商品价格属性
+	商品数量						商品小计属性
+	总金额							商品数量属性
+								总金额属性				     
+							     }
+
+
+一个用户只有一个 Cart 用户选择的所有商品都在这一个Cart里面
+
+
+需求: 买3个商品 大冬瓜 小冬瓜  小黄瓜 
+
+	Cart(购物车)   ------------------------------------Cart(购物车)
+	{						  {
+		商品图片属性	
+		商品名称属性
+		商品价格属性					购物项的集合
+		商品小计属性
+		商品数量属性					总金额属性  total
+	
+		总金额属性  total
+	}						  }
+	
+
+
+购物项(可以为多个):
+	
+	CartItem
+		{
+			商品图片属性	
+			商品名称属性
+			商品价格属性
+				-----product对象
+			
+			商品数量属性
+			商品小计属性
+
+		}
+
+
+	买大冬瓜(名称 图片 价格...)
+
+	product对象----- select * from product where pid=?
+	商品数量属性---- 页面传递的数量
+	商品小计属性 -- 商品的单价*数量
+
+
+购物车(只有一个):
+
+	cart
+	    {
+		CartItem集合
+		总金额
+	    
+	    }
+
+	cart-------cart.jsp--展示
+
+
+
+////////////////////////////////
+案例2-从购物车移除一个商品
+需求:
+	在cart.jsp上,点击某一个商品的 删除 ,点击确定,从购物车中移除.
+步骤分析:
+	1.给 删除 添加连接
+		/store/cart?method=remove&pid=xxx
+	
+	2.在cartservlet中编写remove方法
+		获取pid
+		获取cart,执行removeFromCart()方法
+		重定向到cart.jsp
+
+案例3-清空购物车
+需求:
+	点击cart.jsp上的 清空购物车,需要将购物车中所有商品移除掉
+
+步骤分析:
+	1.修改 清空购物车的连接
+		/store/cart?method=clear
+	2.编写clear方法
+		获取购物车,执行clearCart()
+		重定向到cart.jsp上
+	3.判断购物车中是否有商品,	
+		有则展示
+		无则提示
+/////////////////////////
+
+
+
+
+案例2-生成订单
+需求:
+	在cart.jsp上,点击 "提交订单",将购物车中的商品,最终保存到数据库中.
+
+
+技术分析:
+
+	要把购物车的而所有数据在生成订单的时候,插入的数据库的2张表上
+
+	
+
+	当用户选择的商品确定 要开始下单
+		 只要下单,那么该购物车中的N多商品 变成一个订单
+
+
+	需求: 将订单的数据存在数据库中表中 --orders 订单表 select * from orders where uid=?
+	
+	只要一点击生成订单,就生成一个订单 在数据库的订单表里面生成一条记录
+	
+	这条记录包含: 
+			随机生成订单号 uuid
+			订单的下单时间 获取当前时间
+			订单的总金额  购物车的总金额
+			订单的状态  0 未付款
+			
+			收货人的地址  没有 付款才记录
+			收货人的姓名  没有 付款才记录
+			收货人的电话  没有 付款才记录
+			
+			订单所属用户  当前登录的用户
+
+	
+		
+	保存订单商品项    
+			// 主键 uuid
+			// 订单商品的数量
+			// 订单商品的小计
+			// 订单下的商品
+			// 订单商品属于哪个订单
+
+	
+	
+	注意: 需不需要写事务  
+			insert orders
+			insert ordersItem
+	      需要写事务
+
+
+
+
+
+
+
+需要的表
+	
+	-- 订单表
+	javabean=orders(封装订单时间,订单编号,订单总金额,订单状态,订单收货人,订单收货人电话...)
+	dao:insert into orders values(orders.getoid,)
+
+	CREATE TABLE `orders` (
+		  `oid` varchar(32) NOT NULL,
+		  `ordertime` date DEFAULT NULL,
+		  `total` double DEFAULT NULL,
+		  `state` int(11) DEFAULT NULL,  0 未付款  1 未发货  2 未评价 3 完成订单
+		  `address` varchar(30) DEFAULT NULL,
+		  `name` varchar(20) DEFAULT NULL,
+		  `telephone` varchar(20) DEFAULT NULL,
+		  `uid` varchar(32) DEFAULT NULL,
+		  PRIMARY KEY (`oid`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+	
+
+
+	javabean==orderitem(封装所属订单,封装该订单项的数量,封装该订单项的小计..)
+	dao:insert into orders values(orderitem.getitemid....)
+	
+	-- 订单商品详情表
+		CREATE TABLE `orderitem` (
+		  `itemid` varchar(32) NOT NULL,
+		  `count` int(11) DEFAULT NULL,
+		  `subtotal` double DEFAULT NULL,
+		  `pid` varchar(32) DEFAULT NULL,  // 订单项下的商品
+		  `oid` varchar(32) DEFAULT NULL,  // 订单项所属的订单
+		  PRIMARY KEY (`itemid`),
+		  KEY `fk_0001` (`pid`),
+		  KEY `fk_0002` (`oid`),
+		  CONSTRAINT `fk_0001` FOREIGN KEY (`pid`) REFERENCES `product` (`pid`),
+		  CONSTRAINT `fk_0002` FOREIGN KEY (`oid`) REFERENCES `orders` (`oid`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;	
+
+
+
+购物车的步骤:
+		1 创建购物项实例对象
+		2 创建购物车实例对象
+
+		3 购物项实例对象中的小计给算了出来 : 商品单价*数量
+
+		4 购物车实例对象中的总金额算了出来: 添加 删除 清空
+					添加: 总金额=总金额+新添加进来的购物项小计
+					
+					删除: 总金额=总金额-删除的购物项小计
+
+					清空: 总金额=0
+
+		5 实现把购物项放在购物车中
+
+
+订单的步骤:
+		
+		1 创建一个订单实例
+		2 把订单实例全部封装完毕
+
+		3 创建一个订单项实例
+		4 把订单项实例全部封装完毕
+				  // 都是又购物车中的购物项转换过来的
+
+		5 单独保存2个存在事务问题
+				 // 把2个合成1个 把所有的订单项放在订单中自定义的list集合中
+
+		6 到service 分开保存 可以写事务
+
+

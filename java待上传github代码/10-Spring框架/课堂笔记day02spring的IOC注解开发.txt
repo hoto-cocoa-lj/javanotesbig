@@ -1,0 +1,163 @@
+
+					
+
+
+					 spring_02
+
+  
+  
+  一: spring整合连接池(c3p0,dbcp)
+		<!-- 让spring知道外部的数据库连接信息的配置文件 jdbc.properties -->
+			<context:property-placeholder location="classpath:jdbc.properties"/>
+		
+		
+		c3p0:
+			  <bean id="c3p0" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+					<property name="driverClass" value="${jdbc.driver}"></property>
+					<property name="jdbcUrl" value="${jdbc.url}"></property>
+					<property name="user" value="${jdbc.username}"></property>
+					<property name="password" value="${jdbc.password}"></property>
+			  </bean>
+
+		
+		dbcp:
+	
+			<bean id="dbcp" class="org.apache.commons.dbcp.BasicDataSource">
+				<property name="driverClassName" value="${jdbc.driver}"></property>
+				<property name="url" value="${jdbc.url}"></property>
+				<property name="username" value="${jdbc.username}"></property>
+				<property name="password" value="${jdbc.password}"></property>
+			</bean>
+		
+
+
+
+以后的企业开发:
+	        全xml的配置(重要)
+		
+		
+		半XML半注解的配置(重要)
+			自己的类全部用注解
+			别人的类全部用xml
+
+
+
+
+
+ ----------------------------------------------------------------------------------------------------------
+  
+  
+  二: spring的IOC注解(重点)
+
+			 注解的开发步骤:
+				 1 导包  spring-aop.jar
+				 2 开启注解扫描器  告诉spring应该去那个包下面解析注解
+				 3 配置注解组件  Component
+				 4 测试
+
+
+			 掌握的注解
+				注解条件:(掌握)
+					1 导包 spring-aop.jar
+					2 配置注解扫描器
+						<context:component-scan base-package="cn.itcast"></context:component-scan>
+
+
+				@Component("bean的id值") 定义在类上 只要定义在了类上 
+							 那么注解扫描器只要一扫描到就会创建该类的实例对象 放在spring容器中
+				spring发布了公告, @Component这个注解不维护了,要维护这个注解下面衍生出的3个注解
+					@Controller("bean的id值") 针对的就是web层  
+					@Service("bean的id值")    针对的是service层
+					@Repository("bean的id值") 针对的是dao层
+				
+				
+				
+				@Value("属性值") 定义在属性字段上 针对的是基本类型和String类型
+					         如果使用了这个注解 该属性的set方法可以省略不写
+
+
+				@Autowired     定义在属性字段上的 针对的是对象类型
+						如果定义在了那个对象类型的属性身上 会自动去spring容器中找该类型的实例对象给赋值
+					
+				@Qualifier("userDaoxxx")定义在属性字段上的 指定用该类型的哪个id名称的实例对象
+				注意: @Qualifier要想使用 必须结合 @Autowired 一起使用
+					
+				
+				@Resource(name="userDaoxxx")
+					@Autowired+@Qualifier("userDaoxxx")
+
+			
+				
+
+		 了解的注解:
+				@Scope("singleton"或则prototype)  定义在类上的 指定当前类是单实例还是多实例
+
+				@PostConstruct  定义在方法上  配置初始化方法
+
+
+				@PreDestroy     定义在方法上 配置销毁的方法
+
+
+
+----------------------------------------------------------------------------------------------------------
+
+	spring新注解: 企业不会用 因为不成熟
+		  完全用注解的方式 完全抛弃掉xml配置文件
+		  半注解半xml方式:
+				别人的类用xml
+				自己的类用注解
+
+		  全注解方式:
+				别人类要用注解
+				自己的类也要用注解
+
+	
+	条件: 
+		需要有一个注解类,不在加载配置文件 而是加载这个注解类
+
+
+
+			
+   
+    三: spring整合Junit做测试
+		普通测试的缺点:
+				代码复用性大
+				配置文件运行一次加载一次
+
+
+
+		Spinrg整合junit开发步骤:
+				
+				1 导包
+					spring-test.jar 增强
+					spring-aop.jar 可以写注解
+					junit.jar  还是之前的测试
+
+
+
+
+				2 要告诉spring谁加载配置文件 (SpringJunt4ClassRunner.class)
+
+
+				3 要告诉spring配置文件的地址
+
+
+				4 分层测试
+
+
+
+
+
+总结:
+	1 spring整合连接池	写出来
+
+
+	2 spring的ioc注解       写出来
+
+
+	3 spring的全注解	理解为主
+
+
+	4 spring整合junit       写出来
+		   
+

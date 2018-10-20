@@ -1,0 +1,216 @@
+						
+	以后的开发: hibernate
+		一对多  分类和商品   数据是:1 :N
+		
+		在一的方有多的一方的集合
+		category()
+		{
+		    id
+		    name
+		    desc
+		
+		  private List<ordersitem> products;
+		}
+
+		orders---->页面展示
+
+
+		在多的一方有一的一方的对象
+
+		product()
+		{
+		   图片
+		   价格
+		   是否热门
+		
+		   private category orders;
+		}
+
+		ordersitem----->页面
+			
+
+
+jquery easyUI 回顾:
+
+	bootstorp
+		作用: 增强页面的效果,完成响应式的功能
+		       响应式: 制作一套项目 就可以匹配不同的设备(pc端 手机 pad...)
+	
+	
+	
+	
+	
+	easyUI
+		作用: 增强页面的效果,完成和数据库数据异步交互(ajax)的效果
+		同步:提交整个页面
+		异步: 局部数据
+
+
+	
+	环境搭建:
+		
+		3个css+2个js
+		
+		easyui.css+images  : 所有插件的样式文件
+
+		icon.css+icons : 用到的图片样式
+
+		demo.css : 自已可以扩展的样式 (可用可不用)
+
+		2个js
+
+		jquery.min.js          js库
+		jquery.easyui.min.js   插件的底层源码
+		
+
+
+
+	2 怎么将一个普通的html标签渲染成easyUI组件 以及 怎样给这个组件设置属性,事件,方法?
+
+	 渲染: 静态方式/动态方式
+
+	 静态方式/css方式
+				特点:所有的代码都在标签体内写
+
+
+				<div>1111</div>
+				在标签内通过class属性="easyui-组件名"
+
+				在标签内通过data-options="属性,事件,方法"
+	
+
+
+
+	
+		动态方式/js方式
+				特点: 需要创建js代码
+			
+				<div id="d1">1111</div>
+
+				<script>
+					$("#d1").组件名
+					(
+						{
+							// 设置属性
+							属性名1:属性值1,
+							属性名2:属性值2,
+							.....
+							// 设置事件
+							事件名1: funciton(){},
+							事件名2: funciton(){},
+							......
+						}
+					)
+
+
+					$("#d1").组件名("方法名","参数列表")
+						参数列表:
+							  单一值: 直接写
+							  多个值: 
+								   {
+									值名:值value,
+									值名:值value,
+									值名:值value,
+									......
+								   }
+
+				</script>
+
+				
+
+
+
+
+
+
+
+	以后对于分页:
+		如果从始至终都是自己写的
+
+		返回永远是pagebean 封装的永远是5个
+
+
+		但是如果是用别人的 你得查别人要什么 给它封装什么
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+						商城案例的后台实现
+
+
+回顾:jquery easyUI
+		
+	作用: 增强用户界面,完成和服务器数据交互(ajax)的效果
+
+
+	1  easyUI的环境搭建?
+		   easyui.css  images文件夹
+		   icon.css    icons文件夹
+		   demo.css    扩展的样式(可选可不选)
+
+
+		   js库			jquery.min.js
+		   组件的核心代码	jquery.easyui.min.js
+
+		   3css文件+2个js文件
+
+
+
+
+
+	
+
+		
+
+
+
+
+
+
+
+	
