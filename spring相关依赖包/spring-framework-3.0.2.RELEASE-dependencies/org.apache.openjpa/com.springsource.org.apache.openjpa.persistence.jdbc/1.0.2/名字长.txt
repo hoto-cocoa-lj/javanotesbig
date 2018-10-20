@@ -1,0 +1,2 @@
+com.springsource.org.apache.openjpa.persistence.jdbc-sources-1.0.2
+改成1

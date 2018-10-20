@@ -1,0 +1,1 @@
+com.springsource.org.hibernate.annotations.common-sources-3.3.0.ga改成1
