@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- 
+		放在src里，加载方法有两种：
+		String x = "applicationContext.xml";
+		String x1 = "/src/applicationContext.xml";
+		// ClassPathXmlApplicationContext c = new ClassPathXmlApplicationContext(x); 			第一种
+		// FileSystemXmlApplicationContext c = new FileSystemXmlApplicationContext(x1);			第二种
+		 
+		 
+		FileSystemXmlApplicationContext c = new FileSystemXmlApplicationContext(x1);
+		1: 基本配置
+			bean标签: 指定要创建的实体类
+				id属性: 可以为任意值  但是在整个配置文件中唯一
+				class属性: 要实例化类的全限定名 反射 
+	
+	 -->
+	 <!-- <bean id="user" class="cn.itcast.domain.User"></bean> --> 
+	
+	<!-- 
+		2: scope属性: 范围
+			    singleton: 单实例 默认值
+			    	 如果是单实例,配置文件文件只要一加载  就会创建对象 放在spring容器 (map<id,对象>)
+			    	当所有人过来问spring容器要的时候(getBean),所用人用的都是同一个对象
+			    prototype: 多实例
+				         如果是多实例,配置文件加载,不创建对象
+				         当每个人过来getbean的时候,getbean一次创建一次 放在容器中
+		<bean id="user" class="cn.itcast.domain.User" scope="singleton" ></bean>
+		<bean id="user" class="cn.itcast.domain.User" scope="prototype" ></bean>
+		什么时候用默认值singleton(单实例)? 什么时候用prototype(多实例)?
+		action: prototype
+		service/dao: singleton
+		
+		
+		3 了解
+		singleton的对象什么时候销毁? prototype创建出来的对象什么时候销毁?
+			singleton的对象当spring容器关闭 对象销毁
+			prototype的对象 长时间不用自动被垃圾回收机制给回收了
+			
+		init-method:指定初始化方法
+		destory-method:指定销毁方法	
+	 -->
+	<!-- <bean id="user" class="cn.itcast.domain.User" scope="prototype" init-method="init" destroy-method="destory"></bean> -->
+   
+   	<!-- 
+   		 3 import:导入外部的配置文件
+   		 	    resource:外部配置文件的地址
+   			web: 所有在web层创建的对象   applicationContext_web.xml
+   			service:所有在service层创建的对象   applicationContext_service.xml
+   			dao:所有在dao层创建的对象   applicationContext_dao.xml
+   			
+   			<import resource="applicationContext_web.xml"/>
+   			<import resource="applicationContext_service.xml"/>
+   			<import resource="applicationContext_dao.xml"/>	
+   			
+   			
+   			<import resource="applicationContext_user.xml"/> 	
+   	 -->
+   		
+   		
+   	<!-- bean的三种创建方式
+   		 无参构造方式
+   		 静态工厂方式(了解)
+   		 实例工厂方式(了解)
+   	
+   	  -->
+   	  <!-- 无参构造方式 
+   	  	<bean id="user" class="cn.itcast.domain.User"></bean>
+   	  -->	
+   	  
+   	  <!-- 静态工厂方式(了解)
+   	  		  条件:需要有一个工厂类 在这个工厂类中还需要有一个静态方法
+   	  		 <bean id="user" class="cn.itcast.utils.BeanFactory" factory-method="createUser"/> 
+   	   -->
+   	  
+   	  <!-- 实例工厂(了解) 
+   	  		  条件:需要有一个工厂类 在这个工厂类中还需要有一个普通方法
+   	  		  <bean id="beanFactory" class="cn.itcast.utils.BeanFactory"></bean>
+   	   <bean id="user" factory-bean="beanFactory" factory-method="createUser"></bean>
+   	   -->
+   	   
+
+   	  <!-- DI的入门:属性的依赖注入 -->
+   	  <bean id="car" class="cn.itcast.serviceImpl.CarImpl">
+   	  		
+   	  			<!-- property:是set属性的方式
+   	  			  name:要赋值的属性名
+   	  			  value:要赋的值
+   	  		 -->
+   	  		<property name="name" value="兰博基尼"></property>
+   	  		<property name="price" value="2000000"></property>
+   	  </bean>
+   		
+   	<!-- 
+   			DI的注入方式:
+   				   1 构造器的方式
+   				   	     条件:需要有参构造方法
+   	
+   	 -->
+   	<!--  <bean id="car" class="cn.itcast.serviceImpl.CarImpl">
+   	 		构造器的方式 
+   	 			 name:要赋值的属性名
+   	 			 value:要赋的值 (针对的是基本类型和String类型)
+   	 			 ref: 针对的是对象类型
+   	 		
+   	 		<constructor-arg name="name" value="BMW"></constructor-arg>
+   	 		<constructor-arg name="price" value="1000000"></constructor-arg>
+   	 </bean> -->
+   	 
+   	 	<!-- 
+   			DI的注入方式:
+   				   1 set属性的方式
+   				   	     条件:属性必须要有set方法
+   				 name:要赋值的属性名
+   	 			 value:要赋的值 (针对的是基本类型和String类型)
+   	 			 ref: 针对的是对象类型   
+   	 			 	       指向的是spring中bean的id名  
+   				   	     
+   	
+   	 -->
+   	 <!-- <bean id="person" class="cn.itcast.serviceImpl.PersonImpl">
+   	 		set属性的方式
+   	 		<property name="name" value="jack"></property>
+   	 		<property name="car" ref="car"></property>
+   	 </bean> -->
+   		
+   	
+	   	<!-- 
+	   			DI的注入方式:
+	   				   1 p名称空间的方式
+	   				   	     条件: 在配置文件中有p的名称空间
+	   				   	                  底层set方式  属性还是得有set方法
+   	     				  语法:
+						<bean p:属性名="属性值" p:属性名-ref="bean的id对象值" >
+	   	 -->
+	   	 <!-- <bean id="person" class="cn.itcast.serviceImpl.PersonImpl" p:name="rose" p:car-ref="car"></bean> -->
+	   	 
+	   	 
+	   	 <!-- DI:复杂属性注入 -->
+	   	 <bean id="collBean" class="cn.itcast.domain.CollBean">
+	   	 	 <property name="ss">
+	   	 	 		<!-- 数组类型 -->
+	   	 	 		<list>
+	   	 	 			<value>aaa</value>
+	   	 	 			<value>bbb</value>
+	   	 	 			<value>ccc</value>
+	   	 	 		</list>
+	   	 	 </property>
+	   	 	 
+	   	 	 <property name="ll">
+	   	 	 		<!-- list类型  -->
+	   	 	 		<list>
+	   	 	 			<value>111</value>
+	   	 	 			<value>222</value>
+	   	 	 			<ref bean="car"/>
+	   	 	 		</list>
+	   	 	 </property>
+	   	 	 
+	   	 	 <property name="mm">
+	   	 	 	<!-- map -->
+	   	 	 	<map>
+	   	 	 		<entry key="k1" value="aaa"></entry>
+	   	 	 		<entry key="k2" value="bbbb"></entry>
+	   	 	 		<entry key="k3" value-ref="car"></entry>
+	   	 	 	</map>
+	   	 	 </property>
+	   	 	 
+	   	 	 <property name="properties">
+	   	 	 	<!-- properties类型 -->
+	   	 	 	<props>
+	   	 	 		<prop key="hibernate.username">root</prop>
+	   	 	 		<prop key="hibernate.password">1234</prop>
+	   	 	 	</props>
+	   	 	 </property>
+	   	 </bean>
+	   	 
+</beans>

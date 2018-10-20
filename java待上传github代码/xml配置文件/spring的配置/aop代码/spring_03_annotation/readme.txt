@@ -1,0 +1,1 @@
+全注解配置，注意SpringJunit.java配置方法有修改
