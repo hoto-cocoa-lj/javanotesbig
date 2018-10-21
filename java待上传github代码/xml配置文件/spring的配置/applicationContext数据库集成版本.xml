@@ -9,6 +9,21 @@
         http://www.springframework.org/schema/context/spring-context.xsd"> 
 
 
+	
+	<!-- 在和struts2配合使用时要配置Spring的核心监听器，
+	默认加载/WEB-INF/applicationContext.xml，所以要设置context-param修改路径--> 
+    <!--<listener>
+    	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <context-param>
+    	<param-name>contextConfigLocation</param-name>
+    	<param-value>classpath:applicationContext.xml</param-value>
+    </context-param>--> 
+    <!-- 配置Spring的核心监听器 完毕--> 
+	
+	
+		
 	<!-- 让spring能够加载jdbc.properties文件，放在src目录
 		 spring提供了一个标签 可以加载外部的properties文件内容
 		 导context的名称空间和约束 才会有提示

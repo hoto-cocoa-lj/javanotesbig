@@ -1,0 +1,45 @@
+这个文件里忽略版本，名字一样就表示一样的包
+不同框架的包可能重复，删掉重复，尤其是javassist-3.18.1-GA
+
+------------------------------------------------------------------------------------------------
+
+
+struts2-convention-plugin-2.3.24			struts2的注解开发包
+
+struts2-json-plugin-2.3.24					struts2的整合ajax的开发包，一般不用
+
+struts2-spring-plugin-2.3.24				struts2的整合spring的开发包
+
+------------------------------------------------------------------------------------------------
+
+hibernate除了必须的包，还需要mysql驱动mysql-connector-java-5.1.37-bin，
+日志记录slf4j-api-1.6.1，slf4j-log4j12-1.7.2，log4j-1.2.16。
+还有c3p的包c3p0-0.9.2.1，hibernate-c3p0-5.0.7.Final，mchange-commons-java-0.2.3.4。
+
+在与spring配置使用时，<property name="hibernate.current_session_context_class">thread</property>这句话要去掉
+
+
+------------------------------------------------------------------------------------------------
+
+spring必须ioc的包，aoc的包，jdbc模板需要jdbc和tx，事务需要tx，
+整合web项目需要web，单元测试需要test，整合hibernate需要orm。
+
+
+和struts2配合时，需要在web.xml里配置核心监听器，让它启动时加载配置文件创建工厂，放在servletcontext里
+    <!-- 配置Spring的核心监听器，默认加载/WEB-INF/applicationContext.xml，所以要设置context-param修改路径--> 
+    <listener>
+    	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+    	<param-name>contextConfigLocation</param-name>
+    	<param-value>classpath:applicationContext.xml</param-value>
+    </context-param>
+    
+    <!-- 配置Spring的核心监听器 完毕--> 
+	
+	
+	
+
+
+
+

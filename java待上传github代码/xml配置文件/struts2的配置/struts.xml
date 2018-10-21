@@ -92,7 +92,7 @@
 	 	
 	 	-->				 
 	 	<action name="product_*" class="cn.itcast.action.ActionDemo4" method="{1}" ></action>
-		<action name="*_*" class="cn.itcast.action.{1}  method="{2}" ></action>
+		<action name="*_*" class="cn.itcast.action.{1}"  method="{2}" ></action>
 	 	
 	 	<!-- 动态方法方式(了解) 
 	 			1 动态方法方式默认是关闭的  需要开启   default.properties

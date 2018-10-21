@@ -5,6 +5,22 @@
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans.xsd">
+		
+		
+		
+	<!-- 在和struts2配合使用时要配置Spring的核心监听器，
+	默认加载/WEB-INF/applicationContext.xml，所以要设置context-param修改路径--> 
+    <!--<listener>
+    	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <context-param>
+    	<param-name>contextConfigLocation</param-name>
+    	<param-value>classpath:applicationContext.xml</param-value>
+    </context-param>--> 
+	    <!-- 配置Spring的核心监听器 完毕--> 
+	
+	
 	
 	<!-- 
 		放在src里，加载方法有两种：
