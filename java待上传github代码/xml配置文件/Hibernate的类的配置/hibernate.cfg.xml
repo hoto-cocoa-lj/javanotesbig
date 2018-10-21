@@ -16,7 +16,7 @@
 		
 		<property name="hibernate.show_sql">true</property>
 		<property name="hibernate.format_sql">true</property>
-		<property name="hibernate.connection.provider_class ">org.hibernate.connection.C3P0ConnectionProvider</property>
+		<property name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
 	
 		<!-- 配置和当前线程绑定的session是否开启，和spring配合使用时要去掉-->
 		<property name="hibernate.current_session_context_class">thread</property>
