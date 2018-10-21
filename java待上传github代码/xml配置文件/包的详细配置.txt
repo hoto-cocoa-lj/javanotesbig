@@ -1,0 +1,8 @@
+不同框架的包可能重复，删掉重复
+
+struts2-convention-plugin-2.3.24.jar			struts2的注解开发包
+
+struts2-json-plugin-2.3.24.jar					struts2的整合ajax的开发包，一般不用
+
+struts2-spring-plugin-2.3.24.jar				struts2的整合spring的开发包
+
