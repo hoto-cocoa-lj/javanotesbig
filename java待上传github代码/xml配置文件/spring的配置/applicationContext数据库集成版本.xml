@@ -10,7 +10,18 @@
 
 
 	
-	<!-- 在和struts2配合使用时要配置Spring的核心监听器，
+	<!-- 
+	spring配置bean时尽量将id设成需要被引用的项的成员属性，例如
+	<bean id="sessionFactory" class="....hibernate5.LocalSessionFactoryBean"></bean>	
+	<bean id="customerDao" class="com.itheima.ssh.dao.impl.CustomerDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>，不要将id和ref简化（例如sf），
+	不然可能No bean named 'sessionFactory' is defined的错误，
+	原因应该是spring暗中创建其他对象时要setSessionFactory，
+	但配置名叫sf所以没找到sessionFactory而报错。
+	
+	
+	在和struts2配合使用时要配置Spring的核心监听器，
 	默认加载/WEB-INF/applicationContext.xml，所以要设置context-param修改路径--> 
     <!--<listener>
     	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
