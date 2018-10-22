@@ -42,7 +42,7 @@
 	</bean> -->
 	
 
-	<!-- C3P0的数据库配置 -->
+	<!-- C3P0的数据库配置，c3p0用来getsession连接数据库 -->
 	<bean id="c3p0" class="com.mchange.v2.c3p0.ComboPooledDataSource">
 		<property name="driverClass" value="${jdbc.driver}"></property>
 		<property name="jdbcUrl" value="${jdbc.url}"></property>
