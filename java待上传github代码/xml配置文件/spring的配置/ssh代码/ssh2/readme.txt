@@ -1,0 +1,1 @@
+ssh整合的代码，使用spring创建hibernate的sessionfactory，所以没有hibernate.cfg.xml

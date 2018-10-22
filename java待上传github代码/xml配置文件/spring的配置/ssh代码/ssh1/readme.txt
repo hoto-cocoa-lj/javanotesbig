@@ -1,0 +1,1 @@
+ssh整合的代码，没有用spring创建hibernate的sessionfactory
