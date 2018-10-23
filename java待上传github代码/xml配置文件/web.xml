@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>ssh1</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  
+      
+    <!-- 配置Spring的核心监听器，默认加载/WEB-INF/applicationContext.xml，所以要设置context-param修改路径--> 
+    <listener>
+    	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <context-param>
+    	<param-name>contextConfigLocation</param-name>
+    	<param-value>classpath:applicationContext.xml</param-value>
+    </context-param>
+    
+    <!-- 配置Spring的核心监听器 完毕--> 
+    
+    
+	
+	 <!-- 下面的代码作用是，处理action里面延迟加载的数据，可以在action里面打开session连接数据库--> 
+	<filter>
+  	<filter-name>OpenSessionInViewFilter</filter-name>
+  	<filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
+  </filter> 
+  
+  <filter-mapping>
+  	<filter-name>OpenSessionInViewFilter</filter-name>
+  	<url-pattern>*.action</url-pattern>
+  </filter-mapping> 
+   <!--  完毕--> 
+  
+  
+  
+    
+  
+  <!--下面这一段要剪切到web.xml	 配置前端控制器  拦截所有的浏览器请求 
+  千万注意：两个init-param里面的内容是用来配置注解加载struts的，这样可以删除struts.xml，不用的话必须注释掉。
+  而且struts.convention.package.locators的值action，表示src下处理action的java文件所在文件夹的名字！！！不然报错no mapping-->
+ 
+  
+  <filter>
+  	<filter-name>strust2_3</filter-name>
+  	<!-- 在整个项目下搜资源:ctrl+shift+t -->
+  	<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+  	<init-param>
+  			  <param-name>struts.objectFactory</param-name>
+	  		<param-value>spring</param-value>
+  	</init-param>
+	<init-param>
+	  		<param-name>struts.convention.package.locators</param-name>
+	  		<param-value>action</param-value>
+	 </init-param>  
+  
+  </filter>
+  
+  <filter-mapping>
+  	<filter-name>strust2_3</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
+    <!-- 配置前端控制器 完毕--> 
+    
+
+    
+    
+    
+</web-app>
