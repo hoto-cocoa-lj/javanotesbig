@@ -47,7 +47,7 @@ public class Linkman
 	  @ManyToOne(targetEntity=Customer.class)
 	  // 维护外键关系
 	  /*name:外键字段名
-	  referencedColumnName:指向的主键字段名*/
+	  referencedColumnName:指向的主键字段名，这里外键名字叫wj_id，其实完全可以起名customer，表示该数据的主键的id*/
 	  @JoinColumn(name="wj_id",referencedColumnName="cust_id")
 	  private Customer customer;
 
