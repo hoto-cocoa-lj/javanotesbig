@@ -1,0 +1,1 @@
+domain使用xml配置
