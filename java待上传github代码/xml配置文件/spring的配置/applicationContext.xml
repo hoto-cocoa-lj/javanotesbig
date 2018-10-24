@@ -210,5 +210,8 @@
 	   	 	 	</props>
 	   	 	 </property>
 	   	 </bean>
+		 
+		 	<!-- 配置扫描 -->
+	<context:component-scan base-package="cn.itcast"></context:component-scan>
 	   	 
 </beans>

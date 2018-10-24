@@ -1,5 +1,8 @@
-ssh整合的代码，使用注解，删除了struts.xml。
+hm2017年12月297期的ssh整合的纯注解代码，使用注解，删除了struts.xml。
 web.xml里面要如下配置struts的信息。
+当然也没有用struts.xml来引用user.hbm.xml，而是在user类里配置了注解，
+并在applicationContexnt.xml的sessionFactory的配置里面，使用packagesToScan引用了该类。
+
 
 
 

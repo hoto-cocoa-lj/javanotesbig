@@ -47,7 +47,7 @@
 		 	name:action的名字  和浏览器访问地址相关
 		 	 	 namespace和name 组成了当前action的访问地址
 		 	class:全限定名
-		 	method: 可以不写 默认就是执行叫一个execute的方法
+		 	method: 可以不写 默认就是执行叫一个execute的方法，不用写括号和参数。。。
 		
 		 <action name="hello" class="cn.itcast.action.ActionDemo1" >
 		 	result: 接收返回值 
