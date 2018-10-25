@@ -24,6 +24,7 @@ hibernate除了9个必须的包，还需要mysql驱动mysql-connector-java-5.1.3
 
 spring必须4个包ioc，2个日志包logging和log4f，4个包aoc，jdbc模板需要2个包jdbc和tx，事务需要1个包tx，
 整合web项目需要1个包web，单元测试需要1个包test，整合hibernate需要1个包orm。
+整合struts2时，如果要注释配置action还需要导入convention。
 
 
 和struts2配合时，需要在web.xml里配置核心监听器，让它启动时加载配置文件创建工厂，放在servletcontext里
@@ -40,7 +41,47 @@ spring必须4个包ioc，2个日志包logging和log4f，4个包aoc，jdbc模板�
 	
 	
 	
+	
+	
+	
+	
+一个bug：alter table SYS_USERS_USERGROUPS add constraint FKEFA61B682527F232。。。
+
+原因是需要创建（一对多的）外键，教程里先创建了一的表并加入了数据，但此表没有外键，
+所以根据<prop key="hibernate.hbm2ddl.auto">update</prop> 语句，
+由于建立外键关系时需要在两个表上都建立，而一表无法修改所以报错。经测试一对一也会报错。
+测试发现在创建一对多外键时，只要有多表有设置外键关系（如manytoone等），
+一表也会被创建外键关系，即使没有对应的set，但是如果设置了对应的set字段，
+就必须设置onetomany，否则会报错无法 确定该字段的数据类型。
+设置字典表，多表可以多个字段指向同一个一表的id。
+
+	
+
+	
+	
+
+
+使用ognl前要加入<%@taglib prefix="s"  uri="/struts-tags"%> 。
 
 
 
+jsp的注释方法是全选要注释的代码后ctrl+shift+/。
 
+
+
+延迟加载放在web.xml里，必须放在struts2的代码前，代码如下：
+	 <!-- 下面的代码作用是，处理action里面延迟加载的数据，可以在action里面打开session连接数据库--> 
+	<filter>
+  	<filter-name>OpenSessionInViewFilter</filter-name>
+  	<filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
+  </filter> 
+  
+  <filter-mapping>
+  	<filter-name>OpenSessionInViewFilter</filter-name>
+  	<url-pattern>*.action</url-pattern>
+  </filter-mapping> 
+   <!--  完毕--> 
+
+   
+   
+   

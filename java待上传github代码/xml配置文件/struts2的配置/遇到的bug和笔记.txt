@@ -1,0 +1,5 @@
+
+
+web.xml和UserAction.java如外面两个文件一样配置，
+可以删除struts可以删除struts.xml。
+

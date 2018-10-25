@@ -1,0 +1,33 @@
+
+===============================================================
+
+action里别自己定义get，set开头的方法；
+
+===============================================================
+
+
+不要把<s:debug></s:debug>放在正常页面里，只在一开始测试值栈是否有数据时使用，
+用完后马上删除，不然在浏览器看页面源码会多出几千行奇怪的东西，
+而且容易报很奇怪的错误，例如stream close，特别难查。
+
+
+===============================================================
+
+   <select name='cust_source.dict_id' >	
+   		<s:iterator value="l1" var="b">
+   			<option value='<s:property value="#b.dict_id"/>'>
+				<s:property value="#b.dict_item_name"/>
+			</option>
+   		</s:iterator>   		
+   	</select>
+	
+一对多结构，使用form保存多时，多方的属性cust_source外键指向一的dict_id，
+那么该字段的select应该如上设置，（l1是一方的某一个列表，供创建多方时选择）
+需要注意的是<option value='<s:property value="#b.dict_id"/>'>的value，
+和<select name='cust_source.dict_id' >的name，name字段和value对应，
+这里value使用一方的id，所以name也一定是id。否则会在提交form表单时报错
+No result defined for action cc.action.UserAction and result input，
+原因是action传递值的问题，而不是没有对应的方法。
+	
+	
+===============================================================

@@ -1,0 +1,43 @@
+有get方法就可以将数据放在值栈并在jsp里用ognl展示，详情建UserAction.java。
+
+action不能设置成redirect，不然值栈的数据传不过去，要用session。
+
+
+
+
+applciationContext.xml里如下配置可以删除hibernate.cfg.xml。
+dao层用private HibernateTemplate进行数据库操作。
+
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	
+	<!-- C3P0的数据库配置，c3p0用来getsession连接数据库 -->
+	<bean id="c3p0" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driver}"></property>
+		<property name="jdbcUrl" value="${jdbc.url}"></property>
+		<property name="user" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+
+<!-- 配置sessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+			 <property name="dataSource" ref="c3p0"></property>
+			 <property name="hibernateProperties">
+			  	<props>
+			  		<!-- <prop key="hibernate.show_sql">true</prop>
+			  		<prop key="hibernate.format_sql">true</prop> -->
+			  		<prop key="hibernate.hbm2ddl.auto">update</prop> 
+			  		<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+			  	</props>
+		  	</property>
+		  	<property name="packagesToScan">
+		   		<list>
+		   			<value>cc.domain</value>
+		   		</list>
+		   </property>
+	</bean>
+
+
+	<!-- 配置hibernateTemplate -->
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
