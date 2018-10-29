@@ -2,6 +2,10 @@
 在虚拟机中
 在doc命令中进入C:\oracle\product\10.2.0\db_1\BIN 目录中
 执行 lsnrctl start
+这一步可能报错12541，提示ip地址什么的有问题。
+（似乎是因为用xp版本每次重新加载，ip地址都会变，而oracle的监听ip会被写死在配置文件里。）
+这时需要修改虚拟机下C:\oracle\product\10.2.0\db_1\NETWORK\ADMIN的listener和tnsnames两个文件的ip。
+
 
 方法二
 可能认不到实例名

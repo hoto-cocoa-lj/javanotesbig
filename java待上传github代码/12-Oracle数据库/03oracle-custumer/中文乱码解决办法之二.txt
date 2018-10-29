@@ -1,0 +1,15 @@
+步骤一
+
+开始-运行-输入regedit-回车进入注册表，
+HKEY_LOCAL_MACHINE--->SOFTWARE ---> ORACLE--->KEY_OraDb11g_home1
+（不同版本的Oracle显示的都不太一样，但都会包含home这个单词），
+找到“NLS_LANG”，查看数值数据是否为：“SIMPLIFIED CHINESE_CHINA.ZHS16GBK”，
+如果不是就将它设置为“SIMPLIFIED CHINESE_CHINA.ZHS16GBK。”
+
+步骤二
+
+设置完注册表后，接下来设置我们的环境变量，
+计算机（右键） --->属性--->高级系统设置--->高级--->环境变量--->新建，
+个人建议新建用户变量，
+变量名输入：“NLS_LANG”，变量值输入：“SIMPLIFIEDCHINESE_CHINA.ZHS16GBK”。
+点击确定即可，到此我们就设置完了。
