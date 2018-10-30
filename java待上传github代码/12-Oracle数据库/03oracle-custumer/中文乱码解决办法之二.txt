@@ -1,15 +1,21 @@
-����һ
+步骤一
 
-��ʼ-����-����regedit-�س�����ע�����
+开始-运行-输入regedit-回车进入注册表，
 HKEY_LOCAL_MACHINE--->SOFTWARE ---> ORACLE--->KEY_OraDb11g_home1
-����ͬ�汾��Oracle��ʾ�Ķ���̫һ�������������home������ʣ���
-�ҵ���NLS_LANG�����鿴��ֵ�����Ƿ�Ϊ����SIMPLIFIED CHINESE_CHINA.ZHS16GBK����
-������Ǿͽ�������Ϊ��SIMPLIFIED CHINESE_CHINA.ZHS16GBK����
+（不同版本的Oracle显示的都不太一样，但都会包含home这个单词），
+找到“NLS_LANG”，查看数值数据是否为：“SIMPLIFIED CHINESE_CHINA.ZHS16GBK”，
+如果不是就将它设置为“SIMPLIFIED CHINESE_CHINA.ZHS16GBK。”
 
-�����
+步骤二
 
-������ע����󣬽������������ǵĻ���������
-��������Ҽ��� --->����--->�߼�ϵͳ����--->�߼�--->��������--->�½���
-���˽����½��û�������
-���������룺��NLS_LANG��������ֵ���룺��SIMPLIFIEDCHINESE_CHINA.ZHS16GBK����
-���ȷ�����ɣ��������Ǿ��������ˡ�
+设置完注册表后，接下来设置我们的环境变量，
+计算机（右键） --->属性--->高级系统设置--->高级--->环境变量--->新建，
+个人建议新建用户变量，
+变量名输入：“NLS_LANG”，变量值输入：“SIMPLIFIED CHINESE_CHINA.ZHS16GBK”。
+点击确定即可，到此我们就设置完了。
+
+
+pdf的第一种方法没说清楚。
+select userenv('language') from dual;和select * from V$NLS_PARAMETERS;
+查出来的都是oracle数据库的字符集，想要解决乱码问题需要将plsql所在电脑的字符集设成一样的，
+即在环境变量里变量名输入：“NLS_LANG”，变量值输入：oracle的。然后要重启电脑！！！

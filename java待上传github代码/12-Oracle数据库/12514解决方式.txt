@@ -1,0 +1,12 @@
+不只这个错误，中途还出现了其他错误。
+显示plsql连不上，主机能ping虚拟机，但虚拟机cmd里的sqlplus无法登陆，
+报错ORACLE not available shared memory realm does not exist，
+服务，注册表都没问题。
+最后解决办法是：
+1、用CMD进入命令行
+2、sqlplus /nolog
+3、conn / as sysdba
+4、startup
+然后可以用plsql登陆了。
+链接是：https://www.cnblogs.com/jacklaw/archive/2008/07/12/1241445.html
+
