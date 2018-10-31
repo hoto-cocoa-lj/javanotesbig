@@ -1,0 +1,93 @@
+--======================================多表关联查询
+--查询员工编号,员工姓名,员工部门编号,员工部门名称,员工部门地址,中文显示员工工资等级,及领导编号,领导姓名,领导部门编号,领导部门名称,中文显示领导工资等级
+select e1.empno,e1.ename,e1.deptno,d1.dname,d1.loc,
+       decode(s1.grade,1,'一级',2,'二级',3,'三级',4,'四级',5,'五级') as "员工工资等级",
+       e2.empno,e2.ename,e2.deptno,d2.dname, d1.loc,
+       decode(s2.grade,1,'一级',2,'二级',3,'三级',4,'四级',5,'五级') as "领导工资等级"
+       from emp e1,dept d1,salgrade s1,emp e2 ,dept d2,salgrade s2
+       where   
+             e1.deptno=d1.deptno and 
+             e1.sal between s1.losal and s1.hisal and
+             e1.mgr=e2.empno and
+             e2.deptno=d2.deptno and
+             e2.sal between s2.losal and s2.hisal;
+--1.查询员工编号,员工姓名,领导编号,领导姓名
+select e1.empno,e1.ename,e2.empno,e2.ename 
+       from emp e1,emp e2 
+       where 
+            e1.mgr=e2.empno
+--2.查询员工编号,员工姓名,员工部门编号,员工部门名称,员工部门地址,领导编号,领导姓名,领导部门编号,领导部门名称
+select e1.empno,e1.ename,e1.deptno,d1.dname,d1.loc,e2.empno,e2.ename,e2.deptno,d2.dname
+       from emp e1,dept d1,emp e2 ,dept d2
+       where
+            e1.deptno=d1.deptno and
+            e1.mgr=e2.empno and
+            e2.deptno=d2.deptno
+			
+			
+			
+
+--======================================外连接
+--1.查询员工编号，姓名，领导编号，领导姓名，包括没领导的
+----left join on方式
+select e1.empno,e1.ename,e2.empno,e2.ename from emp e1  left join emp e2 on e1.mgr=e2.empno
+----Orcl的(+)方式
+select e1.empno,e1.ename,e2.empno,e2.ename from emp e1,emp e2 where e1.mgr=e2.empno(+)
+--2.查询出所有部门信息(包括没员工的部门)及部门下的员工信息
+select * from dept d1 left join emp e1 on d1.deptno=e1.deptno
+select * from dept d1,emp e1 where d1.deptno=e1.deptno(+)
+
+
+
+
+--===========子查询
+--1.查询比雇员7654工资高(这里写了>=方便检查)，同时从事和7788的工作一样的员工
+select * from emp 
+       where 
+         sal>=(select sal from  emp  where empno=7654) 
+         and job=(select job from  emp where empno=7788) 
+--2.查询每个部门最低工资及最低工资的部门名称和雇员名称
+select newe.m,d2.dname,e2.ename 
+       from emp e2,dept d2,(select min(sal) m,deptno d   from emp   group by deptno) newe
+            where newe.m=e2.sal and newe.d=e2.deptno and e2.deptno= d2.deptno
+			
+			
+			
+			
+			
+--===========课堂练习
+--1.找到员工表中工资最高的前三名(rownum是个关键字)
+select rownum,e.* from (select * from emp order by sal desc ) e where rownum<=3
+
+--2.找到员工表中薪水大于本部门平均工资的所有员工(这里写了*方便检查)
+select * from emp e,(select avg(sal) m,deptno d from emp group by deptno) ne
+       where e.sal>ne.m and e.deptno=ne.d
+	   
+--3.统计每年入职的员工个数
+select count(*),t from (select to_char(hiredate,'yyyy') t  from emp) c group by t
+select max(decode(t,1980,h)) "1980",max(decode(t,1981,h)) "1981",
+       max(decode(t,1982,h)) "1982",max(decode(t,1987,h)) "1987",
+       sum(h) total
+       from (
+            select count(*) h,t from (
+                   select to_char(hiredate,'yyyy') t  from emp
+                   ) c group by t order by t
+            ) e
+
+
+
+
+--===========分页查询(rownum不能做大于查询，可以做小于）
+--1.查询员工表，将员工工资进行降序查询，并进行分页取出第一页，一页三条记录
+select * from (select rownum r,e.* from (select * from 表名 order by 列名 desc) e ) 
+       where r between pagenum*pagesize-pagesize and pagenum*pagesize
+
+
+
+
+
+
+	   
+
+		
+			
