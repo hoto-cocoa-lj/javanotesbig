@@ -1,0 +1,29 @@
+基础的servlet：
+
+1_右键新建maven project，勾选create a simple project
+
+2_右键项目名，找到project facets--->点击Dynamic web Module 2.5和java 1.7,
+点击下方的futher configuration avaiable，将context directory改成src/main/webapp，
+勾选generate web.xml。如果Dynamic web Module已经被选择，取消勾选点击app在按上述操作即可。
+这时搜索web，可以看到context root的web-root folder变成了src/main/webapp。
+有时会提示further configuration required，似乎删除folder里的src即可。
+至此已经可以在tomcat7添加此项目运行。
+
+4_配置pom。后面的看pdf。在maven里update project。
+其他配置文件防src/main/resources。
+
+这四步是配置任何程序都要做的。配置pom千万要使用复制粘贴的方法，
+不然会因为导入的库的版本问题出现大量bug，一旦出现过这些bug，
+会在tomcat服务器的相应的lib里生成jar，即使再在pom里更改版本也无效。
+（这时可以从server里删除该项目重新加入）
+
+<!-- 
+这一步只在做servlet项目时采用
+5_创建servle。在pom里的dependencies为servlet和jsp设置<scope>provided</scope>，
+至此已经可以在run as里选择maven build->tomcat7:run运行此项目。
+-->
+
+补充：使用maven启动tomcat7时，可以发现maven自带的jre版本是1.5，
+需要在pom.xml里设置插件后，右键项目选择maven->update project，
+可以更新jre的版本。
+

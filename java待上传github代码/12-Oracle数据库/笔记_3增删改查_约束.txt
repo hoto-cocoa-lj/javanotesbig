@@ -1,0 +1,254 @@
+--===========DDL(Data Definition Language)语句管理表
+/*
+create tablespace 表空间名称
+datafile 数据文件路径，后缀名dbf
+size 100m         默认大小
+autoextend on     是否可以增大空间
+next 10m;             每次增大多少
+*/
+
+--1.创建itcast001表空间，权限不够会报错insufficient privileges
+create tablespace itcast297 datafile 'c:/itcast297.dbf' size 10m autoextend on next 5m
+--2.创建itcastuser用户，设置密码和表空间
+create user itcast identified by itcast default tablespace itcast297
+--3.为itcastuser用户赋予dba权限
+grant dba to itcast
+--删除表空间并将物理文件一并删除。
+--用create生成的表空间都用drop删除
+DROP TABLESPACE itcast297 INCLUDING CONTENTS AND DATAFILES;
+drop user itcast cascade
+
+--===========================Oracle数据类型
+/*
+Oracel数据类型
+字符类型
+      char:固定长度类型
+      varchar2:可变长度类型，可保存1333多个汉字
+数值类型
+      number(3):999
+      number(3,2):9.99
+日期类型
+      date:mysql中日月年,oracle中精确到时分秒,相当于MySQL中的datetime
+      timestamp:精确到秒的后9位
+大数据类型
+      long:大数据字符类型,2G
+      Clob:存放字符类型,4G
+      Blob:存放二进制类型,4G
+*/
+
+--===========================创建表
+--4.创建person表，字段为pid，pname
+create table person(
+       pid number,
+       pname varchar2(50)
+)
+
+--==============================Oracle表中的增删改查
+/*
+Oracle中的事务需要手动commit提交.
+账号a不提交的话，a可以看到数据库的修改，但其他账号看不到
+*/
+--1.为person表新增一条数据
+insert into person values(11,'value1')
+
+--2.修改person表中的一条数据
+update person set pname='valuess1' where pid=11
+
+update person set pname='valuess1' where pid=11
+commit                             --这样可以在执行完后马上提交
+--3.删除person表中的一条数据
+delete from person where pid=11
+--==============================修改表列的属性
+--1.给person表增加sex性别列，类型为number(1)
+alter table person add sex number(1)
+--2.修改person表列sex类型为char(1)
+alter table person modify sex char(1)
+--3.修改person表sex列为gender
+alter table person rename column sex to  gender
+--4.删除person表的gender列
+alter table person drop column gender
+--5.删除person表中所有数据
+delete from person                   -- 会询问是否删除
+delete from person where 1=1         -- 不会询问是否删除   
+--6.摧毁person表（truncate table 表名）
+truncate table person
+
+--7.删除person表
+drop table person
+/*
+ 直接摧毁表结构后重构表，比delete要很快，但是没法按照条件删除
+*/
+
+
+--=========================================约束
+--1.创建person表，pid为主键，pname，gender(主键约束primary key)
+--primary key方式
+create table person(
+       pid number primary key,
+       panme varchar2(50),
+       gender number
+)
+--constraint 主键名 primary key(字段),方式
+create table person(
+       pid number,
+       panme varchar2(50),
+       gender number,
+       constraint pk_person primary key(pid)
+)
+--2.创建person表，pname非空，gender(非空约束not null)
+create table person(
+       pid number,
+       panme varchar2(50) not null,
+       gender number
+)
+
+insert into person(pid,gender) values(1,2)    --报错说没有panme
+--3.创建person表，pid，pname是唯一，gender(唯一约束unique)
+--4.创建person表，pid，pname，gender---检查约束check(列名 in (值))
+create table person(
+       pid number,
+       panme varchar2(50),
+       gender number check(gender in(0,1)) not null
+)
+insert into person(pid) values(11)            
+--值必须是0或者1，但可以没值，即null。想避免这个设置同时not null即可
+
+
+--=========================================外键约束
+/*
+constraint fk_order_orderid foreign key(外键) references 对应的表(对应的主键)
+*/ 
+
+--1.创建orders表,字段为order_id(主键),total_price
+create table orders(
+       oid number primary key,
+       oprice number(8,2)
+)
+--2.创建order_detail表,字段为detail_id(主键),order_id(外键),item_name
+create table orderd(
+       did number primary key,
+       doid number(8,2),
+       dname varchar(50),
+       constraint fk foreign key(doid) references orders(oid)
+)
+--3.为orders表和order_detail表插入数据，
+--从表的doid的值必须能在orders的oid里找到，但是现在从表的外键可以是null
+insert into orderd(did,dname) values(1,'111')
+select * from orders
+select * from orderd
+--4.删除orders表和order_detail表中的数据
+
+--==========================Oracle事务（了解）
+--1.设置savepoint 回滚点，再次修改数据后用rollback to 回滚点，回滚数据
+insert into orders(oid) values(1);
+savepoint p1;
+insert into orders(oid) values(2);
+rollback to p1;                                   --回滚到存档点p1
+--rollback;                                       --回滚到存档点p1前面了                
+select * from orders
+
+--==========================视图
+/*
+grant dba to scott
+视图：就是一张虚拟表，本身不存放数据，数据来源于原始表
+创建 create [or replace] view 视图名 as sql查询语句；
+
+*/
+--作用：为复杂查询创建示意图，然后直接查询视图即可，
+--可以简化sql语句或者hql,dbc语句等
+--1.创建视图
+create or replace view vvv as select * from emp
+create or replace view vv as select * from emp
+--2.查询视图
+select * from vvv
+--3.修改视图中7369的名字为'smith'
+update vv set ename='smith11' where empno=7369
+select * from emp
+insert into  vvv(empno) values('3333')     --可以增加
+insert into  vv(empno) values('3334')      --报错
+--4.删除视图
+drop view vv
+--5.创建只读视图（关键字 with read only,不能增删改）
+create or replace view vv as select * from emp with read only
+
+--==========================序列
+/*
+序列：类似于MySql的自动增长
+create sequence seq_test 
+start with 5     
+increment by 2    
+maxvalue  20
+cycle      
+cache 5      
+*/
+
+
+--1.创建序列
+create sequence s
+--2.如何查询序列（currval,nextval）
+select s.nextval from dual
+select s.currval from dual
+--3.删除序列
+drop sequence s
+--4.为person表插入数据，用序列为id赋值
+select * from person
+insert into person(pid) values(s.nextval)
+select * from person
+
+insert into person(pid) values(3)
+
+
+--==========================索引
+/*
+目的是提高检索速度
+语法：create index 索引名称 on 表名(列名);
+原则：大数据表才创建索引，
+      为经常用到的列创建索引，
+      索引的层数不要超过4层，也就是on 表名(列名1,列名2)这里的列名不要超过4个
+*/
+
+/*
+
+--创建索引
+create  index person_index on person(pname);
+--删除索引
+drop index person_index 
+
+--创建500万条的数据
+create sequence seq_person;
+
+begin
+   for i in 1..5000000 loop
+    insert into person values(seq_person.nextval,'测试数据'||i);
+   end loop;
+   commit;
+end;
+
+select * from t_test where tname ='测试数据4789889'  1.797s
+*/
+
+--====================================同义词（了解）
+/*
+为表创建别名
+同义词和视图的区别：不需要dba权限就可以创建同义词
+视图可以隐藏列，同义词不可以去掉列只是整张表的复制
+
+创建
+create public synonym 同义词名 for 目标表名
+删除
+drop public synonym 同义词名
+*/ 
+select * from scott.emp
+create public synonym ss for scott.emp
+select * from ss
+--====================================导入导出
+/*
+PLSqlDeveloper的导入导出方式参照Oracle导入导出.docx
+
+这个在安装oracle的电脑（虚拟就）的cmd里运行。
+全库导出:exp system/orcl full=y file=expdat.dmp
+全库导入:imp system/orcl full=y file=expdat.dmp
+按用户导出: exp scott/tiger file=expdat.dmp
+按用户导入: imp scott/tiger file=expdat.dmp full=y
+/
+exp scott/tiger full=y file='f:/1.dmp'*
