@@ -1,0 +1,23 @@
+持久化类要遵循JavaBean的规范：
+⑴ JavaBean 必须放在一个单独的包中
+⑵ JavaBean 必须申明为 public class 即：必须是公有的类
+⑶ JavaBean 的所有属性必须申明为 private 即：属性必须私有
+⑷ 通过公有的 setter 方法和 getter 方法设值和取值    
+⑸ 必须有一个公有无参构造方法
+⑹ 编写代码要严格遵守 Java 程序的命名规范（这个不必须）
+(7)必须提供一个OID作为主键（一般是long属性）
+(8)最好使用包装类（int->Integer)
+(9)不能用final修饰
+(10)实现serializable接口。因为可能要读写到硬盘（钝化活化）。
+
+生成数据库表时的默认值
+基本类型：int 0
+包装类：integer null
+
+
+==============================================================================
+
+domain的类写在dao层的java，然后在dao层的resouces同样的路径下hbm.xml，
+例如Customer.java在src/main/java/cn/domain，
+那么Custoemr.hbm.xml在src/main/resouces/cn/domain，否则会报错。
+

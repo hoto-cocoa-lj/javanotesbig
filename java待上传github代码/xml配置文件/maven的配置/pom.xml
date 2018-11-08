@@ -3,14 +3,17 @@
 	
 	<!-- 这么导入的话，myeclipse里显示项目名字是m2，
 		用myeclipse的tomcat运行的话，Context root是m1，
-		即路径是http://localhost:8080/m1/ 	-->
+		即路径是http://localhost:8080/m1/ 。
+		由于name和description可以不写，所以估计最好不写。
+		groupId类似本项目的包，artifactId是项目名，即cn.itcast.maven.m1，
+		这个项目在src.main.java下。下面dependency的类似，不过实在仓库里。-->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.itcast.maven</groupId>
 	<artifactId>m1</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>m2</name>
-	<description>m3</description>
+	<!--<name>m2</name>
+	<description>m3</description>-->
 	
 	
 	<!-- 添加servlet-api，jsp-api -->

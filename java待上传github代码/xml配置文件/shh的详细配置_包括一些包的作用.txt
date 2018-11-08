@@ -66,6 +66,7 @@ spring必须4个包ioc，2个日志包logging和log4f，4个包aoc，jdbc模板�
 
 
 jsp的注释方法是全选要注释的代码后ctrl+shift+/。
+jsp前面要加上<%@taglib prefix="s"  uri="http://java.sun.com/jsp/jstl/core"%>。
 
 
 

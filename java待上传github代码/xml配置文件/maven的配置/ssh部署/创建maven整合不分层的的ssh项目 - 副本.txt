@@ -1,0 +1,23 @@
+1_右键新建maven project，勾选create a simple project
+
+2_右键项目名，找到project facets--->点击Dynamic web Module 2.5和java 1.7,
+点击下方的futher configuration avaiable，将context directory改成src/main/webapp，
+勾选generate web.xml。如果Dynamic web Module已经被选择，取消勾选点击app在按上述操作即可。
+这时搜索web，可以看到context root的web-root folder变成了src/main/webapp。
+有时会提示further configuration required，似乎删除folder里的src即可。
+至此已经可以在tomcat7添加此项目运行。
+
+4_配置pom。直接复制粘贴最好。
+不复制粘贴的话，配置如下：
+	1_加入struts2-core 2.3.24，hivernate-core 5.07，	
+	版本冲突问题：
+	javassist两个版本的冲突，右键低版本，exclude maven artifact，
+	默认ok，保存即可发现低版本没了。不解决的冲突问题可能报错。
+	
+	2_加入struts2-spring-plugin 2.3.24和spring-context 4.2.4，
+	版本问题2：
+	这两个包都依赖spring-beans，但版本不一样，谁先被导入就只用谁的。
+	如果谁的都不想用，可以再单独导入spring-beans，这样会用单独导入的。
+	这个问题不解决也不会报错。
+	
+	3_最好的解决办法是锁定版本。

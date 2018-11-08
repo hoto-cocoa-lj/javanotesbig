@@ -1,0 +1,11 @@
+导入jsp-api的包，在jsp文件前面加上
+<%@taglib prefix="s" uri="/struts-tags" %>
+
+
+遍历语法如下：
+
+ 		<s:iterator value="lc" var="b">
+   
+				<s:property value="#b.cust_name"/>
+
+   		</s:iterator> 

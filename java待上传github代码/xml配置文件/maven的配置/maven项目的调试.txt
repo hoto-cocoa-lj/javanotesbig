@@ -1,0 +1,4 @@
+用myeclipse的tomcat，直接打断点调试即可。教程里用了很多部，原因可能老师用的是eclipse。
+
+如果要用maven的tomcat，需要右键项目名，在debug as选maven build，
+然后tomcat7:run即可。似乎没用。

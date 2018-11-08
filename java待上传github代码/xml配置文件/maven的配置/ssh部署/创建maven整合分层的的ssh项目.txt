@@ -1,0 +1,44 @@
+1_右键新建maven project（主项目），勾选create a simple project，packaging选pom。
+主项目group id是以后子模块的src下的路径，需要匹配。比如group id=cn.itcast，
+那么dao模块的CustomerDao要放在src/main/java/cn.itcast.dao，
+Customer要放在src/main/java/cn.itcast.domain，不然找不到类。
+主项目里不会写任何代码，不放任何文件，导入项目时只导入主项目，
+项目报错的话maven里update主项目试试。
+
+
+
+2_右键新建maven module，勾选create a simple project，
+packaging选pom。分别创建web层(war)，service层(jar)，dao层(jar)。
+
+
+
+3_在web模块创建action，设置私有变量cs和set方法，在web的pom里add依赖CustomerService。
+在service模块创建接口和实现类cs，在service的pom里add依赖CustomerDao。
+在dao模块创建接口和实现类cd。
+
+
+
+4_主项目的pom直接复制粘贴即可。自己配置的话，见未分层的笔记(记得注释掉servlet和jsp的导入)。
+可以发现主项目导入的包，子项目都能使用。
+
+如果a(如service层)依赖了b(如dao层)，那么b的包a都能用。
+
+版本：第一声明优先，路径近者优先。
+
+版本锁定：pom里设置<dependencyManagement>，里面写上包的版本号，在导入该包时不用再写版本号，
+而且add的时候，该版本号上会有一把锁。
+
+版本常量：pom里设置版本变量<properties><a>4.2.4</a></properties>，在下面导入时版本填写${a}，
+即可引用的该版本(4.2.4)，好处是可以非常方便的修改版本。
+
+
+5_每个模块都要自己的applicationContext.xml，dao层可以叫applicationContext-dao.xml，
+其他层名字类似。
+
+dao层需要配置c3p0，sessionFactory，hibernateTemplate，cd，
+不需要处理service和web，所以cs和ca部分的配置可以删掉。
+
+service层需要配置cs，transactionManager，和开启事务即可。不过进行测试的话需要cd，
+所以可以<import resource="classpath:applicationContext-dao.xml"/>，正式运行时再注释掉。
+
+

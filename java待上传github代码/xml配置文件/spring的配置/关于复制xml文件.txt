@@ -1,0 +1,3 @@
+ssh的xml配置版本复制applicationContext_ssh_xml版本.xml，
+这个目录的其他三个xml学习用，不适合做项目。
+要做项目的话，复制ssh代码里对应的xml。
