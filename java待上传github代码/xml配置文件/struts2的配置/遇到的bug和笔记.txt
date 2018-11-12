@@ -3,3 +3,10 @@
 web.xml和UserAction.java如外面两个文件一样配置，
 可以删除struts可以删除struts.xml。
 
+
+报错There is no Action mapped for namespace [/sysadmin] and action。。
+最后发现相应的方法是private方法。
+
+值栈里root区域的数据，可以用${fuck}直接取。
+例如比如a=1,Customer c,c.setName("fuck")，
+那么${a}=1，${name}=“fuck”。

@@ -1,0 +1,16 @@
+分页部分，page.java里封装了links属性，使用了js拼接的方法，
+首页末页上一页下一页写在<a href="#" onclick=formSubmit(url,"_self") />里，
+formSubmit在common.js里，源码如下
+	function formSubmit (url,sTarget){
+		document.forms[0].target = sTarget
+		document.forms[0].action = url;
+		document.forms[0].submit();
+		return true;
+	}，
+作用是通过post提交表单跳转到url。似乎可以用gogo方法代替，
+源码见  笔记day02的Page.java。
+这个代码要特别注意url，因为这个page.java属于工具类，要有通用性，
+而不同地址里的分页的url一定是变化的，所以这里从请求里地址获取，
+并且使用相对路径。
+
+java文件里，选中接口或者class后，ctrl+T可以查看该接口/类的 的继承/实现类。

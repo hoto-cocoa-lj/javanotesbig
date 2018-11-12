@@ -1,18 +1,22 @@
+导入导出数据库见day03.pdf或者Oracle导入导出.docx。
+由于设置import/export executable失败，无法使用oracle import/export。
+使用sql inserts时也必须勾选use command window。
+
 --===========DDL(Data Definition Language)语句管理表
 /*
 create tablespace 表空间名称
-datafile 数据文件路径，后缀名dbf
-size 100m         默认大小
-autoextend on     是否可以增大空间
-next 10m;             每次增大多少
+datafile 			--数据文件路径，后缀名dbf
+size 100m        -- 默认大小
+autoextend on     --是否可以自动增大空间
+next 10m;             --每次增大多少
 */
 
---1.创建itcast001表空间，权限不够会报错insufficient privileges
+--1.创建名为itcast297表空间，权限不够会报错insufficient privileges
 create tablespace itcast297 datafile 'c:/itcast297.dbf' size 10m autoextend on next 5m
---2.创建itcastuser用户，设置密码和表空间
+--2.创建用户itcast，设置密码itcast和表空间
 create user itcast identified by itcast default tablespace itcast297
 --3.为itcastuser用户赋予dba权限
-grant dba to itcast
+grant dba to itcast297
 --删除表空间并将物理文件一并删除。
 --用create生成的表空间都用drop删除
 DROP TABLESPACE itcast297 INCLUDING CONTENTS AND DATAFILES;
