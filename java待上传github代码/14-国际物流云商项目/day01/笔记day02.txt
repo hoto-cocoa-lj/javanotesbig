@@ -1,3 +1,5 @@
+Specification和toPredicate自行百度和参考笔记的 第03天.md。
+
 分页部分，page.java里封装了links属性，使用了js拼接的方法，
 首页末页上一页下一页写在<a href="#" onclick=formSubmit(url,"_self") />里，
 formSubmit在common.js里，源码如下
@@ -15,3 +17,34 @@ formSubmit在common.js里，源码如下
 
 java文件里，选中接口或者class后，ctrl+T可以查看该接口/类的 的继承/实现类。
 创建数据库时，字段是要求字段的3倍，比如密码最长16位，建表时给50位。
+
+更新数据库信息，可以在更新页隐藏域加上id，更新是用这个id搜索得到a，
+然后把要修改的属性一个一个加到a上，再保存更新a即可。
+
+自己写代码解决外键删除时，使用了递归，代码如下：
+	public void deleteById(String id) {
+		Dept d1=dd.findOne(id);
+		try {		
+			if(d1!=null){
+				dd.delete(id);
+			}
+		} catch (Exception e) {
+		}	
+	}
+
+	public void dg_delete(String s) {
+		List<Dept> ld = dd.findDeptByPid(s);
+		for(Dept p:ld){
+			dg_delete(p.getId());
+		}
+		deleteById(s);
+	}
+有几个要点：
+1_Dept d1=dd.findOne(id)这里以前使用getOne，看baidu和看源码可以知道，
+getOne没有找到会报错，所以用findOne（没找到返回null)，不然genOne也要放if里；
+2_dd.delete(id)的源码会先findOne(id)，返回null会报错。
+但是即使在外面接收处理这个错误，也会出现事务无法提交，
+在console不报错而在页面报错，所以代码里我写了findOne返回null就不delete。
+3_下面是递归，没什么要说的。
+4_更好的办法是在sqlplus里设置该列cascade。
+

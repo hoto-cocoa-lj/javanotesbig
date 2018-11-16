@@ -152,3 +152,6 @@ public class Page<T> {
 	
 
 }
+
+spring data jpa方法命名规则
+https://blog.csdn.net/sbin456/article/details/53304148

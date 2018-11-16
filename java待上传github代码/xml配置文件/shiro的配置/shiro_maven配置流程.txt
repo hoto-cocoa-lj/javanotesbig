@@ -1,0 +1,22 @@
+1_在主项目的pom里导入shiro1.2.3
+
+2_ 
+	web.xml里struts配置前面加上：
+			<!-- Shiro Security filter filter-name这个名字的值将来还会在spring中用到 -->
+			<filter>
+				<filter-name>shiroFilter</filter-name>
+				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+				<init-param>
+					<param-name>targetFilterLifecycle</param-name>
+					<param-value>true</param-value>
+				</init-param>
+			</filter>
+			<filter-mapping>
+				<filter-name>shiroFilter</filter-name>
+				<url-pattern>/*</url-pattern>
+			</filter-mapping>
+	<filter-name>shiroFilter</filter-name>这个名字和下面必须一致。
+	
+	applicationContext.xml目录下放applicationContext-shiro.xml。
+	详细部分看本目录的源码
+		
