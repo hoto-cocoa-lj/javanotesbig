@@ -1,0 +1,18 @@
+获取chexkbox的数据，以前都是用String，提交多个值时它自己会拼接，
+成a,b,c这样的字符串，其实还可以用数组，例如Double[]，String []，
+这样获取到的数据就是[a,b,c]。好处是对于非String数据也可以获取(，
+否则需要类型转换。
+
+tabledo的用法见代码。
+excel代码见 ContractPrint.java 。
+里面有插入图片，插入公式，日期，人民币等的设置。
+
+
+
+applicationContext.xml里加入
+<import resource="classpath:applicationContext-job.xml"/>
+0 0 0 9,21 ? 1 1L 2019表示2019年最后一个周(日?)的9点21点各触发一次。
+详情百度quartz CronExpression。
+
+
+applicationContext-job.xml内容见代码。

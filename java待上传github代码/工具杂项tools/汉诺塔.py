@@ -1,9 +1,7 @@
-x=0
-n=5
+x,n=0,8
 a=list(range(1,1+n))
 a.reverse()
-b=[]
-t=[]
+b,t=[],[]
 
 def f(a,b,t,n):
     global x  
@@ -20,6 +18,13 @@ def f(a,b,t,n):
 def g(a1,b1,t1):
     print(a,'\t'*2,b,'\t'*2,t)
     b1.append(a1.pop())
+
+
+
+
+
+
+
     
 def printf(a1,b1,t1):
     a1=a1.copy()

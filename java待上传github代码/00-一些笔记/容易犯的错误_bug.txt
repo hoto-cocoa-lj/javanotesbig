@@ -1,0 +1,1 @@
+判断字符串是否相等一定要用equals，因为Integer a="1",但a=="1"是false。

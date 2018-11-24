@@ -1,3 +1,10 @@
+级联删除有三种，不管是一(a)对多(b)还是一(a)对一(b)，在b引用a的主键的情况下，
+都是在表b设置，且在删除表a的数据时发挥作用，可在plsql里设置：
+no action：删除失败，会报错提示有子数据；
+cascade：删除相应从表数据；
+set null：将从表相应的数据的主键设为null。
+
+
 导入导出数据库见day03.pdf或者Oracle导入导出.docx。
 由于设置import/export executable失败，无法使用oracle import/export。
 使用sql inserts时也必须勾选use command window。

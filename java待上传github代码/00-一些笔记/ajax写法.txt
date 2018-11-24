@@ -1,0 +1,67 @@
+java后台代码
+
+@Action(value="exportAction_getTabledoData")
+	public String getTabledoData() throws Exception {
+		// TODO Auto-generated method stub
+		
+		Specification<ExportProduct> spec = new Specification<ExportProduct>() {
+
+			@Override
+			public Predicate toPredicate(Root<ExportProduct> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+				// TODO Auto-generated method stub
+				return cb.equal(root.get("export").get("id").as(String.class), model.getId());
+			}
+		};
+		List<ExportProduct> epList = exportProductService.find(spec);
+		
+		ArrayList list = new ArrayList();
+		for (ExportProduct exportProduct : epList) {
+			HashMap map = new HashMap();
+			map.put("id", exportProduct.getId());
+			map.put("productNo", exportProduct.getProductNo());
+			map.put("cnumber", exportProduct.getCnumber());
+			map.put("grossWeight", UtilFuns.convertNull(exportProduct.getGrossWeight()));
+			map.put("netWeight", UtilFuns.convertNull(exportProduct.getNetWeight()));
+			map.put("sizeLength", UtilFuns.convertNull(exportProduct.getSizeLength()));
+			map.put("sizeWidth", UtilFuns.convertNull(exportProduct.getSizeWidth()));
+			map.put("sizeHeight", UtilFuns.convertNull(exportProduct.getSizeHeight()));
+			map.put("exPrice", UtilFuns.convertNull(exportProduct.getExPrice()));
+			map.put("tax", UtilFuns.convertNull(exportProduct.getTax()));
+			
+			list.add(map);
+		}
+		
+		String jsonString = JSON.toJSONString(list);
+		
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("utf-8");
+		response.getWriter().write(jsonString);
+		
+		return NONE;
+	}
+	
+
+============================================================
+
+页面ajax代码：不熟悉的话加个error的回调函数，这样才能知道是否出错。
+
+$.ajax({
+			url:'${ctx}/cargo/exportAction_getTabledoData.action?id=${id}',
+			type:'get',
+			dataType:'json', 
+			success:function(v){
+				console.log(v);
+				for(j=0;j<v.length;j++){
+					i=v[j];
+					addTRRecord('mRecordTable', i.id, i.productNo, i.cnumber,
+					i.grossWeight, i.netWeight, i.sizeLength,
+					i.sizeWidth, i.sizeHeight, i.exPrice, i.tax);	
+				}
+			},	
+			error:function(v){
+				alert("error");
+				console.log(v);
+			},	
+		})
+    });
+	
