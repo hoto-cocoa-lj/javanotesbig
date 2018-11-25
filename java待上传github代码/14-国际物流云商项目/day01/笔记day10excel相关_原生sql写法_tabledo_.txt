@@ -1,0 +1,37 @@
+获取chexkbox的数据，以前都是用String，提交多个值时它自己会拼接，
+成a,b,c这样的字符串，其实还可以用数组，例如Double[]，String []，
+这样获取到的数据就是[a,b,c]。好处是对于非String数据也可以获取(，
+否则需要类型转换。
+
+tabledo的用法见代码。
+excel代码见 ContractPrint.java 。
+里面有插入图片，插入公式，日期，人民币等的设置。
+
+
+
+applicationContext.xml里加入
+<import resource="classpath:applicationContext-job.xml"/>
+0 0 0 9,21 ? 1 1L 2019表示2019年最后一个周(日?)的9点21点各触发一次。
+详情百度quartz CronExpression。
+
+
+applicationContext-job.xml内容见代码。
+
+
+amchart，highchart：
+用法：	先把demo加入项目，加入js/css等样式，注意js有顺序，
+		别忘记修改demo的路径和可能要导入jquery，修改demo的路径，
+		路径修改时html文件不用${pageContext.request.contextPath}，
+		路径不对的情况可以在程序运行后页面看到路径，根据路径修改修改即可。
+		要用其他方法或者把html的body里的内容放进jsp，
+		能正常显示图片后用ajax请求数据并替换。
+		有时候数据要double/int类型，可以用Double.parseDouble(a.toString)转换。
+		ajax请求可以用相对路径，直接写action里value的值就行。
+		
+		
+原生sql写法：
+	@Query(value="select o.a1,nvl(p.c,0) from online_info_t o left join "+
+				"(select to_char(t.login_time,'HH24') z,count(*) c "+
+				"from LOGIN_LOG_P t group by to_char(t.login_time,'HH24')) p "+
+				"on o.a1=p.z order by o.a1",nativeQuery=true)
+	public List<Object[]> getip();

@@ -1,0 +1,62 @@
+服务端：
+1_创建maven项目，war，写接口和实现类，
+接口类要加@WebService(import javax.jws.WebService)；
+2_开启服务器，代码如下：
+package cn.itcast.test1;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.junit.Test;
+import cn.itcast.w_service.Weather_s_impl;
+public class Test2 {
+	public static void main(String[] args) {
+		JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
+		f.setAddress("http://localhost:12222/weather");
+		f.setServiceBean(new Weather_s_impl());			//接口的实现类
+		f.create();				//开启服务器
+	}
+}
+
+客户端（似乎可以不创建服务器，用现成的；
+如果服务器修改了代码，删除客户端的自动生成代码重新生成即可）：
+1_创建maven项目，jar，打开src/main/java目录，地址栏输入cmd，
+运行 wsimport -s . http://localhost:12222/weather?wsdl ，
+这样会在客户端生产各种java文件，
+包括服务端的接口和类会在这里生成的对应接口和类；
+2_开启客户端，并调用方法。代码如下：
+package cn.itcast.test1;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import cn.itcast.w_service.WeatherS;
+public class Test1 {
+	public static void main(String[] args) {
+		JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
+		f.setAddress("http://localhost:12222/weather?wsdl");
+		//这里的WeatherS是服务端的Weather_s接口在客户端自动生成的接口。
+		f.setServiceClass(WeatherS.class);			
+		WeatherS c = (WeatherS) f.create();		//创建开启服务端
+		String s = c.wwwwww("北京");
+		System.out.println(s);
+	}
+}
+
+
+
+
+spring整合cxf：
+服务端：创建maven程序，war，web.xml里加入spring和servlet的配置，
+其中servlet的类必须是org.apache.cxf.transport.servlet.CXFServlet，
+不是自己创建serlvet生成的默认配置信息，
+<param-value>classpath:applicationContext*.xml</param-value>可以加载多个，
+applicationContext-ws-service.xml里加入如下配制，用来创建服务器：
+	<jaxws:server address="/user">
+		<jaxws:serviceBean>
+		    <bean class="cn.itcast.service.UserServiceImpl" />
+		</jaxws:serviceBean>
+	</jaxws:server>	
+详细代码见cxfservice(cxf的spring整合代码)。
+
+客户端：
+创建maven程序，jar，applicationContext-ws-cilent.xml里加入如下配制，用来创建服务器：
+	<!-- 配置客户端对象 -->
+	<jaxws:client id="myClient" 
+	address="http://localhost:8080/cxfservice/ws/user?wsdl" serviceClass="cn.itcast.service.IUserService"/>
+加载xml文件。getbean生成对象。
+详细代码见cxfcilent(cxf的spring整合代码)。
