@@ -37,7 +37,7 @@ public class Test1 {
 	}
 }
 
-
+====================================================================
 
 
 spring整合cxf：
@@ -60,3 +60,24 @@ applicationContext-ws-service.xml里加入如下配制，用来创建服务器�
 	address="http://localhost:8080/cxfservice/ws/user?wsdl" serviceClass="cn.itcast.service.IUserService"/>
 加载xml文件。getbean生成对象。
 详细代码见cxfcilent(cxf的spring整合代码)。
+
+
+====================================================================
+海关报运相关：
+描述：海关使用ssh整合cxf提供报运接口，项目作为客户端使用maven整合cxf报运。
+服务端：
+项目名称jk_export，web.xml里设置了/ws/*，这里struts依旧是*，
+applicationCOntext-ws.xml里设置了address="/export"，
+所以最终路径是/jk_export/ws/export?wsdl。还有为了让struts不拦截ws的请求，
+这里struts调用了自己的类a，而类a继承了struts的默认类，并且对ws的连接放行，
+详情见代码jk_export，不过只保留了纯代码部分。上面的笔记的代码的做法是，
+struts拦截的类加了其他前缀。
+
+客户端：
+在主项目下创建maven模块isc，jar，在src/main/java目录cmd，生成代码。
+web模块依赖isc(pom里添加即可)，web模块下添加applicationContext-ws-client.xml，
+作用是有spring管理(生成)对象，不再需要手动创建和getbean，代码如下：
+	<jaxws:client id="exportClient" address="http://localhost:8080/jk_export/ws/export?wsdl" serviceClass="cn.itcast.export.webservice.IEpService"/>
+applicationContext.xml里设置扫描applicationContext-ws-client.xml，
+然后web的对应的action用@Autowired标注私有属性IEpService ies，
+然后根据需要创建map封装属性。详情见isc。

@@ -1,0 +1,8 @@
+源码里汉字乱码(这个可能导致源码报错)：
+windows--->Perfences-->general-->content types-->text-->java source file
+-->default encoding(utf-8/gbk)-->update-->ok
+
+====================================================================
+
+开启多个tomcat7.0，复制tomcat软件，删除webapps的项目，修改conf/server.xml，
+把所有端口修改(+1000)，在myeclipse添加tomcat7即可。
