@@ -31,5 +31,11 @@ action里别自己定义get，set开头的方法；
 No result defined for action cc.action.UserAction and result input，
 原因是action传递值的问题，而不是没有对应的方法。
 	
-	
 ===============================================================
+
+stackoverflow：
+json转换时发生，原因是类a有类b的集合，b有a的引用，造成无限引用。
+解决方法2种，一个是a和b的引用的字段加上transient，
+但是可能造成无法启动项目(原因是spring无法创建类?)；
+一个是用map或者其他对象封装a和b，比如用c,d封装a,b，
+c有d的set，但d没有c的引用即可。

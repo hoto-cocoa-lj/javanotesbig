@@ -1,0 +1,87 @@
+@XmlRootElement(name = "User")		//括号可以不要
+这个注解放在class上面，会把这个类转成xml格式。例如
+<User>
+		<name>fuck</name>
+		<car>fuck car</car>
+</User>
+
+
+服务器：
+海关报运项目，一共有6个封装数据类型，3个封装export3个封装exportproduct，
+export的3个类分别用来封装export，exportvo，exportresult，
+export的商品是exportproduct类的set，exportproduct里没有export的引用，
+所以不会出现无限引用；
+exportvo和exportproductvo分别是export和exportproduct的子类，
+只是加上了@XmlRootElement，这样可以被自己的方法调用；
+exportresult是报运完成后返回数据的类。
+其实vo和result相当于map，封装后更方便。
+
+客户端：
+一共有6个封装数据类型，3个封装export3个封装exportproduct。
+export和exportproduct是自带的，但是会无限引用，根本不能转json，
+如果在某个引用的字段设置transient不会无限引用(不序列化)，
+但是好像会在spring创建对象时报(什么什么shiro?)，所以不能直接转。
+所以封装数据用vo，接收报运返回数据用result，result直接从服务器复制即可，
+但vo不能直接复制服务器的，因为vo继承原始类，
+而服务器的原始类不存在无限引用客户端却存在，但是又不能复制服务器的原始类，
+因为会覆盖客户端的(否则要改名很麻烦)。所以vo直接复制服务器的原始类，
+然后加上@XmlRootElement，并将exportvo的set泛型改成exportproductvo即可。
+因为不改的话依旧引用exportproduct造成无限引用，而且修改的话不会出现排斥，
+(当初自己没想到这里)，虽然客户端的vo引用vo而服务器的vo引用原始类，
+但是服务器的vo和原始类的属性完全相同，而传输方式是json/xml，
+这说明服务器根本不看类只看字段，这也是能直接用map封装的原因。
+
+
+使用restful风格的cxf，需要导入以下jar：
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxrs</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-rs-client</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-rs-extension-providers</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jettison</groupId>
+			<artifactId>jettison</artifactId>
+			<version>1.3.7</version>
+		</dependency>
+
+		
+		
+========================================================================
+
+
+在roleAction里使用redis：
+描述：访问roleAction_genzTreeNodes时优先从redis获取权限列表，
+没有的话再从数据库获取。
+要点：直接从redis获取得到a，a是null则从数据库获取，并复制一份给redis。
+要注意两点，一个是a的key必须带id，因为权限列表包含该id的信息(是否check)，
+一个是权限提交修改后会更新数据库，但redis不会更新，而下次依旧获取reids的数据，
+造成bug。解决方法是提交时从redis删除(del)该key即可。
+也就是说使用redis缓存，都要考虑数据被修改的情况和
+数据的key是否相同(不同人的数据不同就要用不同的key，所有数据相同则不加)。
+
+
+
+========================================================================
+
+https://blog.csdn.net/zl18310999566/article/details/52712465
+用fastjson转换一个list[对象a，对象b，对象a]时，同一个对象会出现"$ref"，
+SerializerFeature.DisableCircularReferenceDetect可以禁止循环引用。
+当出现无限引用时也可以用这个禁止循环引用，但是会出现stackoverflow，
+这时候删除一方对另一方的引用即可。也可以用simplepropertyprefilter。
+
+		
+		
+		
+		
+		
+		

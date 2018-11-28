@@ -6,3 +6,37 @@ windows--->Perfences-->general-->content types-->text-->java source file
 
 开启多个tomcat7.0，复制tomcat软件，删除webapps的项目，修改conf/server.xml，
 把所有端口修改(+1000)，在myeclipse添加tomcat7即可。
+
+
+====================================================================
+
+报错ClassNotFoundException: org.springframework.web.context.ContextLoad...:
+https://www.cnblogs.com/aisam/articles/4686362.html
+运行某项目时报错。工程WEB-INF目录下自动生成了lib目录，但没有jar包。
+Properties-->Deployment Assembly-->Add-->Java Build Path Entries
+-->Next-->Maven Dependencies-->Finish，然后可以看到已经把Maven Dependencies添加到Web应用结构中了。
+在web项目中一般都需要将java文件以及资源文件发布到指定位置，其中deployment assembly的作用就在于此。如图web_Deployment_Assembly.jpg，
+图表示java下的源码，resouce下的配置文件放在web-inf/classes里，
+maven导入的jar放在web-inf/lib，其他放在根目录。
+
+====================================================================
+
+随便打开一个项目，点击项目里面的xml文件，然后返回重新创建maven工程，
+use default workspace此时就变为空了。
+
+====================================================================
+
+  <listener>
+      <listener-class> org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <context-param>
+       <param-name>contextConfigLocation</param-name>
+       <param-value>classpath:applicationContext*.xml</param-value>
+  </context-param>
+  这样设置可以加载满足条件的applicationContext*.xml，
+  不用再在applicationContext.xml里写
+  <import resource="classpath:spring/applicationContext-ws.xml"/>。
+  
+====================================================================
+maven项目里，web模块的classpath:applicationContext.xml里写<import resource="classpath:applicationContext-redis.xml"/>，
+可以读取其他模块下src/main/resouce里的xml。

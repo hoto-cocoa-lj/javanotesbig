@@ -1,0 +1,100 @@
+String url="192.168.153.129";
+
+
+1_：使用jedis：
+		Jedis j = new Jedis(url,6379);
+		String s=j.get("modules");
+		System.out.println(s);
+
+========================================================================
+2_使用spring整合的带连接池的redis：
+
+	在applicationContext.xml里导入applicationContext-redis.xml(a)，a的配置：
+    <!-- 创建Jedis的连接池配置对象    JedisPoolConfig config = new JedisPoolConfig(); -->
+    <bean id="config" class="redis.clients.jedis.JedisPoolConfig">
+    	 <property name="maxTotal" value="50"></property>
+    	 <property name="maxIdle" value="10"></property>
+    </bean>
+    
+    <!-- 创建连接池对象  JedisPool pool = new JedisPool(config, "192.168.153.129", 6379); -->
+    <bean id="pool" class="redis.clients.jedis.JedisPool">
+    	<constructor-arg index="0" ref="config"></constructor-arg>
+    	<constructor-arg index="1" value="192.168.153.129" type="java.lang.String"></constructor-arg>
+    	<!-- <constructor-arg index="2" value="6379"></constructor-arg> -->
+    </bean>
+	
+	maven导包，详情见方法3；
+	
+		JedisPoolConfig c = new JedisPoolConfig();
+		c.setMaxIdle(10);
+		c.setMaxTotal(30);
+		JedisPool jp = new JedisPool(c,url);
+		Jedis j = jp.getResource();
+		String s=j.get("modules");
+
+========================================================================
+
+3_使用spring整合的带org.springframework.data.redis.core.RedisTemplate的redis
+
+在主项目的pom里设置：
+        <!-- redis  start  -->
+        <dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>2.6.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+			<version>2.2</version>
+		</dependency>
+		   <!-- spring data redis -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-redis</artifactId>
+			<version>${springdataredis.version}</version>
+		</dependency>
+		   <!-- spring data redis -->
+
+		<!-- redis end  -->
+		
+		
+在applicationContext.xml里导入applicationContext-redis.xml(a)，a的配置：
+
+
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">  
+        <property name="maxIdle" value="300" />        
+        <property name="maxWaitMillis" value="3000" />  
+        <property name="testOnBorrow" value="true" />  
+    </bean>  
+	
+    <bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+            <property name="hostName" value="192.168.153.129"></property>
+            <property name="port" value="6379"></property>
+            <property name="poolConfig" ref="poolConfig"></property>
+            <!-- redis有16个数据库，这个可以用来切换数据库 -->
+            <property name="database" value="0"></property>
+     </bean>
+        
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">  
+        <property name="connectionFactory" ref="redisConnectionFactory" /> 
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+        </property>
+        <property name="valueSerializer">
+        	<bean class="org.springframework.data.redis.serializer.StringRedisSerializer"> 
+        	</bean>
+        </property> 
+    </bean>  
+
+	@Autowired
+	private RedisTemplate r;
+	public void test1() {
+		Object o = r.opsForValue().get("modules");
+		System.out.println(o);
+		r.opsForValue().set("fuck","you");
+		o = r.opsForValue().get("fuck");
+		System.out.println(o);
+		r.delete("fuck");
+		o = r.opsForValue().get("fuck");
+		System.out.println(o);

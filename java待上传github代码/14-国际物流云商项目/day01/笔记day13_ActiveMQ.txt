@@ -1,0 +1,11 @@
+运行apache-activemq-5.14.5\bin\win64的activemq.bat打开服务器，
+访问http://localhost:8161可以管理和查看详细队列，账号密码都是admin。
+
+学习了ActiveMq的基本写法，spring整合写法。
+每种写法都要写生成者，消费者，生产者成信息，消费者消费信息，
+消费者有两种方式消费，一种是用receive手动消费，receive一次消费一次，
+一种是用监听，有新信息就会调用监听的onMessage方法处理信息。
+这些信息都可以在localhost:8161里看到。详细代码见：
+ActiveMQ的queue基本代码.java
+ActiveMQ的topic基本代码.java
+ActiveMQ的spring整合.java

@@ -1,6 +1,7 @@
 InnoDB: Plugin initialization aborted with error Generic error
 
-
+查看ip：ip add
+centos账号密码：root/shuang
 
 rpm -qa | grep mysql							查看CentOS自带的mysql
 
@@ -49,6 +50,7 @@ cd /usr/local/rjb/apache-tomcat-7.0.57/bin
 
 
 
+redis账号密码都是root
 ./bin/redis-server redis.conf					#启动redis（先到redis目录）
 ./bin/redis-cli -h 192.168.88.130 -p 6379		#打开redis后才可以（远程）连接，需要防火墙开放6379
 192.168.88.130:6379>							#输入ping返回pong表示连接正常
