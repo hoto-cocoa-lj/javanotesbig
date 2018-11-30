@@ -1,0 +1,2 @@
+preferences-->workspace-->text file encoding选择utf-8；
+			-->jsp修改encoding为utf-8；

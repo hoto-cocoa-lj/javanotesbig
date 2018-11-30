@@ -1,0 +1,99 @@
+mybatis第一天
+一、mybatis的简介  
+ibatis1.0  ibatis2.0     ibatis3.0  
+
+jdbc   dbutil      hibernate   springDataJPA
+
+二、jdbc的代码的缺陷
+场景：根据id查询一个用户 
+1、准备一个数据库
+2、创建一个java工程
+3、导入mysql的驱动jar
+
+缺陷：
+1、涉及到重复创建链接和释放链接，造成资源浪费，解决方式：使用连接池
+2、出现硬编码，体现在，数据库驱动，url、用户名密码、sql，解决方式：使用配置文件
+3、结果获取不方便，解决方式：把结果放到一个POJO中
+
+三、mybatis的架构
+1、核心的配置文件 sqlMapConfig.xml      
+2、映射文件       XXXMapper.xml                      
+3、sqlSessionFactory----->sqlSession-->执行器（executor）--> mapperStatement(封装的是sql语句)
+4、输入映射（传入的参数） 
+    支持的数据类型：
+       基本数据类型：基础类型以及包装类、String
+       POJO
+       Map
+       包装的POJO：一个pojo中有pojo属性
+5、输出映射（产生的结果类型）
+        基本数据类型：基础类型以及包装类、String
+        POJO
+	Map
+	List
+四、入门案例
+ 场景：做用户的CRUD
+ 环境搭建步骤：
+ 1、创建java工程
+ 2、jar包：  驱动、mybatis的核心包、mybatis的扩展包、junit
+ 3、添加mybatis核心配置文件sqlMapConfig.xml
+ 4、添加一个log4j.properties
+ 5、创建一个用户的pojo
+ 6、创建一个映射文件
+ 7、把映射文件加载到sqlMapConfig.xml
+
+场景一：根据ID查询用户
+   #{}:占位符
+场景二：根据用户名查询   
+   ${}:连接符
+
+#{}和${}的区别
+#{}:占位符 ，如果传入的是字符串，预编译时会自动带上单引号
+${}:连接符 ：如果传入的是基础数据类型 大括号中只能写value 即${value},如果传入的是pojo或者map类型，大括号中只能写属性名或key名 ${username}
+场景三：新增
+ insert into user(username,birthday,sex,address)  values(aaa,sss,fff,gg);
+
+场景四：修改
+ update user set username=#{} , birthday=#{} ,sex=#{},address=#{} where id=#{}
+
+总结：hibernate和mybatis的区别
+1、应用场景：hibernate一般用于传统项目（银行的项目），mybatis一般应用于互联网项目
+2、学习成本：hibernate高度封装，mybatis半封装，核心封装的是sql语句，改动比较灵活
+
+五、mybatis DAO层的开发方式
+场景：根据ID查询用户+新增用户
+
+方式一：传统开发方式（因为还是有硬编码问题，不推荐）
+  接口+实现类+映射文件（了解）
+namespace：作用 ：sql的隔离
+
+
+方式二：mapper代理形式（官方推荐）
+  接口+映射文件
+
+开发规范：
+   1、接口的全路径要和映射文件的namespace保持一致
+   2、接口的方法名要和映射文件中的statementId保持一致
+   3、接口方法的参数类型、返回数据类型要和映射文件中的parameterType、resultType保持一致
+   4、接口和映射文件的名字最好保持一致   UserMapper.java  UserMapper.xml
+   5、接口和映射文件最好放到同一个目录
+
+六、sqlMapConfig.xml
+1、properties 加载规则：先加内后加外，两者都有会覆盖
+
+2、typeAliases 别名
+
+  <typeAlias type="cn.itcast.mybatis.pojo.User" alias="user"/> 
+   <package name="cn.itcast.mybatis.pojo"/>  默认的别名是类名
+
+3、mappers映射器
+  <mapper class="cn.itcast.mybatis.mapper.UserMapper"/>如果使用此方式：
+    接口和映射文件的名字要保持一致 
+    接口和映射文件要放到同一个目录
+
+ <package name="cn.itcast.mybatis.mapper"/>
+ 如果使用此方式：
+    接口和映射文件的名字要保持一致 
+    接口和映射文件要放到同一个目录
+
+
+

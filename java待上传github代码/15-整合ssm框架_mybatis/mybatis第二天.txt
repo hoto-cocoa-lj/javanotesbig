@@ -1,0 +1,86 @@
+mybatis第二天
+一、回顾
+ 1、mybatis架构
+    核心配置文件：sqlMapConfig.xml
+      properties属性
+      typeAliases别名
+      mapper映射器
+    通过加载sqlMapConfig.xml可以创建sqlSessionFactory（单例模式）---->sqlSession(具有CRUD方法)--->executor----->mappedStatement
+  2、输入映射
+      基础数据类型
+      pojo
+      map
+      包装的pojo
+
+  3、输出映射
+      基础数据类型
+      pojo
+      list
+      map
+  4、入门案例
+      1） #{}和${}的区别
+            #{}占位符，如果传入的是字符串，会自动加上单引号
+	    ${}连接符
+      2） parameterType和resultType
+           parameterType传入的参数类型
+	   resultType结果的类型 
+      3） selectOne和selectList的区别
+ 
+ 二、输入映射和输出映射
+ 1、输入映射
+      map
+      包装的pojo
+2、输出映射
+      基础数据类型
+      map
+3、resultMap
+   手动配置列和属性的映射
+
+三、动态的sql
+ <if> ： 判断
+ <where> ：去除第一个and或者or
+ <foreach> ：循环  可以循环数据也可以循环集合
+ <sql> ：片段
+ <include>:引用某sql片段
+ <set>: 修改时 去除最后一个逗号
+
+四、关联查询
+  一对一
+    <!--      构建一对一关联关系      -->
+     <association property="user" javaType="cn.itcast.mybatis.pojo.User">
+  一对多
+   <!--      collection：一对多关联  ，ofType:集合中包含的类型 -->
+     <collection property="ordersList" ofType="cn.itcast.mybatis.pojo.Orders" >
+五、mybatis和spring整合
+1、思路：从配置文件入手
+    sqlMapConfig.xml 
+      别名
+    XXXMapper.xml
+      <select>  <update>  <delete>
+    applicationContext.xml
+      数据源
+      sqlSessionFactory
+      事务（暂且不配置）
+      mappers映射器
+ 2、步骤：
+  1）、创建java工程
+  2）、导jar包 ，mybatis包、mybatis扩展包、mybatis和spring的整合包、spring的包r、驱动包、junit包
+  3）、添加配置文件
+       log4j.properties
+       jdbc.properties
+       sqlMapConfig.xml
+       applicationContext.xml
+3、开发
+  1）、传统dao开发方式  
+       接口+实现类（需要继承父类 SqlSessionDaoSurport）+映射文件
+
+  2）、代理开发方式
+       接口+映射文件     代理对象的产生交给spring容器
+
+
+
+六、逆向工程（了解）
+ 官方提供的，根据表生成 接口、pojo、映射文件
+
+
+
