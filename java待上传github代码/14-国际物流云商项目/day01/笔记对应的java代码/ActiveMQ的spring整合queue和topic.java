@@ -38,6 +38,9 @@ public class SpringMQ1 {
 //		for(int i=0;i<9;i++){
 			jq.send("itcast_spring_queue",m);
 //		}
+//		测试发现，直接运行这个方法消息也会被消费，因为运行这个就代表加载配置，
+//		就会运行配置好的消费者，所以开启while(true)就可以发现该消费者一直开着。
+//		while(true);
 	}
 	@Test				//spring整合的手动消费者
 	public void test2() throws JMSException {
@@ -48,6 +51,21 @@ public class SpringMQ1 {
 	//spring整合的监听者，配置完成后直接运行就会创建监听者，
 	//由于这是个测试类，为了测试类不关闭所以死循环。
 	public void test3() throws JMSException {
+		while(true);
+	}
+	
+	@Test
+	public void test1t() {
+		MessageCreator m=new MessageCreator() {			
+			@Override
+			public Message createMessage(Session session) throws JMSException {
+				TextMessage m1= session.createTextMessage("fuck spring topic");
+				return m1;
+			}
+		};
+		for(int i=0;i<9;i++){
+			jt.send("itcast_spring_topic",m);
+		}
 		while(true);
 	}
 }
@@ -113,11 +131,11 @@ public class SpringMQ1 {
        <jms:listener destination="itcast_spring_queue" ref="queue1"/>
     </jms:listener-container>
     
-<!--		下面是topic的配置   
+	<!--下面是topic的配置   -->
    <jms:listener-container  destination-type="topic" container-type="default" connection-factory="connectionFactory">
        <jms:listener destination="spring_topic" ref="topicConsumer1"/>
        <jms:listener destination="spring_topic" ref="topicConsumer2" />
-    </jms:listener-container> -->
+    </jms:listener-container> 
     
 </beans>
 
@@ -148,6 +166,30 @@ public class QueueListener implements MessageListener{
 		try {
 			System.out.println(m.getText());
 		} catch (JMSException e) {
+			e.printStackTrace();
+		}		
+	}
+}
+
+package cn.itcast.jms;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.TextMessage;
+
+import org.springframework.stereotype.Component;
+
+@Component(value="topicConsumer1")			//还有个topicConsumer2，不写了
+public class TopicListener1 implements MessageListener{
+
+	@Override
+	public void onMessage(Message arg0) {
+		TextMessage m=(TextMessage)arg0;
+		try {
+			System.out.println(m.getText());
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

@@ -1,0 +1,3 @@
+关于hibernate设置uuid，assigned：
+uuid：hibernate管理id，自己设置了也无效；
+assigned：必须自己添加id。
