@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.itcast.mybatis.mapper.UserMapper">
+<!--   statementId -->
+   <select id="findById" parameterType="int" resultType="user"  >
+    select * from user where id = #{id}
+   </select>
+   
+   
+   <select id="findById2" parameterType="int" resultType="map"  >
+    select * from user where id = #{id}
+   </select>
+   
+   <resultMap  id="findById3ResultMap"   type="user">
+<!--      user_name   username -->
+<!--      gender       sex -->
+     <id column="id" property="id"/>
+     <result column="user_name" property="username"/>
+     <result column="gender" property="sex"/>
+     <result column="birthday" property="birthday"/>
+     <result column="address" property="address"/>
+   </resultMap>
+   
+   <select id="findById3" parameterType="int" resultMap="findById3ResultMap"  >
+    select * from user_copy where id = #{id}
+   </select>
+   
+   <insert id="insertUser" parameterType="user">
+     <selectKey resultType="int" keyProperty="id"  order="AFTER">
+     <!--    返回当前事务最后产生的id值 -->
+     select LAST_INSERT_ID()
+     </selectKey>
+      insert into user(username,birthday,sex,address)  values(#{username},#{birthday},#{sex},#{address});
+   </insert>
+   
+   <select id="findUserByMap" parameterType="map" resultType="user">
+      select * from user where
+       username like '%${username}%'
+       and sex=#{sex} 
+       and address=#{address}
+   </select>
+   
+   
+   <select id="findUserByQueryVo" parameterType="queryVo" resultType="user">
+<!--      queryVo -->
+<!--         user  -->
+<!--           username='张' -->
+      select * from user where username like '%${user.username}%' 
+   </select>
+   
+   <select id="findUserCount" resultType="int">
+    select count(*) from user
+   </select>
+   
+   
+   <select id="findListByUser" parameterType="user" resultType="user">
+      select * from user 
+      
+      <include refid="findUserWhere"></include>
+      
+      
+   </select>
+   
+<!--    片段 -->
+   <sql id="findUserWhere">
+      <where>
+       <if test="username!=null and username!=''">
+         and username like '%${username}%'
+       </if>
+       
+       <if test="sex!=null and sex!=''">
+         and sex=#{sex} 
+       </if>
+       
+       <if test="address!=null and address!=''">
+        and address=#{address}
+       </if>
+      </where> 
+    
+   </sql>
+   
+   <select id="findListByArray" parameterType="queryVo" resultType="user">
+<!--      queryVo  -->
+<!--        ids =[ 1 29 30 ] -->
+<!--      select * from user where id in (1,29,30) -->
+      select * from user where id in
+       <foreach collection="ids" open="("  close=")"  separator="," item="id">
+         #{id}
+       </foreach>
+   
+   </select>
+   
+   
+   <update id="updateUser" parameterType="user">  
+     update user 
+     <set>
+      <if test=" username!=null and username != ''">
+       username=#{username},
+      </if>
+      <if test=" sex!=null and sex != ''">
+      sex=#{sex},
+      </if>
+      <if test="birthday!=null">
+      birthday=#{birthday},
+      </if>
+      <if test="address!=null and address != ''">
+      address=#{address},
+      </if>
+     </set> 
+     where id=#{id}
+   </update>
+   
+</mapper>

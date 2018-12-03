@@ -1,0 +1,82 @@
+mybatis生成的sql语句，parameterType="string"和#{}搭配会自动生成引号包裹，
+模糊查询一般用select * from user where username like '%${value}%'。
+
+==================================================================
+
+不同的mapper.xml可能方法id冲突，每个文件上面有个namespace，使用这个可以避免。
+如下代码，指定selectOne使用test1的findUserById。
+	@Override
+	public User findById(int id) {
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+		 User user = sqlSession.selectOne("test1.findUserById", id);
+		 sqlSession.close();
+		 return user;
+	}
+
+==================================================================	
+
+满足条件4，5命名的情况下，下面代码可以实现包里的类名自动产生别名，pojo类似domain。
+	 <typeAliases>
+ 		<package name="cn.itcast.mybatis.pojo"/>
+		<!-- <typeAlias type="cn.itcast.mybatis.po.User" alias="user"/> -->
+	</typeAliases> 
+下面代码可以实现不用手动到各个pojo类xml文件，mapper类似service。
+	<mappers>
+		<package name="cn.itcast.mybatis.mapper"/>		
+		<!-- <mapper resource="user.xml"></mapper> -->
+		<!-- <mapper resource="mapper/userMapper.xml"></mapper> -->
+		<!-- <mapper class="cn.itcast.mybatis.mapper.userMapper"></mapper> -->
+	</mappers>
+扫描mapper包用来建立 mapper接口和xml的一一对应关系并用xml的对应语句实现该接口方法，
+扫描pojo包用获取各个 pojo类的别名。
+
+==================================================================
+
+查询的数据可以用对应的类，封装类，map进行封装。
+封装类的代码：
+	<select id="findUserByQueryVo" parameterType="queryVo" 	resultType="user">
+		select * from user where username like '%${user.username}%' 
+			and sex=#{user.sex} and address like '%${user.address}%'
+	</select>
+	QueryVo封装了user，设置get/set方法，放在pojo里所以能直接用queryVo别名。
+	
+map封装：
+	<select id="findUserById2" parameterType="int" 	resultType="map">
+		select * from user where id=#{id}
+	</select>
+	
+==================================================================
+
+count方法：
+	<select id="findCount"  resultType="_int">
+		select count(*) from user
+	</select>
+	
+==================================================================
+
+数据库字段和类属性不匹配的情况：
+例如user类和user表完全对应，现在复制user表得到user_copy表，
+并改username字段为user_name，改sex字段为gender。
+下面的代码手动设置两个被修改字段的映射，依旧能得到正常的user。
+注意：如果不设置resultMap依旧能得到user，但是username是null，sex是0，
+因为一个是String一个是int。下面的select的resultMap和resultMap的id必须一样。
+column是这次查找的表(user_copy)的字段，property是user的对应的属性。
+
+	<resultMap type="user" id="ById5">
+		<result column="user_name" property="username"/>
+		<result column="gender" property="sex"/>
+	</resultMap>
+	<select id="findUserById5" parameterType="int" 	resultMap="ById5">
+		select * from user_copy where id=#{id}
+	</select>
+
+==================================================================
+==================================================================
+==================================================================
+==================================================================
+==================================================================
+==================================================================
+==================================================================
+==================================================================
+==================================================================
+	

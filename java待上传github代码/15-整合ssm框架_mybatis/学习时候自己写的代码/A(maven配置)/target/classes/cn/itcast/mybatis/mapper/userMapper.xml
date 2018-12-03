@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- #{id}表示等待传入的参数，parameterType表示参数类型，
+resultType表示输出类型。 -->
+<mapper namespace="cn.itcast.mybatis.mapper.userMapper">
+
+	<select id="findUserById" parameterType="int" 	resultType="user">
+		select * from user where id=#{id}
+	</select>
+	
+	<select id="findUserById2" parameterType="int" 	resultType="map">
+		select * from user where id=#{id}
+	</select>
+	
+	<select id="findUserById3" parameterType="int" 	resultType="map">
+		select * from user_copy where id=#{id}
+	</select>
+	
+	<select id="findUserById4" parameterType="int" 	resultType="user">
+		select * from user_copy where id=#{id}
+	</select>
+	
+	<resultMap type="user" id="ById5">
+		<result column="user_name" property="username"/>
+		<result column="gender" property="sex"/>
+	</resultMap>
+	
+	<select id="findUserById5" parameterType="int" 	resultMap="ById5">
+		select * from user_copy where id=#{id}
+	</select>
+	
+	<insert id="insertUser" parameterType="cn.itcast.mybatis.po.User">
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			select last_insert_id()
+		</selectKey>
+				insert user(username,birthday,sex,address) 	
+				value(#{username},#{birthday},#{sex},#{address})			
+	</insert>	
+	
+	<select id="findUserByMap" parameterType="map" 	resultType="user">
+		select * from user where username like '%${username}%' 
+			and sex=#{sex} and address like '%${address}%'
+	</select>
+	
+	<select id="findUserByMap1" parameterType="map" 	resultType="user">
+		select * from user 
+			<where>
+				<if test="username!=null and username!=''">
+					and username like '%${username}%' 
+				</if>
+				<if test="sex!=null and sex!=''">
+					and sex=#{sex} 
+				</if>
+				<if test="address!=null and address!=''">
+					and address like '%${address}%'
+				</if>
+			</where> 
+	</select>
+	
+	<select id="findUserByQueryVo" parameterType="queryVo" 	resultType="user">
+		select * from user where username like '%${user.username}%' 
+			and sex=#{user.sex} and address like '%${user.address}%'
+	</select>
+	
+	<select id="findUserByQueryVoList1" parameterType="queryVo" resultType="user">
+		select * from user where id in
+		<foreach collection="ints" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</select>
+	
+	<select id="findUserByQueryVoList2" parameterType="queryVo" resultType="user">
+		select * from user where id in
+		<include refid="fuck1"></include>
+	</select>
+	<sql id="fuck1">
+		<foreach collection="ints" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</sql>
+	
+	<select id="findCount"  resultType="_int">
+		select count(*) from user
+	</select>
+	
+	<update id="updateUser" parameterType="user">
+		update user
+		<include refid="fuck2"></include>
+		where id=#{id}
+	</update>
+	<sql id="fuck2">
+		<set>
+			<if test="username!=null and username!=''">
+				username=#{username},
+			</if>
+			<if test="sex!=null and sex!=''">
+				sex=#{sex},
+			</if>
+			<if test="birthday!=null">
+				birthday=#{birthday},
+			</if>
+		</set>
+	</sql>
+	
+	<select id="findUserOrderList"  resultType="map">
+		select * from user u,orders o where o.user_id=u.id
+	</select>
+	
+
+</mapper>

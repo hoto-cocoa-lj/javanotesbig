@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.itcast.mybatis.mapper.OrdersMapper">
+<!--   statementId -->
+   <select id="findOrdersUserList"  resultType="ordersUser"  >
+      select o.*,u.username,u.birthday,u.sex,u.address from orders o LEFT JOIN user u on o.user_id=u.id
+   </select>
+   
+   <resultMap  id="ordersResultMap" type="orders">
+     <id column="id" property="id"/>
+     <result column="user_id" property="user_id"/>
+     <result column="number" property="number"/>
+     <result column="createtime" property="createtime"/>
+     <result column="node" property="node"/>
+     
+<!--      构建一对一关联关系      -->
+     <association property="user" javaType="cn.itcast.mybatis.pojo.User">
+      <id column="user_id" property="id"/>
+      <result column="username" property="username"/>
+      <result column="birthday" property="birthday"/>
+      <result column="sex" property="sex"/>
+      <result column="address" property="address"/>
+     </association>
+          
+   </resultMap>
+   
+   <select id="findOrdersList"  resultMap="ordersResultMap" >
+      select o.*,u.username,u.birthday,u.sex,u.address from orders o LEFT JOIN user u on o.user_id=u.id
+   </select>
+   
+   <resultMap  id="userResultMap" type="user">
+     <id column="id" property="id"/>
+     <result column="username" property="username"/>
+     <result column="birthday" property="birthday"/>
+     <result column="sex" property="sex"/>
+     <result column="address" property="address"/>
+     <!--    private List<Orders> ordersList; -->
+     
+<!--      collection：一对多关联  ，ofType:集合中包含的类型 -->
+     <collection property="ordersList" ofType="cn.itcast.mybatis.pojo.Orders" >
+       <id column="oid" property="id"/>
+       <result column="id" property="user_id"/>
+       <result column="number" property="number"/>
+       <result column="createtime" property="createtime"/>
+       <result column="note" property="node"/>
+     </collection>
+   
+   </resultMap>
+   
+   <select id="findUserList" resultMap="userResultMap">
+    select u.*,o.id oid,o.number,o.createtime,o.note from user u inner JOIN orders o   on o.user_id=u.id  
+   </select>
+   
+</mapper>

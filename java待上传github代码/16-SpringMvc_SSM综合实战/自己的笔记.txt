@@ -1,0 +1,1 @@
+@RequestMapping里的action可以写可以不写。

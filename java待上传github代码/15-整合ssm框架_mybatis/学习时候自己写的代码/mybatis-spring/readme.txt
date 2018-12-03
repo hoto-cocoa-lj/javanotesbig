@@ -1,0 +1,2 @@
+教程的代码用spring管理UserMapper，我也仿照它写了。
+自己预先写的是用spring管理SqlSessionFactory，没有删除。

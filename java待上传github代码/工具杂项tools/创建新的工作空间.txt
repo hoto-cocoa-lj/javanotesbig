@@ -1,2 +1,6 @@
+把旧空间的tomcat下的项目remove，不然新空间启动项目时还会启动旧的。
 preferences-->workspace-->text file encoding选择utf-8；
 			-->jsp修改encoding为utf-8；
+			
+
+			

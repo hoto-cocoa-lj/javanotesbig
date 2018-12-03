@@ -1,0 +1,9 @@
+作用：
+已经存在的数据库的表，生成pojo包，里面有相应的pojo类和example类，生成mapper包，
+里面有mapper类和xml文件，复制到mybatis里可直接使用。不过不生成外键关系。
+
+用法：
+导入已经存在的java项目，选择generatorSqlmapCustom，
+修改generatorConfig.xml，需要修改数据地址，账号密码和指定数据库表，
+将生成的mapper和pojo包复制近项目即可。mapper的xml里面已经实现了很多方法，
+源码也就在该文件里。通过 **Example类 添加条件，详情百度。
