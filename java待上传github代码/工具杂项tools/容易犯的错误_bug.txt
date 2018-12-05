@@ -9,7 +9,12 @@ spring整合redis时，不要一个项目整合两个，之前同时整个了red
 action里设置了某私有属性telphone和set方法，但后台始终获取不到值，
 同样设置的其他属性却能获取到。
 原因是action设置了属性驱动，而且该类有telephone属性，属性重复了。。。
-以后遇到获取不到和有时获取不到都应该考虑是否有重复、
+以后遇到获取不到和有时获取不到都应该考虑是否有重复。
+使用springmvc的话，属性名重复不会出现这个问题，所有的属性都能获得值。
 
 
 maven项目是pom时，运行会报错找不到applicationContext.xml。
+
+表单里要写value="${item.detail }"，不要写value=${item.detail }，
+因为如果值中间有空格时，前者能显示所有内容，后者只能显示空格前面的内容。
+

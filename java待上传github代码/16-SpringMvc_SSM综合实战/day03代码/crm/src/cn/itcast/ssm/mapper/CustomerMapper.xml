@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.itcast.ssm.mapper.CustomerMapper">
+   
+<!--    //	select * from customer c where  c.cust_name like '%黑马%' and  cust_source='6'  and cust_industry='1' and cust_level='22' -->
+<!-- //			 LIMIT 0,5 -->
+<!-- 	public List<Customer> findByPage(QueryVo queryVo); -->
+<select id="findByPage" parameterType="queryVo" resultType="customer">
+	 select
+		cust_id,        
+		cust_name,      
+		cust_user_id,   
+		cust_create_id, 
+		b1.dict_item_name  cust_source,   
+		b2.dict_item_name cust_industry,
+		b3.dict_item_name cust_level,
+		cust_linkman,   
+		cust_phone,     
+		cust_mobile,    
+		cust_zipcode,   
+		cust_address,   
+		cust_createtime
+	from customer c left JOIN base_dict b1   on c.cust_source=b1.dict_id 
+                	left JOIN base_dict b2   on c.cust_industry=b2.dict_id 
+					left JOIN base_dict b3   on c.cust_level=b3.dict_id 
+	 <include refid="findCustomerWhere"></include>
+ 		LIMIT #{start},#{pageSize}
+	
+</select>
+	
+<!-- //	select count(*) from customer  where  c.cust_name like '%黑马%' and  cust_source='6'  and cust_industry='1' and cust_level='22' -->
+<!--     public int findTotalCount(QueryVo queryVo); -->
+   <select id="findTotalCount" parameterType="queryVo" resultType="int">
+   select count(*) from customer c 
+   <include refid="findCustomerWhere"></include>
+   </select>
+   
+   <sql id="findCustomerWhere">
+     <where>
+	  <if test="custName !=null and custName !=''">
+	    and c.cust_name like '%${custName}%' 
+	  </if>
+	  <if test="custSource !=null and custSource !=''">
+	   and  c.cust_source=#{custSource}
+	  </if>
+	  <if test="custIndustry !=null and custIndustry !=''">
+	   and c.cust_industry=#{custIndustry}
+	  </if>
+	  <if test="custLevel !=null and custLevel !=''">
+	   and c.cust_level=#{custLevel}
+	  </if>
+	 </where>
+   </sql>
+   
+   <select id="findById" parameterType="long" resultType="customer">
+      select * from customer where cust_id=#{id}
+   </select>
+   
+   <update id="update" parameterType="customer">
+      update customer 
+        <set>
+          <if test="cust_name!=null and cust_name!=''">
+			cust_name=#{cust_name},
+			</if>
+			<if test="cust_user_id!=0">
+			cust_user_id=#{cust_user_id},
+			</if>
+			<if test="cust_create_id!=0">
+			cust_create_id=#{cust_create_id},
+			</if>
+			<if test="cust_source!=null">
+			cust_source=#{cust_source},
+			</if>
+			<if test="cust_industry!=null">
+			cust_industry=#{cust_industry},
+			</if>
+			<if test="cust_level!=null">
+			cust_level=#{cust_level},
+			</if>
+			<if test="cust_linkman!=null">
+			cust_linkman=#{cust_linkman},
+			</if>
+			<if test="cust_phone!=null">
+			cust_phone=#{cust_phone},
+			</if>
+			<if test="cust_mobile!=null">
+			cust_mobile=#{cust_mobile},
+			</if>
+			<if test="cust_zipcode!=null">
+			cust_zipcode=#{cust_zipcode},
+			</if>
+			<if test="cust_address!=null">
+			cust_address=#{cust_address},
+			</if>
+			<if test="cust_createtime!=null">
+			cust_createtime=#{cust_createtime},
+			</if>
+		</set>
+        where cust_id=#{cust_id}
+   </update>
+   
+   <delete id="delete" parameterType="long">
+    delete from customer where cust_id=#{id}
+   </delete>
+   
+</mapper>

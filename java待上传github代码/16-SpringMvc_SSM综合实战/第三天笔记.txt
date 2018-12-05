@@ -1,0 +1,55 @@
+springmvc第三天
+
+一、搭建框架
+1、准备数据库  
+ customer 
+ sys_user 员工
+ base_dict 数据字典表
+2、搭建框架
+  分析：ssm整合的思路
+  dao层：
+    sqlMapConfig.xml(可以为空，也可以不存在)
+    applicationContext-dao.xml
+      数据源
+      sqlSessionFactory
+        数据源
+	别名
+      mapper扫描器
+  service层：
+    applicationContext-service.xml
+      扫描器 @Service
+      事务
+  web层：
+    springmvc.xml
+     扫描器@Controller
+     注解驱动
+     视图解析器
+     （异常处理器、拦截器、文件解析器）
+  web.xml
+    前端控制器
+    监听器
+步骤：
+ 1、创建web工程
+ 2、添加jar：mybatis、mybatis扩展包、spring、mybatis和spring整合包、springmvc
+ 3、添加配置文件
+     log4j.properties
+     jdbc.properties
+     resource.properties
+     sqlMapConfig.xml
+     applicationContext-dao.xml
+     applicationContext-service.xml
+     springmvc.xml
+  4、引入资源文件
+       jsp  --放到 /WEB-INF/jsp  文件夹下
+       js 、 图片、 css  --放到WebContent下
+       分页标签 --放到 /WEB-INF  文件夹下
+二、开发
+ 1、展示列表页面 list.action
+ 2、初始化查询条件数据
+ 3、展示分页数据
+     列表中的中文
+     数据回显
+     乱码
+ 4、修改
+ 5、删除
+ 

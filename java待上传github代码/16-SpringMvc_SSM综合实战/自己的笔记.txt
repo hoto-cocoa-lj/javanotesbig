@@ -1,1 +1,217 @@
 @RequestMapping里的action可以写可以不写。
+
+查询多用blobs，因为可能遇到这样的bug：
+某字段明明有值，查询数据库却是null。看了源码发现，该字段是长文本，
+用selectByExample会不搜索长文本，用selectByExampleWithBLOBs才行。
+
+==========================================================================================
+
+
+参数传递错误会报错The request sent by the client was syntactically incorrect，
+对象的普通类型的参数(目前知道int,string,folat等)的数组在QueryVo可以封装数组传递(不封装该对象)，
+传递date数组时报上面的错(似乎是因为进行了String和Date的转换)，目前已知的解决办法是用教程的方法，
+在Query封装该对象的数组，并且jsp的name使用序号。例如：
+items对象有name和date，QueryVo里要封装List<Items> ls，jsp里写ls[${status.index}].date。
+
+==========================================================================================
+
+contoroller里面可以写如下代码，但是比较麻烦一般不用，因为完全可以用return editItem代替。
+	@RequestMapping("/itemEdit")
+	public void editItem(@RequestParam(value="id") int iid,Model model,
+			HttpServletRequest r,HttpServletResponse s) throws ServletException, IOException{
+		Items i = itemService.findByID(iid);
+		r.setAttribute("item",i);
+		r.getRequestDispatcher("/WEB-INF/jsp/editItem.jsp").forward(r, s);
+	}
+
+==========================================================================================
+
+上传代码如下，pictureFile必须和表单的<input type="file"  name="pictureFile"/> 一一对应
+	@RequestMapping("/updateitem")
+	public String updateitem(Items items,MultipartFile pictureFile) throws Exception{
+		System.out.println(items);
+		String ss=pictureFile.getOriginalFilename();
+		int lastIndexOf = ss.lastIndexOf(".");
+		String s1=UUID.randomUUID().toString();
+		ss="d:/up/"+s1+ss.substring(lastIndexOf);
+		System.out.println(lastIndexOf+"\t"+ss);
+		items.setPic(ss);
+		pictureFile.transferTo(new File(ss));
+		itemService.update(items);
+		return "redirect:list.action";		
+	}
+ajax请求不能上传文件，所以不能用MultipartFile pictureFile，
+不然会报错表单不是multipart，当时没注意，以为老师的代码用ajax上传文件，
+一直试图模仿，白白浪费了一个多小时。
+
+==========================================================================================
+
+这里的url-pattern表示前端控制器会处理*.action，/*会处理所以，/会处理jsp以外的。
+
+  	<!-- springmvc配置开始 -->
+     <servlet>
+  	<servlet-name>springmvc</servlet-name>
+  	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  	<!-- 默认会加载/web-inf/{servlet-name}-servlet.xml，修改 -->
+  	<init-param>
+  		<param-name>contextConfigLocation</param-name>
+  		<param-value>classpath:springmvc.xml</param-value>
+  	</init-param>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>springmvc</servlet-name>
+  	<url-pattern>*.action</url-pattern>
+  </servlet-mapping>
+ 	<!-- springmvc配置完毕 -->
+	
+==========================================================================================
+
+//		重定向
+return "redirect:list.action";  //通知浏览器，让浏览器重新发起请求，使用的两个不同的request域
+//		请求转发
+return "forward:list.action";  //浏览器保留原有的请求地址，使用的是同一个request域		
+
+==========================================================================================
+
+restful风格需要用@PathVariable("thisid")注解，并且修改web.xml的springmvc处理的链接范围。
+修改成/后会找不到静态文件如js文件，原因是js文件路径也会被springmvc处理，
+但是没有给该路径设置相应的方法，所以会找不到。解决办法是
+在springmvc.xml加上 <mvc:resources location="/js/" mapping="/js/**"> </mvc:resources>，
+可以同时加上<mvc:resources location="/css/" mapping="/css/**"> </mvc:resources>，
+<mvc:resources location="/fonts/" mapping="/fonts/**"> </mvc:resources>等，
+location表示链接，表示可以处理/js/，mapping表示文件路径，**表示多个层级，
+
+使用/js/1/a.js，/js/b.js测试，发现
+location="/js/" mapping="/js/*"找得到b，找不到a；
+location="/js/**" mapping="/js/**"都找得到；
+location="/js/*" mapping="/js/*"都找不到；
+location="/js/" mapping="/js/**"都找得到；
+
+
+	@RequestMapping("/itemEdit/{thisid}")
+	public String editItemRestful(@PathVariable("thisid") int iid,Model model) throws Exception{
+		System.out.println(iid);
+		Items i = itemService.findByID(iid);
+		if(i==null){
+			throw new Exception("没有找该到id");
+		}
+		model.addAttribute("item", i);
+		return "editItem";
+	}
+	
+	
+==========================================================================================
+
+@RequestParam(value="id")  int iid表示页面的id属性赋值给iid，
+形参名字如果和页面的id属性一样，不用加这个注解。
+
+	@RequestMapping("/itemEdit")
+	public String editItem(@RequestParam(value="id") int iid,Model model) throws Exception{
+		System.out.println(iid);
+		Items i = itemService.findByID(iid);
+		if(i==null){
+			throw new Exception("没有找该到id");
+		}
+		model.addAttribute("item", i);
+		return "editItem";
+	}
+	
+==========================================================================================
+
+创建拦截器处理类，代码如下：(preHandle返回true表示放行，false不放行)
+package cn.itcast.ssm.interceptor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+public class MyIterceptor1 implements HandlerInterceptor{
+
+	@Override
+	public boolean preHandle(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse,
+			Object paramObject) throws Exception {
+		// TODO Auto-generated method stub
+		System.out.println(this.getClass().getName()+"前置方法");
+		return true;
+	}
+
+	@Override
+	public void postHandle(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse,
+			Object paramObject, ModelAndView paramModelAndView) throws Exception {
+		// TODO Auto-generated method stub
+		System.out.println(this.getClass().getName()+"中间方法");
+	}
+
+	@Override
+	public void afterCompletion(HttpServletRequest paramHttpServletRequest,
+			HttpServletResponse paramHttpServletResponse, Object paramObject, Exception paramException)
+			throws Exception {
+		// TODO Auto-generated method stub
+		System.out.println(this.getClass().getName()+"后面方法");
+	}
+}
+复制粘贴一份，取名MyIterceptor2，在springmvc加上如下配置。开启拦截器，
+	
+<!-- 拦截器配置 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<bean class="cn.itcast.ssm.interceptor.MyIterceptor1"></bean>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<bean class="cn.itcast.ssm.interceptor.MyIterceptor2"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+	
+可以发现访问一个页面拦截器触发了多次，
+测试发现是载入静态资源(上面列子的a.js和b.js)也触发了拦截器。
+
+==========================================================================================
+
+使用拦截器拦截未登录用户，一般不用这个而是用框架判断，例如shiro：
+先判断当前方法的名字，如果是某特定方法(如登陆方法，这里是showList2方法)，
+直接放行，这个方法里有设置session的 user，相当于登陆成功。
+如果不是该方法，则判断session是否有user，没有则去error.jsp，否则放行。测试发现没问题
+
+public class MyIterceptor1 implements HandlerInterceptor{
+
+	@Override
+	public boolean preHandle(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse,
+			Object paramObject) throws Exception {
+
+		String name = h.getMethod().getName();
+		System.out.println("name="+name);
+		if("showList2".equals(name)){
+			return true;
+		}
+		
+		Object u = paramHttpServletRequest.getSession().getAttribute("user");
+		HandlerMethod h=(HandlerMethod) paramObject;
+		if(u!=null){
+			System.out.println(this.getClass().getName()+"前置方法");
+			return true;
+		}
+		
+		String servletPath = paramHttpServletRequest.getContextPath();
+		System.out.println("servletPath="+servletPath);
+		paramHttpServletRequest.getRequestDispatcher("/WEB-INF/jsp/error.jsp")
+			.forward(paramHttpServletRequest, paramHttpServletResponse);
+
+		return false;
+	}
+	......
+}
+
+
+==========================================================================================
+==========================================================================================
+==========================================================================================
+==========================================================================================
+==========================================================================================
+==========================================================================================
+==========================================================================================
+==========================================================================================
+==========================================================================================

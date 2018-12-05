@@ -29,4 +29,4 @@
 		</dependency>
 导入jar包后可能还是提示找不到，删除搜索即可。
 
-		mvn install:install-file -DgroupId=org.mybatis -DartifactId=mybatis-spring -Dversion=1.2.2 -Dpackaging=jar -Dfile=mybatis-spring-1.2.2.jar
+		mvn install:install-file -DgroupId=com.fasterxml.jackson.core -DartifactId=jackson-databind -Dversion=2.4.2 -Dpackaging=jar -Dfile=jackson-databind-2.4.2.jar

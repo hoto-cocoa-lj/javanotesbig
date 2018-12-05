@@ -1,0 +1,76 @@
+springmvc第二天
+一、高级参数绑定
+1、默认参数绑定：request response  session  model
+2、基础数据类型
+3、pojo
+4、自定义参数绑定（定义转换器Converter）
+5、包装的pojo
+
+6、数组
+    可以直接绑定到形参上，可以绑定到包装的pojo中
+7、集合
+    只能绑定到包装的pojo中
+二、@RequestMapping的用法
+  1、value={"/list","/list2","/itemList"}  多个请求地址可以同时指向同一个方法
+  2、method=RequestMethod.GET  限制请求方式
+  3、@RequestMapping可以写到Controller上  窄化请求映射
+三、方法的返回类型
+1、ModelAndView
+2、String
+   //		重定向
+		return "redirect:list.action";  //通知浏览器，让浏览器重新发起请求，使用的两个不同的request域
+//		请求转发
+//		return "forward:list.action";  //浏览器保留原有的请求地址，使用的是同一个request域
+3、void
+   如果想跳转页面
+     只能使用servlet方式
+      	request.getRequestDispatcher("/WEB-INF/jsp/editItem.jsp").forward(request, response);
+
+四、文件上传（重要）
+1、文件上传页面三要素
+    1）、表单的提交方式method一定是post
+    2）、表单enctype的值一定是multipart/form-data
+    3) 、input的类型一定是file
+2、springmvc的要素
+   1）、需要添加两个jar  commons-io.jar  commons-fileupload.jar
+   2)、在springmvc容器中配置文件解析器
+   3）、绑定参数类型 MultipartFile ，参数的名字要和 input的name属性值保持一致
+3、文件的保存
+	String originalFilename = pictureFile.getOriginalFilename();//获取上传文件的完整名称（带扩展名）
+	String fileName = UUID.randomUUID().toString(); //创建一个随机数，作为即将保存图片的名字
+	String ext = originalFilename.substring(originalFilename.lastIndexOf(".")); //获取文件的扩展名
+	pictureFile.transferTo(new File("d:\\uploadFile\\"+fileName+ext));  //文件的保存
+	item.setPic(fileName+ext);  //文件名称保持到表中
+	itemService.update(item);
+
+五、异常处理器（了解）
+  自定义异常处理器实现HandlerExceptionResolver接口
+
+六、json交互
+  @ResponseBody（重点）  //作用 把即将返回的对象转成json字符串并且回写到浏览器
+  @RequestBody（了解）   //强制请求的参数是json对象
+
+七、springmvc对restful风格的支持
+   /items/itemEdit.action?id=2
+   /items/itemEdit/2/3
+1、修改web.xml中的url-pattern：  <url-pattern>/</url-pattern>
+2、修改方法的@RequestMapping
+   @RequestMapping("/itemEdit/{id}")  ////	itemEdit/1
+     public void itemEdit(@PathVariable("id")int itemId）
+3、处理静态资源 （如果是静态资源，直接访问相应文件夹中的文件）  http://localhost:8080/springmvc-mybatis/js/jquery-1.4.4.min.js
+     <mvc:resources location="/js/" mapping="/js/**"> </mvc:resources>
+       以js开头的请求，从js文件夹中找相应的文件
+
+八、拦截器（了解）  interceptor
+	执行了MyHandlerInterceptor1的前置方法......
+	执行了MyHandlerInterceptor2的前置方法......
+	执行了MyHandlerInterceptor2的执行方法......
+	执行了MyHandlerInterceptor1的执行方法......
+	执行了MyHandlerInterceptor2的后置方法......
+	执行了MyHandlerInterceptor1的后置方法......
+   场景：访问 list.action时判断是否有当前登录人，如果有执行访问，如果没有跳转到登录页面
+
+
+
+
+
