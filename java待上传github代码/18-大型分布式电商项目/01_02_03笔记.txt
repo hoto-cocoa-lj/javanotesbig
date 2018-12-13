@@ -1,0 +1,127 @@
+day01:
+
+主工程的pom的<dependencyManagement></dependencyManagement>里的坐标，
+都不会被导入，只是做了定义了。子程序要导入的话复制里面的坐标到各自的pom即可。
+
+
+运行pyg-manager报错：java.nio.channels.ClosedChannelException：
+一开始一直搜索这一行，百度找不到原因，然后搜第二行的错误提示：
+at sun.nio.ch.SocketChannelImpl.shutdownInput：
+很快就找到了原因，centos防火墙没关。
+
+
+(服务?)发布的另一种方法：
+<!-- 声明需要暴露的服务接口 -->
+<dubbo:service interface="com.alibaba.dubbo.demo.DemoService" ref="demoService" />
+<!-- 和本地bean一样实现服务 -->
+<bean id="demoService" class="com.alibaba.dubbo.demo.provider.DemoServiceImpl" />
+
+
+============================================================================
+day02:
+
+第一天成功开启了zookepper，但是第二天无法打开dubbo，原因是我的虚拟机使用jdk1.8，
+无法运行。于是创建新的虚拟机，安装了jdk1.7，dubbo和tomcat，运行后无法连接数据库。
+数据库是原来的虚拟机的，该虚拟机没有开启，开启即可。这里考虑到mysql安装很麻烦，
+暂时继续使用原虚拟机的数据库。即zookeper的服务和dubbo的服务安装在不同的服务器上。
+
+使用github的pagehelper一直不返回数据，pageinfo的gettotal是0，getlist是null，
+找了很久最后发现 <property name="configLocation" value="classpath:sqlMapConfig.xml" /> 这一行配置被注释了，而这个文件里有<property name="dialect" value="mysql"/>，
+正是这个原因导致分页失败。修改后返回数据如下：p.getTotal()=22，	p.getList()=Page{pageNum=1, pageSize=10, startRow=0, endRow=10, total=22, pages=3, reasonable=false, pageSizeZero=false}
+
+============================================================================
+
+angularjs的post方法之一：
+
+1_在按钮上绑定方法，关键代码是ng-click='add()'
+
+	<button class="btn btn-success" ng-click='add()' data-dismiss="modal" aria-hidden="true">保存</button>
+	
+2_在输入框设置ng-model，用来获得数据，相当于name=，下面的获取方式可以获取对象。
+
+	<td><input  class="form-control" ng-model='entity1.name' placeholder="品牌名称" >  </td>
+	<td><input  class="form-control" ng-model='entity1.firstChar' placeholder="首字母">  </td>
+
+3_在$scope绑定add方法，
+
+	$scope.add=function(){
+				alert($scope.entity1.name);
+				$http({
+					method:'post',
+					url:'../brand/add',
+					data:$scope.entity1
+				}).then(
+					function success(data){
+						/* alert(0); */
+						console.log(data);
+					},
+					function error(data){
+						alert('error');
+					}
+				);
+			};
+	
+由于双向绑定，每次新建都会出现上次的数据，所以设置点击新建时，
+执行entity1=null，注意这里不应写$scope.entity。
+	<button type="button" ng-click='entity1=null'> 新建</button>
+                                       
+
+============================================================================
+
+分页条件查询的两种写法：
+写法1_前端用post发送$scope.t，page和rows拼接到url里，然后用t.name和t.firstChar接收两个值，
+后端接收参数用接收@RequestBody TbBrand t，这样会自动给相同的属性赋值。
+写法2_前端把page、rows、name、firstChar拼接到url里，后端一个一个接收参数，
+然后手动给tbBrand赋值。
+	
+	@RequestMapping("/findPage")	
+	public PageResult findPage(@RequestBody TbBrand tbBrand,Integer page,Integer rows){
+//	public PageResult findPage(String name,String firstChar,Integer page,Integer rows){
+//		TbBrand tbBrand=new TbBrand();
+//		tbBrand.setFirstChar(firstChar);
+//		tbBrand.setName(name);
+		System.out.println("findPage--> "+tbBrand+"\t"+page+"\t"+rows);
+		
+		return brandService.findPage(tbBrand,page, rows);
+	} 
+	
+============================================================================
+
+service层接收不到$scope，即使传值给它。get/post方法有两种写法。详情见03的brand.html。
+
+============================================================================
+
+代码生成器HeimaCodeUtil：生成器必须放在非中文路径。
+
+============================================================================
+
+$index可以获取序号，详情见specification.html。
+
+============================================================================
+
+其他页面写法：
+1_生成代码后，把java代码复制到interface、service、controller层，js复制到web的相应位置；
+2_在各页面导入各自的js文件，在body写ng-app='pyg'(app的名字)，np-controller='(controller的名字)';
+3_寻找页面的动态数据，使用合适的名字(在js里找)赋值。
+
+如果没有页面，service的js代码如下
+
+		app.service('loginService',function($http){
+			//下面是service的方法区域
+			this.loadLoginName=function(){
+				return $http.get('../login/loadLoginName');
+			};
+			//service的方法区域到此为止
+
+		});
+controller的js代码如下
+		app.controller('loginController',function($scope,loginService){	
+			//下面是controller的方法区域		
+			$scope.loadLoginName=function(){			
+				loginService.loadLoginName().success(function(data){
+							$scope.loginName=data.username;							
+						}
+				)				
+			}
+			//controller的方法区域到此为止
+		})

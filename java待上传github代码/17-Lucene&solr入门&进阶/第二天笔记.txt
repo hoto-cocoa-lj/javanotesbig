@@ -1,0 +1,161 @@
+Lucene&solr第二天
+
+一、回顾
+ Lucene创建索引
+  步骤：
+    1、指定目录
+    2、创建IndexWriter
+    3、执行IndexWriter添加文档document的方法
+         Document中添加域（相当于表中的列）
+	  不同的document中可以包含不同的域
+    4、关闭资源IndexWriter
+    
+二、索引的维护
+  是否分析：是否拆词       是否索引：是否用来检索         是否存储：是否要用来展示
+  1、Field属性：    是否分析（分词）       是否索引         是否存储
+     StringField      N                      Y               N or Y                   比如：手机号、身份证号
+      LongField       Y                      Y               N or Y                   比如：商品的价格、文件大小
+      StoredField     N                      N               Y                        比如：网页地址URL、文件路径
+      TextFiled       Y                      Y               N or Y                   比如：网页内容、文件内容   
+ 2、删除操作
+      indexWriter.deleteAll();//慎用
+      indexWriter.deleteDocuments(new Term("name", "spring"));
+3、修改操作
+     indexWriter.updateDocument(term, doc);
+4、查询操作
+     1）、TermQuery   语法：   name:apache
+     2）、MatchAllDocsQuery  语法： *:*
+     3）、NumericRangeQuery  语法：  size:[100 TO 1000] 但是luke不支持数值的范围查询   solr支持的
+     4）、BooleanQuery    
+     Query query1 = new TermQuery(new Term("name", "apache"));
+     Query query2 = new TermQuery(new Term("content", "spring"));
+     query.add(query1, Occur.MUST);
+     query.add(query2, Occur.MUST);  语法：  +name:apache +content:spring
+
+     query.add(query1, Occur.MUST);
+     query.add(query2, Occur.SHOULD);语法：  +name:apache content:spring
+
+
+      query.add(query1, Occur.MUST);
+      query.add(query2, Occur.MUST_NOT); 语法： +name:apache -content:spring
+  
+      query.add(query1, Occur.MUST_NOT);
+      query.add(query2, Occur.MUST_NOT);  此查询无意义
+
+     5）、QueryParser  分词后查询            需要导 lucene-queryparser-4.10.3.jar
+     语法： name:lucene name:project name:apache
+     6）、MulitFieldQueryParser
+     语法：(name:lucene content:lucene) (name:project content:project) (name:apache content:apache)
+
+三、相关度排序（竞价排序）
+	name:apache
+		apache lucene.txt
+		Apache_Lucene_README.txt
+		Welcome to the Apache Solr project.txt
+	打分：默认分值是1，设置越高排名靠前
+	Field.setBoost(分数)；
+四、solr简介
+ Lucene是API，类库，solr基于Lucene开发一个项目
+
+五、安装配置
+  1、准备一个干净的tomcat
+  2、把solr-4.10.3\dist中的war拷贝到tomcat的webapps文件夹下
+  3、把war解压 （直接启动tomcat，然后删除压缩包）
+  4、配置solrHome（就是配置索引库位置） 
+      1）、把solr-4.10.3\example\solr下的所有文件拷贝到指定的位置
+      2）、配置solr项目和solrHome的关系：修改solr项目的web.xml的第43行，将solrHome的路径填入，并将注解标签放开
+  5、添加solr项目运行的扩展包，把solr-4.10.3\example\lib\ext下的所有jar放到solr项目中
+  6、重新启动tomcat
+  7、访问solr  http://localhost:8080/solr
+ 
+六、solr core 类比成mysql的database
+添加solr core步骤
+ 1、赋值solrHome下的collection1文件夹
+ 2、粘贴到solrHome下，修改名字collection2
+ 3、修改collection2文件夹下的core.properties 
+ 4、重启tomcat
+
+七、使用solr控制台
+1、添加索引
+   注意：1、solr中的域名是先定义后使用
+         2、添加文档时id不能少
+2、删除索引
+     <delete><id>1</id></delete> <commit/>   -- 根据id删除
+     <delete><query>id:2</query></delete> <commit/>   --根据Lucene的语法删除
+     <delete><query>*:*</query></delete> <commit/>    --根据Lucene的语法删除所有
+3、修改索引
+    只要ID相同就会被修改，方法和添加一样
+  
+八、java代码操作solr   ，solrJ
+ 1、创建java工程
+ 2、添加jar
+     solrJ核心包solr-4.10.3\dist\solr-solrj-4.10.3.jar、
+     solrJ扩展包solr-4.10.3\dist\solrj-lib下的所有
+     solr的扩展包solr-4.10.3\example\lib\ext下的所有
+ 3、代码实例
+  /**
+	 * 添加
+	 * @throws Exception
+	 */
+	@Test
+	public void addIndex() throws Exception{
+		//创建solrServer，链接solr项目
+		SolrServer solrServer = new HttpSolrServer("http://localhost:8080/solr/collection1");
+		//执行solrServer的添加方法
+		SolrInputDocument doc = new SolrInputDocument();
+		doc.addField("name", "solrJ添加name");
+		doc.addField("content", "solrJ添加的内容");
+		doc.addField("id", "2");
+		solrServer.add(doc);
+		solrServer.commit();
+	}
+	/**
+	 * 修改
+	 * @throws Exception
+	 */
+	@Test
+	public void updateIndex() throws Exception{
+		//创建solrServer，链接solr项目
+		SolrServer solrServer = new HttpSolrServer("http://localhost:8080/solr/collection1");
+		//执行solrServer的添加方法
+		SolrInputDocument doc = new SolrInputDocument();
+		doc.addField("name", "solrJ修改name");
+		doc.addField("content", "solrJ修改的内容");
+		doc.addField("id", "2");
+		solrServer.add(doc);
+		solrServer.commit();
+	}
+	/**
+	 * 删除
+	 * @throws Exception
+	 * @throws IOException
+	 */
+	@Test
+	public void deleteIndex() throws Exception, IOException{
+		//获取solr的服务器 用于连接solr项目
+		SolrServer solrServer = new HttpSolrServer("http://localhost:8080/solr/collection1");
+		//solrServer.deleteById("1");//根据id删除
+		//solrServer.deleteByQuery("id:2");//根据条件删除
+		solrServer.deleteByQuery("*:*");//全删
+		solrServer.commit();
+	}
+	@Test
+	public void searchIndex() throws Exception, IOException{
+		//获取solr的服务器 用于连接solr项目
+		SolrServer solrServer = new HttpSolrServer("http://localhost:8080/solr/collection1");
+		//设置查询条件
+		SolrQuery solrQuery = new SolrQuery();
+		solrQuery.setQuery("*:*");
+		//执行查询
+		QueryResponse queryResponse = solrServer.query(solrQuery);
+		//获取结果
+		SolrDocumentList results = queryResponse.getResults();
+		System.out.println("总记录数:"+results.getNumFound());
+		for (SolrDocument doc : results) {
+			System.out.println(doc.get("id"));
+			System.out.println(doc.get("name"));
+			System.out.println(doc.get("content"));
+		}
+	}
+
+

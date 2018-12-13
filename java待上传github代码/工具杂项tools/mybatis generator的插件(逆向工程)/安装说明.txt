@@ -1,0 +1,19 @@
+1. 把plugins中的所有jar拷贝到eclipse的plugins文件夹之中
+2. 把features中的所有文件夹拷贝到eclipse的features文件夹之中
+3. 重启eclipse，ok
+
+使用方法:
+把generatorConfig.xml复制粘贴到dao层，修改
+	1_驱动的jar包地址classPathEntry
+	2_数据库地址和登陆信息jdbcConnection
+	3_生成的pojo的地址：javaModelGenerator的targetPackage(生成后java文件所在的包名)
+		和targetProject(生成后java文件所在的项目名)
+	4_生成的mapper的地址：sqlMapGenerator的targetPackage(生成后java文件所在的包名)
+		和targetProject(生成后java文件所在的项目名)
+	5_javaClientGenerator，好像是生成用来实现4_的java接口的xml文件。
+		三个参数分别是xml文件的包名，被实现的接口所在包名，项目名。
+	6_tableName：数据库里要被逆向工程生成代码的表名。
+修改完成后，右键generatorConfig.xml，generate mybatis/ibatis artifacts。
+maven项目不会编译src/main/java里的非java文件，
+所以要将生成的xml文件放到本项目下src/main/resource的同路径。
+比如java的包名是com.pyg.mapper，则放到src/main/resource/com/pyg/mapper里。

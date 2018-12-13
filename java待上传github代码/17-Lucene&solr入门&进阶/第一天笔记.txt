@@ -1,0 +1,108 @@
+Lucene&solr第一天
+一、什么是全文检索
+数据分类
+   1、结构化数据：有固定格式和有限长度，比如Oracle或mysql表中的数据
+               使用SQL语句查询结构化数据，速度快
+	       如果数据量大时，可以在数据库中创建索引，但是此时创建的索引是不支持模糊查询，需要创建另外一套索引库
+   2、非结构化数据：每有固定格式也没 有限长度  比如：磁盘上的文件 word excel ppt pdf txt
+                查询非结构化数据：1、目测（顺序扫描法） 2、IO读取 3、全文检索
+
+    对源数据创建索引，在索引上搜索这个过程就是全文检索
+     创建索引+查询
+二、全文检索的应用场景
+   1、搜索引擎  谷歌 百度 360  搜狗
+   2、站内搜索  淘宝、京东、微博、论坛
+
+三、怎么实现全文检索
+ 使用Lucene实现
+四、Lucene简介
+ 是Apache下的开源用来实现全文检索的工具包，API
+
+五、Lucene实现全文检索的流程
+ 1、创建索引
+      1）、获取源文档
+           什么是源文档？
+	    场景1：搜索引擎：指的是互联网上的所有网页
+            场景2：站内搜索：磁盘上的文件或表中的数据
+          获取源文档的方式？
+            场景1：搜索引擎： 网络爬虫
+            场景2：站内搜索 ：IO流、sql查询
+      2）、构建文档对象（Document）
+       一个Document对象中放的是：一个网页内容、或一个文件内容、或表中的一列数据
+      3）、对内容分词（分析文档）
+             举例：①、一个文件包含的信息：
+		      document
+			     1、文件名称
+			     2、文件大小
+			     3、文件路径
+			     4、文件内容
+		   ②、一个网页包含的信息：
+		      document
+			     1、网络地址URL
+			     2、网页标题
+			     3、网页内容
+		   ③、一条数据包含的信息：
+		      document
+			     一条数据每个列的内容
+			     有多少列就应该创建多少个域
+              分词效果：
+	      原内容：The Spring Framework provides a comprehensive programming and configuration model.
+		分词的处理方式：
+		1、按空格分词
+		2、处理大小写
+		3、停用词
+		4、标点符号
+		最后的效果：  term
+		        name:spring
+			content:spring
+			content:framework
+			content:provides
+			content:comprehensive
+			content:programming
+			content:configuration
+			content:model
+      4）、创建索引（存储）
+               分析后的格式： name:spring  name自定义的域名称，spring，此域中的值  name:spring就是一个词汇term
+	       一个文档中可以有多个域,不同的文档可以有不同的域
+	       创建索引是对语汇单元索引，通过词语找文档，这种索引的结构叫倒排索引结构。比如：新华字典
+  2、查询索引
+     1)、用户查询接口：就是用户输入关键字的位置
+     2）、创建查询
+     3）、执行查询
+     4）、渲染结果
+六、Lucene入门案例
+
+  核心的jar：lucene-core-4.10.3.jar、lucene-analyzers-common-4.10.3.jar 
+    commons-io.jar
+  1、创建索引
+       场景：给磁盘的文件创建索引
+       步骤：
+         1、指定索引库位置   Directory
+	 2、创建写入索引的对象   IndexWriter
+	 3、获取源文档IO流
+	 4、把文档写入索引库  indexWriter.addDocument(doc);
+	 5、关闭资源IndexWriter
+   使用luke工具查看索引文件
+
+  2、查询索引步骤
+     1、指定索引库的位置 Directory
+     2、创建读取索引对象 IndexWriter
+     3、创建查询索引对象 IndexSearcher
+     4、执行查询方法  search方法
+     5、获取查询结果 TopDocs
+     6、关闭资源IndexWriter
+
+七、分词器  Analyzer 每个分词器tokenStream方法
+ //		Analyzer analyzer = new StandardAnalyzer(); //英文按照空格分词，中文一个字一个字
+//		Analyzer analyzer = new CJKAnalyzer();  //中文两个字两个字
+//		需要导入lucene-analyzers-smartcn-4.10.3.jar
+//		Analyzer analyzer = new SmartChineseAnalyzer(); //中文还可以，但是英文容易出现缺字母
+		
+//		第三方分词器IK-Analyzer
+//		需要导入jar IKAnalyzer2012FF_u1.jar
+		Analyzer analyzer = new IKAnalyzer();
+
+
+八、分词器的使用时机
+  1、需要查询就需要分词
+  2、查询时也需要分词

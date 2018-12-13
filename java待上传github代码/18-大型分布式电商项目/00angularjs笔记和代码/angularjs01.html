@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<script type="text/javascript" 
+	src="plugins/angularjs/angular.min.js"></script>
+
+</head>
+
+<body ng-app='pyg' ng-init="name1='大的'">
+	<input type="text" ng-model="name1" />
+	<h3 class={{name1}}>{{name1}}</h3>
+	<div ng-controller="f1"><h3>{{text1}}</h3></div>
+	<div ng-controller="f1"><h3>{{json1.fuck1}}</h3></div>
+	
+	<div ng-controller="c1">
+		x:<input type=text ng-model='x'/>
+		y:<input type=text ng-model='y'/>
+		
+		<button ng-click='add();'>jisuan</button>
+		<!-- <h3>{{add()}}</h3>
+		上面的add方法似乎会一直运行，导致不点击button也会计算出z -->
+		<h1>{{z}}</h1>
+	</div>
+	<script type="text/javascript">
+		function f1($scope){
+			$scope.text1="hello aa!";
+			$scope.json1={"fuck1":"fuck2"};
+		}
+		var app=angular.module('pyg',[]);
+		app.controller("c1",function($scope){
+			$scope.add=function(){
+				$scope.z=parseInt($scope.x)+parseInt($scope.y);
+				return $scope.z;
+			}
+		})
+	</script>
+</body>
+
+</html>

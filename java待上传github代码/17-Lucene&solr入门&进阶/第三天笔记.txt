@@ -1,0 +1,110 @@
+Lucene&solr第三天
+一、添加自定义域名
+1、找到SolrCore下config/schema.xml
+ 1) field 属性： name域名称 type域类型 indexed是否索引 stored是否存储  multiValued：是否可以多值
+ 2) dynamicField  name="*_i" 通配符
+ 3）<uniqueKey>id</uniqueKey>
+ 4）copyField 属性：   source源域名  dest目标域名
+ 5）fieldType 属性：name类型名称  class类型对应的类
+2、自定义field 在schema.xml中添加以下信息
+<!--自定义field-->
+   <field name="title_ik" type="text_ik" indexed="true" stored="true" />
+   <field name="content_ik" type="text_ik" indexed="true" stored="false" multiValued="true"/>
+	
+<!--类型IKAnalyzer-->
+    <fieldType name="text_ik" class="solr.TextField">
+      <analyzer class="org.wltea.analyzer.lucene.IKAnalyzer"/>
+    </fieldType>
+把IKAnalyzer的jar和配置文件放到solr项目/WEB-INF/lib目录下
+配置文件放到\solr项目\WEB-INF\classes下，classes如果没有，就创建
+
+二、导入数据
+  定义dataimport-handler步骤：
+  1、打开collection1/config/solrconfig.xml
+  2、导入jar ,放到 solrHome\collection1\lib下 如果没有lib文件夹就自己创建
+	    solr-4.10.3\dist\solr-dataimporthandler-extras-4.10.3.jar
+	    solr-4.10.3\dist\ solr-dataimporthandle-4.10.3.jar
+	    mysql-connector-java-5.1.7-bin.jar
+   3、在solrconfig.xml中添加如下配置文件
+   <requestHandler name="/dataimport" 
+	class="org.apache.solr.handler.dataimport.DataImportHandler">
+	    <lst name="defaults">
+	      <str name="config">data-config.xml</str>
+	     </lst>
+	  </requestHandler> 
+   4、创建配置文件data-config.xml放到和solrconfig.xml同目录
+     data-config.xml内容如下：
+	<?xml version="1.0" encoding="UTF-8" ?>  
+	<dataConfig>   
+	<dataSource type="JdbcDataSource"   
+			  driver="com.mysql.jdbc.Driver"   
+			  url="jdbc:mysql://localhost:3306/lucene"   
+			  user="root"   
+			  password="root"/>   
+	<document>   
+		<entity name="product" query="SELECT pid,name,catalog_name,price,description,picture FROM products ">
+			 <field column="pid" name="id"/> 
+			 <field column="name" name="product_name"/> 
+			 <field column="catalog_name" name="product_catalog_name"/> 
+			 <field column="price" name="product_price"/> 
+			 <field column="description" name="product_description"/> 
+			 <field column="picture" name="product_picture"/> 
+		</entity>   
+	</document>   
+
+	</dataConfig>
+    5、在schema.xml中添加域，这才能查出来
+	<!-- products Field -->
+	<field name="product_name" type="text_ik" indexed="true" stored="true" />
+	<field name="product_catalog_name" type="string" indexed="true" stored="true" />
+	<field name="product_price" type="float" indexed="true" stored="true" />
+	<field name="product_description" type="text_ik" indexed="true" stored="false" />
+	<field name="product_picture" type="string" indexed="false" stored="true" />
+	<field name="product_release_time" type="date" indexed="true" stored="true" />
+    	<!-- products copyField -->
+    	<field name="product_keywords" type="text_ik" indexed="true" stored="false" multiValued="true"/>
+	<copyField source="product_name" dest="product_keywords"/>
+	<copyField source="product_description" dest="product_keywords"/>
+5、重启tomcat
+
+三、实现京东的案例页面分析
+ 页面传到后台的：
+  1、当前页码默认 是1
+  2、每页显示条数 默认是 60
+  3、主查询条件                          
+  4、过滤条件 商品类别和商品价格区间
+  5、价格排序 升序 降序
+后台提供页面的数据：
+ 1、商品列表 list
+ 2、商品总条数
+ 3、总页数           PageBean
+ 4、当前页码 
+ 5、每页显示的条数
+
+四、搭建jd案例框架
+ 分析：
+dao层
+  solrJ实现
+service层：
+
+web层：
+ springmvc.xml
+  扫描器
+  注解驱动
+  视图解析器
+
+步骤
+ 1、创建一个web工程
+ 2、导入jar solrJ、solrJ扩展包、solr的扩展包、springmvc、spring
+ 3、配置文件
+     springmvc.xml
+     log4j.properties
+ 4、在web.xml配置前端控制器
+ 5、引入静态资源
+
+
+
+
+
+
+ 

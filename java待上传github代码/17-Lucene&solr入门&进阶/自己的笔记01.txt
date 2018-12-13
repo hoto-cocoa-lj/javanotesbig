@@ -1,0 +1,89 @@
+分词器：
+将某文件夹下文件进行分词，将其路径，大小，内容，文件名根据标准分词方法分词，
+生成文件夹a，用luke打开a，可以看到分词后的结果。搜索spring可以在所有字段搜，
+搜索path:spring则只在path搜，需要注意搜索spring得到结果，用ring或者spr等搜索是搜不到的。
+创建maven项目，导入lucene-core 4.1和lucene-analyzers-common 4.1，commons-io，
+版本较高的需要jdk1.8，部分代码如下：
+
+public class IndexWriterTest {
+	@Test
+	public void t1() throws IOException{
+	
+	// 1： 指定索引库位置，路径a
+		File path = new File("d:/up");							
+		
+	// 2： 创建写入索引的对象
+		Directory d = FSDirectory.open(path);
+		Analyzer analyzer=new StandardAnalyzer();				//分词标准，选择默认的
+		IndexWriterConfig iconfig = new IndexWriterConfig(Version.LATEST, analyzer);
+		IndexWriter indexWriter = new IndexWriter(d, iconfig);
+		
+	// 3： 获取源文档的io流
+		String s="H:\\黑马java淘宝68元\\17-Lucene&solr入门&进阶\\Lucene&solr-day01\\
+												资料\\上课用的查询资料searchsource";
+		File srcFile = new File(s);
+		File[] files=srcFile.listFiles();
+		//System.out.println(Arrays.toString(new String[4])+"------");	
+		
+	// 4： 将文档写入索引库
+		for(File f:files){
+			Document doc=new Document();
+
+			String fileName = f.getName();
+			Field nameField=new TextField("name",fileName,Store.YES);
+			doc.add(nameField);
+			
+			long fileSize = FileUtils.sizeOf(f);
+			Field sizeField=new LongField("size",fileSize,Store.YES);
+			doc.add(sizeField);			
+			
+			String filePath = f.getPath();
+			Field pathField=new TextField("path",filePath,Store.YES);
+			doc.add(pathField);
+			
+			String fileContent = FileUtils.readFileToString(f);
+			Field contentField=new TextField("context",fileContent,Store.YES);
+			doc.add(contentField);
+			
+			indexWriter.addDocument(doc);
+			
+		}
+		
+	// 5： 关闭资源
+		indexWriter.close();
+	}
+}
+
+===========================================================================
+查询代码(基本没用)：
+
+	@Test
+	public void t1() throws IOException{
+		//1，指定索引库的位置
+		File path = new File("d:/up");
+		Directory d=FSDirectory.open(path);
+		
+		//2，创建读取索引对象
+		IndexReader indexReader=DirectoryReader.open(d);
+		
+		//3，创建查询索引对象
+		IndexSearcher searcher=new IndexSearcher(indexReader);
+		
+		//4，执行查询方法
+		Term t=new Term("context","spring");
+		Query q=new TermQuery(t);
+		//参数1是查询条件，参数2是最多结果条数
+		TopDocs td = searcher.search(q, 20);
+		System.out.println(td.totalHits);
+		ScoreDoc[] sd=td.scoreDocs;
+		for(ScoreDoc s:sd){
+			int docID=s.doc;
+			Document doc=searcher.doc(docID);
+			System.out.println(doc.getField("name"));
+			System.out.println(doc.get("name"));
+		}
+		indexReader.close();
+	}
+	
+	
+===========================================================================

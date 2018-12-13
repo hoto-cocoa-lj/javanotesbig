@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<script type="text/javascript" 
+	src="plugins/angularjs/angular.min.js"></script>
+
+</head>
+
+<body ng-app='pyg' ng-controller='c1' ng-init='f2()'>
+	<div ng-repeat='x in list'><span>{{x}}个人</span></div><hr>
+	<div ng-repeat='x in json()'><span>{{x.name}}--{{x.age}}</span></div><hr>
+	<div ng-repeat='x in list1.data'><span>{{x.a}}--{{x.b}}</span></div><hr>
+	<!-- 当前文件根目录下有data.json，内容是[{"a":1,"b":2},{"a":3,"b":4}] -->
+	
+
+			
+	<script type="text/javascript">
+		app=angular.module("pyg",[]);
+		
+		app.controller("c1",function($scope,$http){
+			$scope.list=[1,4,9,16,25];
+			$scope.json=function(){
+				return [{name:'a',age:1},{name:'b',age:2},{name:'c',age:3}];
+			};
+			/* 会出现跨域解析错误，需要用firefox */
+			$scope.f1=function(){
+				$http({method:'get',url:'data.json'
+				}).then(
+					function success(data){
+						$scope.list1=data;
+						alert(0);
+					},
+					function error(data){
+						alert(1);
+					}
+				);
+			};
+			/* f2报数据解析的错误，原因不明 */
+			$scope.f2=function(){
+				$http({method:'get',url:'data.json'
+				}).success(function(data){
+					$scope.list1=data;
+					alert(0);
+				}).error(function(data){
+					alert(1);
+				})
+			};
+			
+		});
+
+	</script>
+</body>
+
+</html>

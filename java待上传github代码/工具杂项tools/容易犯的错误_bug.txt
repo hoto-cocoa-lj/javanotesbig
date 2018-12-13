@@ -5,6 +5,8 @@ spring整合junit测试，运行测试方法卡住，原因是没连接数据库
 spring整合redis时，不要一个项目整合两个，之前同时整个了redis.xml和cache.xml，
 里面分别赢了jedis和热第四template。
 
+=================================================================
+
 描述：
 action里设置了某私有属性telphone和set方法，但后台始终获取不到值，
 同样设置的其他属性却能获取到。
@@ -12,9 +14,26 @@ action里设置了某私有属性telphone和set方法，但后台始终获取不
 以后遇到获取不到和有时获取不到都应该考虑是否有重复。
 使用springmvc的话，属性名重复不会出现这个问题，所有的属性都能获得值。
 
+=================================================================
 
 maven项目是pom时，运行会报错找不到applicationContext.xml。
+
+=================================================================
 
 表单里要写value="${item.detail }"，不要写value=${item.detail }，
 因为如果值中间有空格时，前者能显示所有内容，后者只能显示空格前面的内容。
 
+=================================================================
+
+一个xml文件或者properties文件加载多次可能报错，
+之前遇到web的applicationCOntext.xml import了springmvc.xml，
+而springmvc.xml配置了<context:property-placeholder 
+location="classpath:resource.properties"/>，导致该文件被加载两次，
+报错No qualifying bean of type  **** found for。
+
+=================================================================
+
+运行pyg-manager报错：java.nio.channels.ClosedChannelException：
+一开始一直搜索这一行，百度找不到原因，然后搜第二行的错误提示：
+at sun.nio.ch.SocketChannelImpl.shutdownInput：
+很快就找到了原因，centos防火墙没关。
