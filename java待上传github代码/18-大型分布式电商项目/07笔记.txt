@@ -1,0 +1,4 @@
+fastdfd服务器账号密码：root/itcast。
+FastDFS存放的位置/home/fastdfs/store_path0/data/00/00，
+估计还有其他地方，从fastdfs开始查找即可。
+

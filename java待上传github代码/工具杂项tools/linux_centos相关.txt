@@ -130,5 +130,10 @@ https://www.cnblogs.com/AndyAo/p/8135980.html
 
 查看java版本：	java -version
 
+=========================================================================
+
+开启zookeeper：
+cd /usr/local/rjb/registry-zookeeper/bin-->./zkServer.sh start。
+查看zookeeper开启状态./zkServer.sh status。
 
 ========================================================================

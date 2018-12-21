@@ -1,0 +1,16 @@
+1_新建properties文件，比如application.properties，输入a=b，
+比如IMAGE_SERVER_URL=http\://192.168.25.153/。
+如果properties文件不能输入中文，右键该文件，properties-->resource修改成utf-8，
+然后window-preferences-->content types-->text-->java properties file
+-->*.properties，修改default encoding成UTF-8，保存修改即可。
+
+2_在applicationContext.xml等spring的配置文件里扫描该文件，
+比如<context:property-placeholder location="classpath:application.properties" />。
+
+3_在需要使用该常量的类里写如下代码，即可使用该常量：
+	@Value("${IMAGE_SERVER_URL}")
+	private String IMAGE_SERVER_URL;
+	
+
+
+	

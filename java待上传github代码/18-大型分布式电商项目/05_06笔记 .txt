@@ -1,0 +1,112 @@
+一个bug：
+一直报错找不到方法，通过前端打断点调试发现有访问/seller/add但是找不到路径，
+前端调试太牛逼了。原因是springnvc.xml里引入dubbo服务时
+<dubbo:annotation package="com.pyg.manager.controller" /> 的，
+amager忘记改成shop，造成扫描不到该方法。
+
+
+security可以这么配置：
+UserDetailsServiceImpl需要dubbo的SellerService(在com.pyg.shop.service.impl里，
+已经被dubbo的service注解)，然后security的authentication-provider需要
+UserDetailsServiceImpl进行登陆验证。教程里用xml方式，我自己试了下可以用注解配置。
+
+
+userDetailsServiceImpl需要sellerService，由dubbo用注解方式提供。
+provider需要userDetailsService，所以使用了spring的包扫描和在UserDetailsService加上@service，
+依旧报错找不到userDetailsService，所以修改注解@Service("userDetailsService")。
+本打算在spring-security加上上面的注释，但是添加失败，所以加到springmvc里。
+spring管理userDetailsService后，security就能找到它。
+
+	<!--springmvc.xml： 引用dubbo 服务，扫描包 -->
+	<dubbo:application name="pyg-shop-web" />
+	<dubbo:registry address="zookeeper://192.168.153.130:2181"/>
+	<dubbo:annotation package="com.pyg.shop.controller" /> 
+	<dubbo:annotation package="com.pyg.shop.service.impl" /> 
+	
+	<context:component-scan base-package="com.pyg.shop.service.impl">
+	</context:component-scan>
+	
+	
+	
+	//自己写的验证类UserDetailsServiceImpl，这里括号里的东西不能省略，
+	//因为security里有user-service-ref=‘userDetailsService’
+	@Service("userDetailsService")
+	public class UserDetailsServiceImpl implements UserDetailsService{
+	@Reference
+	private SellerService sellerService;
+	@Override
+	public UserDetails loadUserByUsername(String arg0) throws UsernameNotFoundException {
+		List<GrantedAuthority> authrities= new ArrayList<GrantedAuthority>();
+		authrities.add(new  SimpleGrantedAuthority("ROLE_USER1"));
+		TbSeller one = sellerService.findOne(arg0);
+		return new User(arg0, one.getPassword(),authrities);
+	}
+	
+
+	<!-- spring-security.xml：配置认证管理器，bean应该也可以用扫描，但是不熟悉暂不测试。 -->
+	<authentication-manager>
+		<authentication-provider user-service-ref="userDetailsService"></authentication-provider>
+	<!-- 	<authentication-provider>
+			<user-service>
+				<user name="admin" password="admin" authorities="ROLE_USER1"/>
+				<user name="a" password="a" authorities="ROLE_USER1"/>	
+			</user-service>		
+		</authentication-provider> -->
+	</authentication-manager>
+
+================================================================================
+
+如何在controllerA传参serviceB：
+描述:controllerA需要使用多个service的方法。例如typeTemplateController调用brandService。
+解决办法：直接传就可以了，当然页面也要引用这些service的js。代码如下：
+
+页面：
+    <script src="../js/service/brandService.js"></script>
+
+     <script src="../js/controller/baseController.js"></script>
+    <script src="../js/controller/typeTemplateController.js"></script>
+
+contoller：
+	app.controller('typeTemplateController' ,
+			function($scope,$controller,typeTemplateService,brandService){		
+		$controller('baseController',{$scope:$scope});//继承
+
+		// 查询规格属性下拉列表
+		$scope.specList={data:[]};
+			$scope.findSpecList = function() {
+			// 调用service服务方法
+				specificationService.findSpecList().success(function(data) {
+				$scope.specList = {
+					'data' : data
+				};
+			});
+		};	
+	});	
+
+================================================================================
+	
+select2用法如下：
+config是数据来源，ng-model只能获取id，赋值给c；
+select2-model能获取全部选择的全部json，赋值给entity.brandIds。
+		      		<td>关联品牌:{{c}}</td>
+		      		<td>
+		      			<input select2-model='entity.brandIds'   select2  
+		      			config="brandList" multiple  ng-model='c'
+		      			placeholder="选择品牌（可多选）" 
+		      			class="form-control" type="text"/>
+		      		</td>
+
+数据格式必须这么写，如下
+$scope.brandList={data:[{'id':1,'text':'11'},{'id':2,'text':'22'}]};
+	
+================================================================================
+
+报错query function not defined for Select2 undefined：
+augularjs加载数据时，由于方法是异步的，该数据还没有返回值，
+所以会报错数据没有定义。解决方式是给个格式正确的初始值。
+比如上列的$scope.brandList ={data:[]};
+
+================================================================================
+================================================================================
+================================================================================
+================================================================================

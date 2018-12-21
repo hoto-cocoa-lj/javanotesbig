@@ -58,3 +58,9 @@ Riding，通常缩写为 CSRF 或者 XSRF，是一种对网站的恶意利用。
 如果你没有设置登录页 security="none" ，将会出现以下错误
 always-use-default-target：指定了是否在身份验证通过后总是跳转到 default-target-url 属性指
 定的 URL。
+
+
+用法：
+web.xml配置spring security 安全框架过滤器并加载spring-security.xml，
+配置好spring-security.xml，登陆页面配置表单使用post提交，name=username/password，
+action配置spring-security.xml的login-processing-url，一般是/login。
