@@ -21,4 +21,69 @@ ng-options：
 	上例表示生成一个下拉列表，每个option显示的值是遍历list的每个对象x的b属性，
 	即[2,4,6]，而对应的w的值分别是[1,2,3]。类似于x.a是value，x.b是option的text。
 
+ng-checked：
+	   <input  ng-checked='a==1' type="checkbox" >
+	   <input  ng-checked='willcheck()' type="checkbox" >
+上面第一行代码表示a==1则选中，第二行表示'willcheck()返回true则选中false则不选中。			
+	
+	
+===========================================================================
+
+angularjs页面间传递数据：
+url地址需要加一个#，如goods_edit.html#?id={{x.id}}，
+然后在goods_edit.html的controller.js里用
+app.controller('goodsController' ,function($scope,$controller,$location){
+	 $scope.uid=$location.search().id;
+}即可将该id值({{x.id}})传递给uid。
+
+===========================================================================
+
+似乎app.controller的形参的顺序没有要求，上例改了形参顺序依旧能够运行。
+
+===========================================================================
+
+
+
+===========================================================================
+
+updateGoodsStatus里$scope.reloadList()和location.href='goods.html'都可以回到列表页面，
+但是location.href='goods.html'会刷新整个页面，页面被重新渲染，scope域会被重新生成；
+而$scope.reloadList不会，因为它调用了findPage，重新去数据库拿更新后的数据，
+只刷新数据不渲染页面。类似于ajax。原理是(pinyougou的$scope绑定的)这些方法在后台
+都是@RestController，即不返回页面只返回数据。
+还有$scope.selectIds=[]写在$scope.reloadList()前后都一样，因为$scope没有被重新生成。
+
+    $scope.updateGoodsStatus=function(i){
+    	goodsService.updateGoodsStatus($scope.selectIds,i).success(function(data){
+    		if(data.success){
+    			$scope.selectIds=[];
+    			$scope.reloadList();
+    	/*		$scope.selectIds=[];
+				location.href='goods.html';  */
+    		}else{
+    			alert(data.success);
+    		}
+    	})
+    }
+	
+	$scope.reloadList=function(){
+			//切换页码
+				$scope.findPage( $scope.paginationConf.currentPage,
+				$scope.paginationConf.itemsPerPage);
+			}
+	
+===========================================================================
+===========================================================================
+===========================================================================
+===========================================================================
+===========================================================================
+===========================================================================
+
+===========================================================================
+
+===========================================================================
+
+===========================================================================
+
+
 

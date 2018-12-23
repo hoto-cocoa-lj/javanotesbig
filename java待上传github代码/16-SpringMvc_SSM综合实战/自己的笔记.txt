@@ -1,3 +1,51 @@
+超重要：：
+controller方法里可以自己定义接收类型，前端代码如下，selectIds是个数组，
+i是字符串还是数组我也不知道，不过理论上通过页面传送肯定是字符串。
+url里selectIds应该也会转成字符串。这里也可以用get方法。
+	
+	this.updateGoodsStatus=function(selectIds,i){
+		return $http.post('../goods/updateGoodsStatus?selectIds='+selectIds+'&i='+i);
+	}  
+
+下面是后台代码。测试发现这三个方法都可以用，当然形参名字不能改！！
+方法1用Long数组接收selectIds，可以发现接收到的确实是java的Long数组；
+方法2用String数组接收selectIds，再转Long数组也没问题。所以接收到的确实是java的String数组；
+方法3用字符串接收selectIds也没问题。
+这说明url里selectIds被转成了  149187842867913,149187842867914  ，所以后台接收时可以自由处理。
+f12里也可以发现地址确实是这样的，地址如下
+http://localhost:8080/goods/updateGoodsStatus?selectIds=149187842867913,149187842867914&i=2
+
+
+	@RequestMapping("/updateGoodsStatus")
+	public PygResult updateGoodsStatus(Long[] selectIds,String i){		
+		System.out.println(selectIds+"\t"+Arrays.toString(selectIds));	
+		//[Ljava.lang.Long;@1417b1d5	[149187842867912, 149187842867921]
+		return goodsService.updateGoodsStatus(selectIds,i);		
+	}
+	
+	@RequestMapping("/updateGoodsStatus")
+	public PygResult updateGoodsStatus(String[] selectIds,String i){
+		Long[] selectIds1=new Long[selectIds.length];
+		for(int j=0;j<selectIds.length;j++){
+			selectIds1[j]=Long.parseLong(selectIds[j]);
+		}
+		return goodsService.updateGoodsStatus(selectIds1,i);		
+	}
+	
+	@RequestMapping("/updateGoodsStatus")
+	public PygResult updateGoodsStatus(String selectIds,String i){
+		System.out.println("--------------------------------"+selectIds);
+		//149187842867912, 149187842867921
+		String[] selectIds2 = selectIds.split(",");
+		Long[] selectIds1=new Long[selectIds2.length];
+		for(int j=0;j<selectIds2.length;j++){
+			selectIds1[j]=Long.parseLong(selectIds2[j]);
+		}
+		return goodsService.updateGoodsStatus(selectIds1,i);		
+	}
+
+==========================================================================================
+
 @RequestMapping里的action可以写可以不写。
 
 查询多用blobs，因为可能遇到这样的bug：
