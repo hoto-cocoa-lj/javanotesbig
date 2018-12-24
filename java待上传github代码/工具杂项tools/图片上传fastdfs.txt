@@ -1,0 +1,77 @@
+1_上传页面用angularjs这么写，entity.pic可以保存图片地址到数据库，
+而<img src='entity.pic'/>可以展示上传成功的图片。一举两得。
+<tr>
+	<td>图片</td>
+	<td>
+		<table>
+			<tr>
+				<td><input type="file" id="file" />
+				<button class="btn btn-primary" type="button"
+				ng-click="uploadFile()">上传</button></td>
+				<td><img src="{{entity.pic}}" width="200px"
+				height="200px">	</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+
+
+2_uploadFile()方法。controller层这么写，调用uploadService层的uploadFile()：
+	$scope.uploadFile=function(){
+		uploadService.uploadFile().success(function(data){
+			if(data.success){
+				$scope.entity.pic=data.message;
+			}else{
+				alert(data.message);
+			}
+		})
+	}
+	uploadService这么写(需要注意var file = document.getElementById("file").files[0])：
+	app.service('uploadService',function($http){	
+		this.uploadFile=function(){
+			var formData=new FormData();			
+			var file = document.getElementById("file").files[0];
+			formData.append("fileName",file);
+			return $http({
+					method:"post",
+					url:"../content/upload",
+					data:formData,
+					headers: {'Content-Type':undefined},
+					transformRequest:angular.identity,
+			});
+		};		
+	});
+		
+
+3_后台绑定"../content/upload"的方法：
+	自定义常量IMAGE_SERVER_URL写在application.properties里，在spring的配置文件里通过
+	<context:property-placeholder location="classpath:application.properties" />读取。
+	fdfs_client.conf里是fastdfs的配置文件，里面有图片服务器的ip等信息。
+	这两个文件都放在resources里。
+
+	@RestController
+	@RequestMapping("/content")
+	public class UploadController {	
+		@Value("${IMAGE_SERVER_URL}")
+		private String IMAGE_SERVER_URL;
+		
+		@RequestMapping("/upload")
+		public PygResult uploadPic(MultipartFile fileName){
+			try {
+				String a="classpath:fdfs_client.conf";
+				FastDFSClient f=new FastDFSClient(a);
+				String name = fileName.getOriginalFilename();
+				String name1 = fileName.getName();
+				
+				String ext = name.substring(name.lastIndexOf(".")+1);
+				String url = f.uploadFile(fileName.getBytes(),ext);
+				url=IMAGE_SERVER_URL+url;
+				System.out.println("oname="+name+"\tgetname="+name1+"\turl="+url);
+				return new PygResult(true,url);
+			}  catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return new PygResult(false,"上传失败");
+			}
+		}
+	}

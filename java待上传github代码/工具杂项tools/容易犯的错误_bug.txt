@@ -37,3 +37,44 @@ location="classpath:resource.properties"/>，导致该文件被加载两次，
 一开始一直搜索这一行，百度找不到原因，然后搜第二行的错误提示：
 at sun.nio.ch.SocketChannelImpl.shutdownInput：
 很快就找到了原因，centos防火墙没关。
+
+=================================================================
+
+数据库回滚失败：
+
+做pyg项目时，controller层springmvc.xml扫描部分配置如下：
+	<dubbo:annotation package="com.pyg.shop.controller" /> 
+	<dubbo:annotation package="com.pyg.shop.service.impl" /> 
+	
+service层applicationContext-tx.xml事务配置如下(不知道为什么不用配扫描)：
+		<!-- 定义事物管理平台 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- 注解式事物 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+service层相应的类标注了@Service(dubbo的)和@Transactional
+(org.springframework.transaction.annotation.Transactional)，
+然后手动报错1/0后数据库始终不回滚，查看各种配置文件都没问题。debug发现：
+DEBUG DataSourceTransactionManager:851 - Initiating transaction rollback
+DEBUG DataSourceTransactionManager:284 - Rolling back JDBC transaction on Connection [com.mchange.v2.c3p0.impl.NewProxyConnection@1a311b95]，
+百度后发现这似乎表示发生了回滚，后来发现数据库的表的引擎是MyISAM，
+只有InnoDB才支持回滚，修改后问题解决。
+
+=================================================================
+
+=================================================================
+
+=================================================================
+
+=================================================================
+
+=================================================================
+
+=================================================================
+
+=================================================================
+
+=================================================================
+
+=================================================================
