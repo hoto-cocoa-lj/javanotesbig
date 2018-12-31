@@ -82,10 +82,27 @@ junit测试方法3个规范：不能传参数，void，public。
 
 ====================================================================
 
+mybatis的排序方法如下：
+		@Override
+		public List<TbContent> findContentListByCategoryId(Long categoryId) {
+			TbContentExample e=new TbContentExample();
+			Criteria c = e.createCriteria();
+			c.andCategoryIdEqualTo(categoryId).andStatusNotEqualTo("0");
+			e.setOrderByClause("sort_order");
+			return contentMapper.selectByExample(e);
+		}
 
 ====================================================================
 
+ctrl+shift+f无法格式化，可能和搜狗输入法冲突，切换输入法即可。
+
 ====================================================================
+
+Spring项目出现Referenced file contains errors的 解决方法
+
+S运行项目的时候并没有错误，出现红色的x看起来很不舒服，在网上看的解决方法是清除Cache，
+结果还是报错，反复搞了很久终于解决了：解决方法：
+Window--Preferences--搜索“Validation”，去掉XML Validator 和 XSL Validator 等文件类型的验证信息(包括Manual和Build).
 
 ====================================================================
 ====================================================================

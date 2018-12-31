@@ -1,0 +1,39 @@
+bug太多，忘记顺序了。以下bug无先后顺序：
+
+
+1、java.lang.ClassNotFoundException: ContextLoaderListener
+忘记配置pyg-search-web的springmvc坐标web.xml了。
+
+
+
+2、BeanDefinitionParsingException:  Unable to locate Spring NamespaceHandler
+譬如Configuration problem: Unable to locate Spring NamespaceHandler for XML schema namespace [http://www.springframework.org/schema/tx
+就是少了org.springframework.transaction-3.0.0.M3.jar包；
+
+而Configuration problem: Unable to locate Spring NamespaceHandler for XML schema namespace [http://www.springframework.org/schema/aop
+则是少了org.springframework.aop-3.0.0.M3.jar包；
+
+
+
+3、dubbo HessianProtocolException: 'SolrResultPage' could not be instantiated
+原因不明，我在pyg-search-service-impl已经从索引库得到ScoredPage<TbItem>类型的数据，
+然后直接把这个数据传递到controller层就会报这个错。但是把数据封装到一个Map，
+然后把Map传到controller层就没问题。
+
+
+
+4、No provider available for the service
+忘记在提供服务的类上加上dubbo的注解@Service
+
+
+
+
+5、ClassNotFoundException: org.springframework.data.domain.Page
+6、缺少org.apache.commons.collections.CollectionUtils
+百度搜索它们在哪个包，然后加入坐标。
+
+
+
+
+7、ClassNotFoundException: org.springframework.data.domain.Page
+controller里获取不到参数，因为忘记给形参加上@RequestBody。

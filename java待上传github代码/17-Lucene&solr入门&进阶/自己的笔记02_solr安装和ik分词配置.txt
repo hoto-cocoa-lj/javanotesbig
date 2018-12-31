@@ -1,0 +1,127 @@
+
+====================================================================================
+
+
+安装solr：
+1_准备一个干净的tomcat(删除webapps里的东西)；
+
+2_把dist下的solr-4.10.3.war拷贝到tomcat的webapps，运行tomcat/bin的startup.bat；
+	（这样不能删除war包，不然项目也会被删除，手动解压的话可以删除）
+	
+3_配置solrHome，就是配置索引库位置。
+	1_复制example\solr里的文件(这个是索引仓库)到位置p；
+	2_配置solr和solrHome的关系，修改tomcat里solr的web.xml，修改43行的位置成p，释放注释；
+	
+4_添加solr项目运行的扩展包，把example\lib\ext的jar包放到tomcat的webapps\solr\WEB-INF\lib；
+
+5_重启tomcat(运行tomcat/bin的startup.bat)。
+（要修改索引库名字修改索引库文件里core.properties的name即可，最好把该文件夹名字也改一样的）
+
+6、打开ip:port/solr，能打开即配置成功。
+
+
+====================================================================================
+
+
+安装ik分词器：
+1、导入ik分词器的jar包(IKAnalyzer2012FF_u1.jar)到tomcat的webapps/solr/web-inf/lib/里；
+
+2、导入ik分词器配置文件(3个文件)到tomcat的webapps/solr/web-inf/classes/里，需要手动创建；
+	1、IKAnalyzer.cfg.xml：真配置文件；
+	2、ext_stopword.dic：停用词汇，比如不需要的次"的"和违禁词"flg"；
+	3、mydict.dic：扩展词汇，比如需要分词的特殊词某朋友的名字，即需要分词不是常用词的；
+	这3个文件必须是无BOM的utf-8格式，另存为时可以看到encoding是utf-8而不是utf-8+BOM；
+	
+3、创建索引域的类型。索引库里的/仓库名/conf/schema.xml，加上如下配置：
+	<fieldType name="text_ik" class="solr.TextField">
+		<analyzer class="org.wltea.analyzer.lucene.IKAnalyzer"/>
+	</fieldType>
+	
+4、配置域字段。如<field name="username_ik" type="text_ik" indexed="true" stored="true"/>。
+	这表示username_ik字段使用ik分词器分词，这里的type和索引域的类型的name必须一样。
+	至此可以进行测试。打开ip:port/solr，选择core selector的合适的仓库，
+	选择analysis，输入一句话进行分析，看分词是否成功。
+	
+5、配置复制域。如<field  name="item_keywords"  type="text_ik"  indexed="true"  stored="false"
+			multiValued="true"/>
+	<copyField source="item_title" dest="item_keywords"/>
+	<copyField source="item_category" dest="item_keywords"/>，
+	这表示搜索item_keywords时会同时从item_title和item_category两个域找。
+	
+6、配置动态域。如<dynamicField name="item_spec_*" type="string" indexed="true" stored="true"/>。
+	配置原因是有item_spec_a和item_spec_b这样的字段。至此，一个实例配置如下：
+	
+		<dynamicField name="item_spec_*" type="string" indexed="true" stored="true" />
+		<field name="item_goodsid" type="long" indexed="true" stored="true"/>
+		<field name="item_title" type="text_ik" indexed="true" stored="true"/>
+		<field name="item_price" type="double" indexed="true" stored="true"/>
+		<field name="item_image" type="string" indexed="false" stored="true" />
+		<field name="item_category" type="string" indexed="true" stored="true" />
+		<field name="item_seller" type="text_ik" indexed="true" stored="true" />
+		<field name="item_brand" type="string" indexed="true" stored="true" />
+
+		<field  name="item_keywords"  type="text_ik"  indexed="true"  stored="false"
+				multiValued="true"/>
+		<copyField source="item_title" dest="item_keywords"/>
+		<copyField source="item_category" dest="item_keywords"/>
+		<copyField source="item_seller" dest="item_keywords"/>
+		<copyField source="item_brand" dest="item_keywords"/>
+		
+		<field name="username_ik" type="text_ik" indexed="true" stored="true"/>
+		<fieldType name="text_ik" class="solr.TextField">
+			<analyzer class="org.wltea.analyzer.lucene.IKAnalyzer"/>
+		</fieldType>
+		
+7、pojo的maven项目里导入spring-data-solr和solr-solrj的坐标。
+			<dependency>
+ 				<groupId>org.springframework.data</groupId>
+ 				<artifactId>spring-data-solr</artifactId>
+   				<version>1.5.5.RELEASE</version>
+   			</dependency>
+	然后在需要被查询的pojo类里进行字段映射，其中动态域配置比较复杂，实例见TbItem.java。
+			
+	在合适的service项目的resouces里创建applicationContext-solr.xml，配置如下：
+			<?xml version="1.0" encoding="UTF-8"?>
+			<beans xmlns="http://www.springframework.org/schema/beans"
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+				xmlns:p="http://www.springframework.org/schema/p"
+				xmlns:context="http://www.springframework.org/schema/context"
+				xmlns:solr="http://www.springframework.org/schema/data/solr"
+				xsi:schemaLocation="http://www.springframework.org/schema/data/solr
+				http://www.springframework.org/schema/data/solr/spring-solr-1.0.xsd
+				http://www.springframework.org/schema/beans
+				http://www.springframework.org/schema/beans/spring-beans.xsd
+				http://www.springframework.org/schema/context
+				http://www.springframework.org/schema/context/spring-context.xsd">
+				<!-- solr 服务器地址 -->
+				<solr:solr-server id="solrServer" url="http://192.168.153.129:8081/solr/仓库名" />
+				<!-- solr 模板，使用 solr 模板可对索引库进行 CRUD 的操作 -->
+				<bean id="solrTemplate" class="org.springframework.data.solr.core.SolrTemplate">
+					<constructor-arg ref="solrServer" />
+				</bean>
+			</beans>
+
+8、
+
+要到的bug：
+报错unexpected parsing xml document from class path resource，
+NoClassDefFoundError:org/springframework/data/repository/config/RepositoryConfigurationExtension
+和ClassNotfoundException：.../RepositoryConfigurationExtension，找到了这个网站
+https://stackoverflow.com/questions/44271403/spring-data-jpa-error-in-repositoryconfigurationextension，加入spring-data-commons的1.12.2.RELEASE坐标，继续报错
+ClassNotfoundException：org.apache.commons.lang3.StringUtils，
+加入commons-lang3的3.3.2的坐标，然后报错找不到某字段，重启solr的tomcat，问题解决。
+
+====================================================================================
+
+
+
+
+Solr Core的管理界面(类似mysql的database)。
+Solr core是Solr的一个独立运行实例单位，它可以对外提供索引和搜索服务，
+一个Solr工程可以运行多个SolrCore（Solr实例），一个Core对应一个索引目录。
+添加solrcore：
+第一步：复制collection1改名为collection2
+第二步：修改core.properties。name=collection2
+第三步：重启tomcat
+
+		

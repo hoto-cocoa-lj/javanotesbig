@@ -23,7 +23,12 @@ tail -f logs/catalina.out 查看tomcat日志(当前路径tomcat根目录)
 
 =========================================================================
 
-
+虚拟机ifconfig不显示127.0.0.0以外的ip：
+一般重启就行了，有一次重启了也无效。重启网络服务service network start，
+报错 Failed to start LSB: Bring up/down networking，解决方式：禁用NetworkManager，
+1. systemctl stop NetworkManager
+2. systemctl disable NetworkManager 
+然后重启网络服务，能正常联网了！
 
 =========================================================================
 
@@ -57,7 +62,7 @@ service mysqld restart							#重启
 
 
 ========================================================================
-
+https://www.cnblogs.com/moxiaoan/p/5683743.html
 
 centos7防火墙操作：
 常用命令介绍
@@ -71,6 +76,18 @@ centos7防火墙操作：
 版权声明：本文为博主原创文章，转载请附上博文链接！
 firewall-cmd --state                           ##查看防火墙状态，是否是running
 									##开启状态：running 	关闭状态：not running 
+systemctl start firewalld						开启防火墙
+注意：防火墙关闭的情况下，netstat -lntp | grep 6379显示6379被占用，
+打开了redis且配置没问题，但是远程始终连不上。无法tennet ip 6379，能tennet ip 22，
+发现开启防火墙，并开放6379后解决。
+
+
+永久关闭后，开启防火墙（开机自动启用）
+systemctl enable firewalld
+chkconfig iptables on
+
+
+
 firewall-cmd --reload                          ##重新载入配置，比如添加规则之后，需要执行此命令
 firewall-cmd --get-zones                       ##列出支持的zone
 firewall-cmd --get-services                    ##列出支持的服务，在列表中的服务是放行的
@@ -80,6 +97,7 @@ firewall-cmd --add-service=ftp --permanent     ##永久开放ftp服务
 firewall-cmd --remove-service=ftp --permanent  ##永久移除ftp服务
 
 firewall-cmd --zone=public --add-port=80/tcp --permanent     ##永久添加80端口 
+firewall-cmd --reload							#开放端口reload才生效
 firewall-cmd --zone=public --list-ports		   #查看所有打开的端口
 
 
@@ -105,13 +123,24 @@ tail -f logs/catalina.out 查看tomcat日志(当前路径tomcat根目录)
 
 =========================================================================
 
+修改redis.conf里damonize为yes					#设置后台启动
 
-redis账号密码都是root
-./bin/redis-server redis.conf					#启动redis（先到redis目录）
-./bin/redis-cli -h 192.168.88.130 -p 6379		#打开redis后才可以（远程）连接，需要防火墙开放6379
+./bin/redis-server redis.conf					
+#启动redis（redis账号密码都是root？？，先到redis目录，我装在rjb同级目录，redis.conf放在根目录）
+
+./bin/redis-cli
+127.0.0.1:6379> keys *							#打开客户端，并查看所有keys
+
+netstat -lntp | grep 6379						#检测6379端口是否被占用
+kill -9 进程id									#发现某进程占用端口后，关闭该进程
+
+./bin/redis-cli -h 192.168.88.130 -p 6379	
+							#打开redis后（./bin/redis-cli）才可以（远程）连接，需要防火墙开放6379
 192.168.88.130:6379>							#输入ping返回pong表示连接正常
+
 ps -ef | grep redis								#使用命令查看6379端口是否启动
 ./bin/redis-cli shutdown						#关闭redis（先到redis目录）
+
 
 redis持久化
 两种方法：rdb持久化和aof持久化

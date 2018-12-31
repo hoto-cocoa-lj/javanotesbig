@@ -63,6 +63,30 @@ DEBUG DataSourceTransactionManager:284 - Rolling back JDBC transaction on Connec
 
 =================================================================
 
+https://www.cnblogs.com/softidea/p/4186090.html
+
+maven项目：
+java.lang.IllegalStateException: Failed to read Class-Path attribute from manifest of jar 。。。。
+原因估计是jar包冲突，删掉对应的jar然后maven update
+Failed to read Class-Path attribute from manifest  activemq-broker-5.13.4.jar
+Could not transfer artifact 。。。。。。
+The type  。。。。。。 cannot be resolved
+
+这句话的意思是： 对于这个包从maven中心传输到本地仓库失败，决定不会重新尝试下载jar包，
+直到mavne再改更新索引，或强制更新。
+
+实际的解决办法是：直接去本地仓库（local repository），把这个org.apache.poi存放的目录删除掉（因为包没有下载下来），
+(1)刷新你的项目（在项目上点右键-->刷新）； 
+(2)在你的项目上右击，选择maven--->update（刷新Maven配置）就可以了，
+让maven重新下载；
+(3)编译maven项目。在项目上点右键-->Run As -->Maven build
+
+使用说明：
+如果pom.xml中配置的jar不能下载，提示pom.xml中报错，反复使用（1）和（2）操作；
+如果pom.xml文件没有报错，就使用（3）来处理；
+
+maven-->update会自动下载坏jar包和缺失的jar包。
+
 =================================================================
 
 =================================================================
