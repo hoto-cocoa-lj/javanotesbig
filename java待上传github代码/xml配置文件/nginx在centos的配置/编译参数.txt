@@ -1,0 +1,56 @@
+=====================================================================
+
+进行nginx安装要先安装gcc等，详情百度。
+
+1、在linux的/usr/local/rjb/nginx-1.8.0粘贴下面的代码，回车运行：
+（这里/usr/local/rjb和/var/temp/nginx两个路径必须存在）
+
+./configure \
+--prefix=/usr/local/rjb/nginx \
+--pid-path=/var/run/nginx/nginx.pid \
+--lock-path=/var/lock/nginx.lock \
+--error-log-path=/var/log/nginx/error.log \
+--http-log-path=/var/log/nginx/access.log \
+--with-http_gzip_static_module \
+--http-client-body-temp-path=/var/temp/nginx/client \
+--http-proxy-temp-path=/var/temp/nginx/proxy \
+--http-fastcgi-temp-path=/var/temp/nginx/fastcgi \
+--http-uwsgi-temp-path=/var/temp/nginx/uwsgi \
+--http-scgi-temp-path=/var/temp/nginx/scgi
+
+
+2、停止后输入make回车
+
+3、停止后输入make install回车
+
+=====================================================================
+
+开启nginx：/usr/nginx/sbin/nginx
+开启时提示nginx: bind to 0.0.0.0:80 failed，可能是端口冲突，
+修改conf/nginx.conf的  "server {listen 端口; "  的端口即可。
+
+关闭：/usr/nginx/sbin/nginx -s stop
+reload？（没用过）：/usr/nginx/sbin/nginx -s reload
+
+=====================================================================
+
+一个测试用例如下：
+
+conf/nginx.conf：
+    server {
+        listen       8082;
+        server_name  item.pyg.com;
+        location / {
+            root   /usr/local/rjb/nginx/data/images;
+            index  index.html index.htm;
+        }
+	}
+	
+C:\Windows\System32\drivers\etc\hosts：
+	#pyg测试环境
+	192.168.153.129 item.pyg.com
+
+浏览器输入http://item.pyg.com:8082/abc.html即可打开
+/usr/local/rjb/nginx/data/images下的abc.html页面。
+
+=====================================================================
