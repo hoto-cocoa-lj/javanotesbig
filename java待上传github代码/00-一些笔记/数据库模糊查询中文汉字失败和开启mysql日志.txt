@@ -1,0 +1,36 @@
+模糊查询数字和英文没问题，查询汉字查不到。
+
+查询代码如下(添加不添加binary都查不到)：
+	@Test
+	public void t5() throws SQLException {
+		Connection c = dataSource.getConnection();
+		String sql = "select * from base_dict where dict_type_name like ?";
+		//String sql = "select * from base_dict where dict_type_name like binary?";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setObject(1, "%业%");
+		ResultSet q = s.executeQuery();
+		while (q.next()) {
+			System.out.println(q.getObject(1) + ":" + q.getObject("dict_type_name"));
+		}
+	}
+	
+c3p0连接池地址是
+    <property name="jdbcUrl">jdbc:mysql://localhost:3306/hibernate1?userUnicode=true&amp;charcterEncoding=UTF-8</property>，其中&amp;写成&也查不到数据
+
+
+
+想查看mysql的日志，百度了一对方法都无效，修改my.ini都不会无法启动mysql。
+终于在
+找到了开启日志的方法：在my.ini设置general_log=on，
+此时在workbench执行show variables like 'general_log%'可以看到设置成功
+和日志所在文件。打开文件，发现查询语句是
+select * from base_dict where dict_type_name like binary '%?%'，
+但是使用"%a%"查询，查询语句后面是where dict_type_name like binary '%a%'，
+这说明中文转码出现问题。在
+https://blog.csdn.net/tjzhaomengyi/article/details/52924729找到答案，
+workbench执行show variables like 'char%'，发现character_set_server是latin1，
+在my.ini的mysqld下面加上
+character-set-server = utf8 
+collation-server = utf8_general_ci
+后重启，character_set_server是变成utf8，查询成功。
+
