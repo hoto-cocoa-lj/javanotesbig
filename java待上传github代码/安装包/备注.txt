@@ -1,0 +1,1 @@
+profile是linux安装java的配置文件，在/etc里，自己用window+xftp老是报错找不到命令。

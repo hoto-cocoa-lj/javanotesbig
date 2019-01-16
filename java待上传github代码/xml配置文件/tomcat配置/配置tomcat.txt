@@ -1,0 +1,9 @@
+1、preferences搜索server，选择server runtime environments，add-->tomcat v7.0，
+	tomcat installation directory选择tomcat的根目录，即bin所在目录，
+	如bin在**/apache-tomcat-7.0.52/bin，目录就是**/apache-tomcat-7.0.52，
+	jre选择自己的不选默认的，finish，配置服务器完毕；
+2、视图显示servers，新建server，选择tomcat7，server runtime environment
+	选择刚刚创建的tomcat7服务器，finish。
+	
+
+	

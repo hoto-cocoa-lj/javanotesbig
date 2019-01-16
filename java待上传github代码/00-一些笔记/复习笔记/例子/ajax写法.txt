@@ -1,0 +1,107 @@
+java后台代码
+
+@Action(value="exportAction_getTabledoData")
+	public String getTabledoData() throws Exception {
+		// TODO Auto-generated method stub
+		
+		Specification<ExportProduct> spec = new Specification<ExportProduct>() {
+
+			@Override
+			public Predicate toPredicate(Root<ExportProduct> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+				// TODO Auto-generated method stub
+				return cb.equal(root.get("export").get("id").as(String.class), model.getId());
+			}
+		};
+		List<ExportProduct> epList = exportProductService.find(spec);
+		
+		ArrayList list = new ArrayList();
+		for (ExportProduct exportProduct : epList) {
+			HashMap map = new HashMap();
+			map.put("id", exportProduct.getId());
+			map.put("productNo", exportProduct.getProductNo());
+			map.put("cnumber", exportProduct.getCnumber());
+			map.put("grossWeight", UtilFuns.convertNull(exportProduct.getGrossWeight()));
+			map.put("netWeight", UtilFuns.convertNull(exportProduct.getNetWeight()));
+			map.put("sizeLength", UtilFuns.convertNull(exportProduct.getSizeLength()));
+			map.put("sizeWidth", UtilFuns.convertNull(exportProduct.getSizeWidth()));
+			map.put("sizeHeight", UtilFuns.convertNull(exportProduct.getSizeHeight()));
+			map.put("exPrice", UtilFuns.convertNull(exportProduct.getExPrice()));
+			map.put("tax", UtilFuns.convertNull(exportProduct.getTax()));
+			
+			list.add(map);
+		}
+		
+		String jsonString = JSON.toJSONString(list);
+		
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("utf-8");
+		response.getWriter().write(jsonString);
+		
+		return NONE;
+	}
+	
+
+============================================================
+
+页面ajax代码：不熟悉的话加个error的回调函数，这样才能知道是否出错。
+
+$.ajax({
+			url:'${ctx}/cargo/exportAction_getTabledoData.action?id=${id}',
+			type:'get',
+			dataType:'json', 
+			//data:data,			//post请求的参数
+			success:function(v){
+				console.log(v);
+				for(j=0;j<v.length;j++){
+					i=v[j];
+					addTRRecord('mRecordTable', i.id, i.productNo, i.cnumber,
+					i.grossWeight, i.netWeight, i.sizeLength,
+					i.sizeWidth, i.sizeHeight, i.exPrice, i.tax);	
+				}
+			},	
+			error:function(v){
+				alert("error");
+				console.log(v);
+			},	
+		})
+    });
+
+	
+============================================================
+
+关于通过ajax传对象给服务器：
+	$(function() {
+		data={'x':JSON.stringify({'dict_id':2,3:'鹌鹑蛋'})};
+		console.log(data);
+		var a=$('#a');
+		a.keyup(function(e){f(e.target);});	
+		function f(e){
+			$.ajax({
+				url : '<%=request.getContextPath()%>/s4',
+				type : 'post',
+				dataType : 'json',
+				data:data,
+				success : function(data) {
+					alert(e+"\t"+data+"\t"+data.dict_id);
+				},
+				error : function(data) {
+					alert("error" + JSON.stringify(data));
+				},
+			})
+		}
+	})
+	
+	后台接收：Dictbean a = JSON.parseObject(r1, Dictbean.class);
+	
+方法如上，data必须是类似python的字典对象，如果value是对象，必须用JSON.stringify
+将对象转字符串，然后后台将此json字符串转成相应的对象即可。
+
+============================================================
+
+服务器向浏览器传对象：
+后台代码：Dictbean m = new Dictbean();m.setDict_id(12L);
+		s.getWriter().print(JSON.toJSON(m));
+将对象转json字符串，浏览器拿到字符串会自动转成对象，直接使用即可。
+
+
+

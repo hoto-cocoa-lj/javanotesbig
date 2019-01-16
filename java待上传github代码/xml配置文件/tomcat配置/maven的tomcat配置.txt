@@ -1,0 +1,39 @@
+
+
+
+
+
+
+	<build>
+		<plugins>
+			<plugin>
+
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<port>8888</port>
+					<path>/</path>
+				</configuration>
+
+
+			</plugin>
+		</plugins>
+	</build>
+
+
+
+bug：“maven编码gbk的不可映射字符”的解决办法
+https://www.cnblogs.com/xdp-gacl/p/4239006.html
+
+　　解决这个问题的思路： 在maven的编译插件中声明正确的字符集编码编码——编译使用的字符集编码与代码文件使用的字符集编码一致！！
+
+　　安装系统之后，一般中文系统默认字符集是GBK。我们安装的软件一般都继承使用操作系统的默认字符集。所以当在中文XP或者win7系统开发，在使用maven（mvn compile）编译项目的时候，就会出现“编码 gbk 的不可映射字符”： 这个是由于代码使用的UTF-8，而maven编译的时候使用的GBK的缘故。 可以通过修改项目的pom文件，可以告诉maven这个项目使用UTF-8编码来编译。在项目的pom.xml文件中添加下面的配置：
+
+1 <!-- 指明编译源代码时使用的字符编码，maven编译的时候默认使用的GBK编码， 通过project.build.sourceEncoding属性设置字符编码，告诉maven这个项目使用UTF-8来编译 -->
+2     <properties>
+3         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+4     </properties>
+　　或者在pom.xml的/project/build/plugins/下的编译插件声明 中加入下面的配置：
+
+1 <encoding>utf8</encoding>

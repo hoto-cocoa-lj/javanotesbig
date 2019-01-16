@@ -1,0 +1,9 @@
+1、src/main/webapp的资源会被存放到tomcat/webapps/项目名/下
+	，即webapp到webapps的映射；
+2、使用的jar包全部放在webapps/项目名/web-inf/lib下；
+3、java文件编译成的class文件和resources里配置文件，
+	全部放在webapps/项目名/web-inf/classes下；
+	
+	
+项目名就是浏览器访问路径里的项目名。
+

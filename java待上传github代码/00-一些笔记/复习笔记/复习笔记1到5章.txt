@@ -1,0 +1,1233 @@
+第一章
+================================================================================
+
+相对路径是相对于项目的根目录，例如maven项目day01的任意包下创建如下测试类，
+运行后会在day01的根目录生成1.txt。
+
+	public class Day1 {
+		@Test
+		public void t1() throws IOException {
+			String file = "1.txt";
+			FileWriter fw = new FileWriter(file);
+			fw.write(65);		//和fw.write('A')一样，两种写法都会在1.txt写入A
+			fw.flush();
+			fw.close();
+		}
+	}
+
+maven项目里src/main/resources有1.propertie，地址如下：
+	@Test
+	public void t3() throws FileNotFoundException, IOException {
+		Properties p = new Properties();
+		p.load(new FileInputStream("src/main/resources/1.properties"));
+		System.out.println(p.getProperty("a"));
+	}
+================================================================================
+
+ass+r：生成get/set方法；ass+s：toString方法。
+
+================================================================================
+
+静态代码块是定义在成员位置，使用static修饰的代码块。
+特点：
+在同一个类中,它优先于主方法执行、优先于构造代码块执行，当以任意形式第一次使用到该类时执行。
+该类不管创建多少对象，静态代码块只执行一次。
+可用于给静态变量赋值，用来给类进行初始化。//数据库JDBC
+
+public class Person {
+	private String name;
+	private int age;
+ //静态代码块
+	static{
+		System.out.println("静态代码块执行了");
+	}
+}
+
+================================================================================
+
+public class Animal{
+	int age=100;
+	public void eat(){"animal eat"}
+}
+
+public class Dog extends Animal{
+	int age=10000;
+	public void eat(){"dog eat"}
+}
+
+public class Test1{
+@Test
+	public void test1(){
+		Animal a=new Dog();
+		Syso(a.age);		//100
+		a.eat();			//dog eat
+	}
+}
+多态调用成员变量：
+	编译时看父类，运行时看父类
+多态调用成员方法：
+	编译时看父类，运行时看子类
+
+================================================================================
+
+日期相关：
+	@Test
+	public void t1() {
+		Date date = new Date();
+		int d = date.getDate();				//获取当天是几号，已经过期
+		long t = date.getTime();
+		Date d1 = new Date(t + 60000);
+		System.out.println(d + "\t" + t + "\t" + d1);
+		//5	1546686378263	Sat Jan 05 19:07:18 CST 2019
+	}
+
+	@Test					//获取当前时间带格式
+	public void t2() {
+		SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		System.out.println(s.format(new Date()));		
+		//2019-01-05 19:06:01	Sat Jan 05 19:06:01 CST 2019
+	}
+	
+	@Test
+	public void t3() {
+		Calendar.getInstance();
+		Calendar c = new GregorianCalendar();
+		Date d = c.getTime();
+		System.out.println(c);			//java.util.GregorianCalendar[.....]
+		System.out.println(d);			//Sat Jan 05 19:04:03 CST 2019
+		
+		System.out.println(System.currentTimeMillis());
+		//1546686432513，这时获取当前时间戳的最快捷方法
+	}
+
+================================================================================
+
+并发修改异常
+举例:
+使用Iterator对象或者增强for循环遍历集合,如果出现”itcast”字符串,那么向集合中添加一个大写的”ITCAST”字符串
+
+迭代的常规用法中我们要尽量避免在迭代过程中为集合添加/删除数据。否则会报错，原因是Java抛出了并发修改异常。	
+迭代过程中并发修改异常的原因为:
+迭代器中”记忆”的集合长度与集合中实际长度不同，而导致出现索引与实际元素不符甚至无限循环的情况发生。
+所以在使用Iterator时，避免类似操作，for循环底层为迭代器实现，所以也需要避免类似操作。
+有些迭代器避免了这样的问题，如ListIterator，但该类并不通用也不常用，实际开发中很少使用，只需要简单了解。
+
+java中提供了很多个集合，它们在存储元素时，采用的存储方式不同。我们要取出这些集合中的元素，可通过一种通用的获取方式来完成。
+
+	@Test
+	public void t5() {
+		List l = new ArrayList();
+		for (int i = 0; i < 5; i++) {
+			l.add(i);
+		}
+		List l1 = new ArrayList();
+		for (int i = 0; i < 3; i++) {
+			l1.add(i);
+		}
+		ListIterator i = l.listIterator();
+		while (i.hasNext()) {
+			int next = (Integer) i.next();
+			if (next > 2) {
+				i = l1.listIterator();
+				continue;
+			}
+			System.out.println(next);			//0,1,2,0,1,2
+		}
+
+	}
+
+
+================================================================================
+
+判断字符串是否相等用"abc".equals(x)不用==和x.equals("abc")，因为x=null时后者报错。
+
+================================================================================
+
+泛型测试(一般单个用<E>,map用<K,V>)：
+package suibain.xie;
+
+import org.junit.Test;
+
+public class Day4 {
+	@Test
+	public void t1() {
+		D<Double> d = new D<Double>();
+		d.setF(1.23);
+		System.out.println(d.getF());			//1.23
+	}
+}
+
+class D<FUck> {
+	private FUck f;
+
+	public FUck getF() {
+		return f;
+	}
+
+	public void setF(FUck f) {
+		this.f = f;
+	}
+}
+
+================================================================================
+
+java文件右键，properties-->resource可以修改编码，解决java文件的乱码问题。
+
+================================================================================
+
+文件过滤器，只能给list和listFiles用，使用了正则表达式。
+	@Test
+	public void t4() throws IOException {
+		File f1 = new File("e:/");
+
+		FilenameFilter filter = new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				if (Pattern.matches(".*\\d+.*", name)) {
+					return true;
+				}
+				return false;
+			}
+		};
+		System.out.println(Arrays.toString(f1.list(filter)));
+	}
+	
+================================================================================
+
+Arrays笔记有用的方法：Arrays.toString()，Arrays.asList()，Arrays.sort()。
+
+================================================================================
+
+使用bufferrd管道比较快：
+循环读取100次1.txt的时间是194：44，1000次是1730：286，该文件有2340个字符。
+
+	@Test
+	public void t4() throws IOException {
+		byte[] b = new byte[3];
+		InputStream i;
+		int len = 0;
+		long l1 = System.currentTimeMillis();
+		for (int t = 0; t < 100; t++) {
+			// i = new FileInputStream("e:/1.txt");
+			i = new BufferedInputStream(new FileInputStream("e:/1.txt"));
+			while ((len = i.read(b)) != -1) {
+				new String(b, 0, len);
+			}
+			i.close();
+		}
+		long l2 = System.currentTimeMillis();
+		System.out.println(l2 - l1 + "\t=================");
+	}
+	
+================================================================================
+
+读取中文不能用字节流inputstream，需要用字符流filereader。
+2.txt的内容是："阿斯1顿发1发送1到"，输出如下：
+
+é:233	:152	¿:191	æ:230	:150	¯:175	1:49	é:233	¡:161	¿:191	å:229	:143	:145	1:49	å:229	:143	:145	é:233	:128	:129	1:49	å:229	:136	°:176	=============================
+阿:38463	斯:26031	1:49	顿:39039	发:21457	1:49	发:21457	送:36865	1:49	到:21040	=============================
+阿斯1顿:4	发1发送:4	1到:2	
+
+
+	@Test
+	public void t5() throws IOException {
+		InputStream i = new FileInputStream("e:/2.txt");		//字节流读取出现乱码
+		int x = 0;
+		while ((x = i.read()) != -1) {
+			System.out.print((char) x + ":" + x + "\t");
+		}
+		i.close();
+		System.out.println("=============================");
+		
+		FileReader j = new FileReader("e:/2.txt");		//字符流一个一个字符读取
+		int len = 0;
+		while ((len = j.read()) != -1) {
+			System.out.print((char) len + ":" + len + "\t");
+		}
+		j.close();
+		System.out.println("=============================");
+		
+		j = new FileReader("e:/2.txt");		//字符流用字符数组读取
+		char[] b = new char[4];
+		while ((len = j.read(b)) != -1) {
+			System.out.print(new String(b, 0, len) + ":" + len + "\t");
+		}
+		j.close();
+	}
+	
+================================================================================
+
+编码表：其实就是生活中字符和计算机二进制的对应关系表。
+1、ascii： 一个字节中的7位就可以表示。对应的字节都是正数。0-xxxxxxx
+2、iso-8859-1:拉丁码表 latin，用了一个字节用的8位。1-xxxxxxx  负数。
+3、GB2312:简体中文码表。包含6000-7000中文和符号。用两个字节表示。两个字节都是开头为1 ，两个字节都是负数。
+  		GBK:目前最常用的中文码表，2万的中文和符号。用两个字节表示，其中的一部分文字，第一个字节开头是1，第二字节开头是0
+   		GB18030：最新的中文码表，目前还没有正式使用。
+4、unicode：国际标准码表:无论是什么文字，都用两个字节存储。
+Java中的char类型用的就是这个码表。char c = 'a';占两个字节。
+Java中的字符串是按照系统默认码表来解析的。简体中文版 字符串默认的码表是GBK。
+5、UTF-8:基于unicode，一个字节就可以存储数据，不要用两个字节存储，而且这个码表更加的标准化，在每一个字节头加入了编码信息(后期到api中查找)。
+
+能识别中文的码表：GBK、UTF-8；正因为识别中文码表不唯一，涉及到了编码解码问题。
+对于我们开发而言；常见的编码 GBK  UTF-8  ISO-8859-1
+文字--->(数字) ：编码： 就是看能看懂内容，转换成看不懂的内容。
+(数字)--->文字  : 解码： 就是把看不懂的内容，转换成看懂的内容。
+
+================================================================================
+
+InputStreamReader可以把字节流转成字符流，查源码发现FileReader正是由InputStreamReader和InputStream拼接成的，即new FileReader(file)=new InputStreamReader(InputStream in)，FileWriter同理。
+
+================================================================================
+
+对象读写流，需要该对象实现序列化接口。
+
+	public void t6() throws FileNotFoundException, IOException, ClassNotFoundException {
+		D<Map> d = new D();
+		String f="e:/2.txt";
+		Map m = new HashMap();
+		m.put(1, "a");
+		d.setF(m);
+		ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(f));
+		o.writeObject(d);
+		o.close();
+		ObjectInputStream i = new ObjectInputStream(new FileInputStream(f));
+		int len = 0;
+		D d1 = (D) i.readObject();
+		System.out.println(d1);
+	}
+	
+================================================================================
+
+多线程的两种写法：
+1、继承方法：
+	@Test
+	public void t7() {
+		Thread t = new Thread() {
+			@Override
+			public void run() {
+				for (int i = 0; i < 55; i++) {
+					System.out.println("吃" + i + "个饭");
+					try {
+						Thread.sleep(33);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		t.start();
+		for (int i = 0; i < 55; i++) {
+			System.out.println("听" + i + "个歌曲=======");
+			try {
+				Thread.sleep(33);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+2、实现接口方法：
+	@Test
+	public void t8() {
+		Runnable t1 = new Runnable() {
+			public void run() {
+				for (int i = 0; i < 55; i++) {
+					System.out.println("吃" + i + "个饭");
+					try {
+						Thread.sleep(33);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		new Thread(t1).start();
+		for (int i = 0; i < 55; i++) {
+			System.out.println("听" + i + "个歌曲=======");
+			try {
+				Thread.sleep(33);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+================================================================================
+
+测试线程不安全：
+这里要注意，一定要把判断语句也放在锁里，不然进入判断一定会完成打印和++操作。
+
+	@Test
+	public void t9() {
+		long l = System.currentTimeMillis();
+		Runnable t1 = new Thread1();
+		new Thread(t1).start();
+		new Thread(t1).start();
+		new Thread(t1).start();
+		while (true) {
+			if (System.currentTimeMillis() - l > 3222) {
+				break;
+			}
+		}
+	}	
+	
+	public class Thread1 implements Runnable {
+		static int i = 1;
+		private Object obj = new Object();
+
+		public void run() {
+			while (true) {
+				f();
+			}
+		}
+
+		public synchronized void f() {
+			if (i < 99) {
+				try {
+					Thread.sleep(25);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				System.out.println(Thread.currentThread() + "吃" + i + "个饭");
+				i++;
+			}
+		}
+	}
+	
+	更好的办法是使用锁：
+	public class Thread1 implements Runnable {
+		static int i = 1;
+		private Lock l = new ReentrantLock();
+
+		public void run() {
+			while (true) {
+				l.lock();
+				if (i < 99) {
+					try {
+						Thread.sleep(25);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					System.out.println(Thread.currentThread() + "吃" + i + "个饭");
+					i++;
+				}
+				l.unlock();
+			}
+		}
+	}
+	
+	@Test
+	public void t9() {
+		long l = System.currentTimeMillis();
+		Runnable t1 = new Thread1();
+		new Thread(t1).start();
+		new Thread(t1).start();
+		new Thread(t1).start();
+		while (true) {
+			if (System.currentTimeMillis() - l > 3222) {
+				break;
+			}
+		}
+	}
+	
+================================================================================
+
+第二章无，第三章：
+================================================================================
+
+	@Test
+	public void t1() throws SQLException, ClassNotFoundException {
+		// 1、 加载com.mysql.jdbc.Driver类，该类会注册驱动
+		Class.forName("com.mysql.jdbc.Driver");
+		// 2、 获取数据库连接对象，是Connection接口的实现类对象
+		String url = "jdbc:mysql:///hibernate1";
+		Connection conn = DriverManager.getConnection(url, "root", "");
+		// 3、 获取sql语句的执行对象，是Statement接口的实现类对象，
+		//应该类似python的cursor游标
+		Statement st = conn.createStatement();
+		// 4、 获取结果集对象，是ResultSet接口的实现类对象，并打印结果
+		ResultSet rs = st.executeQuery("select * from base_dict");
+		while (rs.next()) {
+			// 序号从1开始
+			System.out.println(rs.getObject("dict_id") + ":" + rs.getObject(4));
+		}
+		//善后处理
+		rs.close();st.close();conn.close();
+	}
+	
+================================================================================
+
+等待用户键盘输入：
+	@Test
+	public void t2() {
+		Scanner sc = new Scanner(System.in);
+		System.out.print("please insert username:");
+		String username = sc.nextLine();
+		System.out.print("please insert pwd:");
+		String pwd = sc.nextLine();
+		System.out.println(username + ":" + pwd);
+	}
+	//please insert username:n
+	//please insert pwd:a
+	//n:a
+	
+================================================================================
+
+c3p0连接池使用方法(src或者resources下放c3p0的xml配置文件，用如下代码即可获取连接)：
+	ComboPooledDataSource c=new ComboPooledDataSource();
+	c.getConnection();
+
+================================================================================
+
+DBUtils框架的两个方法：
+
+	public class Day1 {
+		private ComboPooledDataSource dataSource = new ComboPooledDataSource();
+		QueryRunner qr = new QueryRunner(dataSource);
+		String sql = "select * from base_dict where dict_type_name like ?";
+		Object[] params = new Object[] { "%客%" };
+		@Test
+		public void t1() throws SQLException {		//bean列表查询
+			BeanListHandler rsh = new BeanListHandler<Dictbean>(Dictbean.class);
+			List<Dictbean> q = qr.query(sql, rsh, params);
+			for (Dictbean d : q) {
+				System.out.println(d);
+			}
+		}
+		
+		@Test
+		public void t2() throws SQLException {		//map列表查询
+			MapListHandler rsh = new MapListHandler();
+			List<Map<String, Object>> query = qr.query(sql, rsh, params);
+			for (Map<String, Object> m : query) {
+			System.out.println(m);
+			}
+		}
+		
+		@Test
+		public void t3() throws SQLException {		//聚合查询
+			sql = "select count(*) from base_dict where dict_type_name like ?";
+			ScalarHandler rsh = new ScalarHandler();
+			Object q = qr.query(sql, rsh, params);
+			System.out.println(q);
+		}
+	}
+	
+================================================================================
+
+ThreadLocal与线程同步机制的比较
+
+线程同步机制通过对象的锁机制保证同一时间只有一个线程去访问变量，该变量时多个线程共享的。ThreadLocal则为每一个线程提供了一个变量副本，从而隔离了多个线程访问数据的冲突，ThreadLocal提供了线程安全的对象封装，在编写多线程代码时，可以把不安全的代码封装进ThreadLocal。概括的说，对于多线程资源共享的问题，线程同步机制采取了时间换空间的方式，访问串行化，对象共享化；而ThreadLocal采取了空间换时间的方式，访问并行化，对象独享化。
+
+Spring中采用ThreadLocal解决线程安全的问题
+
+我们知道一般情况下，只有无状态的bean才可以在多线程环境下共享，在spring中绝大多数的bean都可以声明为singleton作用域。就是因为spring对一些非线程安全的“状态性对象”采用了ThreadLocal进行封装，让它们成为线程安全的对象，因此有状态的bean就可能以singleton的方式在多线程中正常工作了。
+
+ThreadLocal用法：
+	public class R implements Runnable {
+		public ThreadLocal<String> t = new ThreadLocal<String>();
+		public void run() {
+			t.set(Thread.currentThread().toString());
+			System.out.println(t.get());
+		}
+	}
+	
+	@Test
+	public void t7() throws SQLException {
+		for (int i = 0; i < 4; i++) {
+			new Thread(new R()).start();
+		}
+	}
+	
+	输出：
+	Thread[Thread-1,5,main]
+	Thread[Thread-2,5,main]
+	Thread[Thread-3,5,main]
+	Thread[Thread-4,5,main]
+
+================================================================================
+
+dbutils框架的queryrunner的用法，增改删全部用update，查询用query，
+只有查询时需要handler，详情见第四章queryrunner用法范例ProductDao.java。
+创建queryrunner时要给ds，或者使用query/update时传connection。
+
+================================================================================
+
+第四章：
+多选下拉列表：
+multiple="multiple"可以多选，size表示下拉列表显示7项，style是css属性设置雷拉列表宽度
+	<select multiple="multiple" size="7" style="width:100px">
+		<option>1</option>
+		<option>2</option>
+		<option>3</option>
+		<option>4</option>
+		<option>11</option>
+		<option>12</option>
+		<option>13</option>
+		<option>14</option>
+		<option>21</option>
+		<option>22</option>
+		<option>23</option>
+		<option>24</option>
+	</select>
+
+================================================================================
+
+append和appendTo可以把元素从原位置删除，再放到新位置。
+	<script>
+		$(document).ready(function() {
+			$("button").click(function() {
+				$("#div2").append($("p:last"))
+			});
+		});
+	</script>
+	</head>
+	<body>
+		<div id="div1">This is some text in the div.
+			<p>This is a paragraph in the div.</p>
+			<p>This is another paragraph in the div.</p>
+		</div><br>
+		<button>删除 div 元素</button>
+		<div id="div2">gaga</div>
+	</body>
+</html>
+
+================================================================================
+
+bootstrap各自样例：https://v3.bootcss.com/css/#overview
+用法：复制粘贴，稍作修改即可。
+
+================================================================================
+
+第五章：
+项目名：在项目名上右键，properties搜索web，web project settings下有context root，
+这个就是访问路径的项目名，比如eclipse里项目名字叫day01，而context root的值是d1，
+那么ip:port/d1才是该项目地址。一般这两个值相等，如果将项目a复制粘贴处项目b，
+务必要把context root的值改成b，否则这两个项目的地址都是ip:port/a。
+
+================================================================================
+
+servlet配置方法：
+web.xml里如下配置，页面访问协议://ip:port/项目名/fuc时会找com.action.S1进行处理，
+com.action.S1必须implements javax.servlet.Servlet或者extends HttpServlet(推荐)，
+前者重写service,init,destroy,getServletInfo,getServletConfig5个方法，
+后者重写doGet和doPost方法。这里GenericServlet也实现Servlet，并重写了后4个方法，
+HttpServlet继承了GenericServlet，实现了service方法，service里调用了doGet和doPost。
+	<servlet>
+		<servlet-name>s1</servlet-name>
+		<servlet-class>com.action.S1</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>s1</servlet-name>
+		<url-pattern>/fuc</url-pattern>
+	</servlet-mapping>
+
+================================================================================
+
+implements javax.servlet.Servlet里可以重写init和destroy方法，
+init在第一次访问时调用，web.xml里配置<load-on-startup>正整数</load-on-startup>
+的话会在服务器启动时调用；destroy在服务器关闭时调用，这两个方法只会调用一次，
+在servers里关闭会调用，console里关闭不会调用，且必须先执行init才有destroy；
+service每次有访问时都被调用。
+默认第一次请求来的时候,服务器创建servlet的对象,且调用init方法实现初始化操作,
+且调用一次service方法，每当请求来的时候,服务器获取一个线程,调用service方法,
+完成具体的业务逻辑(编写的代码)当servlet被移除的时候或者服务器正常关闭的时候,
+服务器调用destroy方法实现销毁操作。（单实例多线程）
+
+================================================================================
+
+url-pattern的配置：
+完全匹配：以"/"开始  例如 :   /aa/bb  /hello    /aa   目前使用这种方式
+目录匹配：以"/"开始 以"*"结束  例如:  /aa/*      /*
+后缀名匹配：以"*"开始，没有"/"  例如: *.jsp  *.action  *.do
+优先级：完全匹配>目录匹配>后缀名匹配
+
+================================================================================
+
+1,3,4都是绝对路径，其中3和4省略了ip和端口，2是相对路径，
+当前页面是http://localhost:8080/Di1Tian/index.jsp，所以2和1地址一样。
+4也和1一样，3的地址是http://localhost:8080/s3。一般用绝对路径，
+项目里文件a移动时能保证文件a引用的其他文件依然能够访问。
+	<a href="http://localhost:8080/Di1Tian/s3">1</a>
+	<a href="s3">2</a>
+	<a href="/s3">3</a>
+	<a href="/Di1Tian/s3">4</a>
+	
+================================================================================
+
+获取上下文的两种方式：
+getServletConfig().getServletContext()和getServletContext()，
+后一种方法和前一种一样，它的源码就是前一种写法。
+
+================================================================================
+
+servlet上下文ServletContext的一些方法：
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ServletConfig config = getServletConfig();
+		
+		System.out.print(config.getServletName() + "\t");	//S3，打印当前类的名字
+		
+		Enumeration e = config.getInitParameterNames();
+		while (e.hasMoreElements()) {
+			String n = (String) e.nextElement();
+			System.out.println(n + ":" + config.getInitParameter(n));
+		}			//自己在web.xml里配置的，init-name:init-value
+		
+		ServletContext sc = config.getServletContext();
+		System.out.print(sc.getContextPath() + "\t");		//项目名加斜杠，/Di1Tian
+
+		System.out.print(sc.getServerInfo() + "\t");		//Apache Tomcat/7.0.52
+		
+		System.out.print(sc.getServletContextName() + "\t");	//项目名，Di1Tian	
+		
+		System.out.println(sc.getRealPath("/1.txt"));
+				//E:\apache-tomcat-7.0.52\webapps\Di1Tian\1.txt，文件的全路径
+				
+		System.out.println(sc.getRealPath("2.txt"));
+				//E:\apache-tomcat-7.0.52\webapps\Di1Tian\2.txt，文件的全路径
+				
+		InputStream ras = sc.getResourceAsStream("/1.jsp");
+		BufferedReader br = new BufferedReader(new InputStreamReader(ras));
+		String x = null;
+		while ((x = br.readLine()) != null) {
+			System.out.println(x);				//打印该文本文件的内容
+		}
+		
+		System.out.println(sc.getMimeType("/1.txt"));			//text/plain
+		System.out.println(sc.getMimeType("/1.html"));			//text/html
+	}
+	
+================================================================================
+
+响应状态码：4XX、用户操作错误(cilent error)；5XX、服务器错误(server error)
+
+================================================================================
+
+设置重定向，可以看到浏览器进行了两次请求，一次是原地址，一次是/Di1Tian/s3：
+方法1：		s.setHeader("location", "/Di1Tian/s3");
+			s.setStatus(302);
+方法2：		s.sendRedirect("/Di1Tian/s3");
+
+请求响应，只有一次请求，且地址里没有项目名，重定向有项目名：
+			r.getRequestDispatcher("/s4").forward(r, s);
+
+================================================================================
+
+设置定时刷新(貌似叫定时重定向更好)，下面的例子都表示2s后重定向到url：
+方法1，在java里设置s.setHeader("refresh", "2;url=/Di1Tian/s1");
+方法2：在页面里设置<meta http-equiv="refresh" content="2;url=/Di1Tian/s1">
+
+================================================================================
+
+同一个响应体里getWriter()和getOutputStream只能用一个
+
+================================================================================
+
+打开图片，不知道为什么new FileInputStream("/1.jpg")找不到文件，相对路径也找不到：
+	@Override
+	protected void doGet(HttpServletRequest r, HttpServletResponse s) throws ServletException, IOException {
+		ServletContext sc = getServletContext();
+		byte[] b = new byte[1024];
+		String p = sc.getRealPath("/1.jpg");
+		FileInputStream f = new FileInputStream(p);
+		int len = 0;
+		while ((len = f.read(b)) != -1) {
+			s.getOutputStream().write(b, 0, len);
+		}
+	}
+使用这种方法获取文件，如果浏览器能打开该文件，如jpg、txt等格式，浏览器会直接打开，
+如果不能打开该文件，则变成下载。
+	
+================================================================================
+
+响应乱码(指服务器发送的内容在浏览器显示乱码)：
+方法1：s.setHeader("content-type", "text/html;charset=utf-8");
+方法2：s.setContentType("text/html;charset=utf-8");
+这两个方法用来告诉浏览器用utf-8来解码。然后直接response.getWriter.print直接
+写中文即可。但是中文文件名必须用URLEncode.encode进一步编码。
+
+请求乱码(指浏览器提交的数据，在服务器变成乱码)：
+方法1：用URLEncoder is08859-1编码再用URLDecoder utf-8解码；
+方法2：用getBytes is08859-1再用new String utf-8；
+方法3：修改tomcat配置；
+方法4：r.setCharacterEncoding("utf-8")			//仅对post方法有效
+方法1和方法2的缺点是必须对每个数据进行处理。
+
+================================================================================
+
+下载实现，解决中文文件名乱码问题(包括火狐浏览器)：	
+	public class S2 extends HttpServlet {
+	@Override
+	protected void doGet(HttpServletRequest r, HttpServletResponse s) throws ServletException, IOException {
+	
+		ServletContext sc = getServletContext();
+			//filename是乱码，因为浏览器的中文经过utf8编码传给服务器，
+			//服务器在is08859-1编码得到filename，所以还原需要用同样的方法
+		String filename = r.getParameter("filename");
+
+			//用is08859-1解码再用utf-8编码，得到原文件名filename1。方法1：
+		//byte[] bytes = filename.getBytes("iso8859-1");
+		//String filename1 = new String(bytes, "utf-8");
+			//方法2：
+			//两种方法都能得到原文件名，似乎方法2更好，因为得到f3也是字符串
+		String f3 = URLEncoder.encode(filename, "iso8859-1");
+		String filename1 = URLDecoder.decode(f3, "utf-8");
+				
+		byte[] b = new byte[1024];
+		String p = sc.getRealPath("myjpg/" + filename1);
+		String mimeType = sc.getMimeType(p);
+			//这里根据文件类型得到mimetype，根路径无关，jpg的mimetype是image/jpeg
+
+		s.setHeader("content-type", mimeType);				//必须设置1
+			
+		//String cd = "attachment;filename=" + filename1;		//头1
+		String cd = "attachment;filename*=utf-8'zh_cn'" + f3;	//头2
+			//一般浏览器用头1就可以解决中文乱码问题，但火狐不行，通用方法是头2
+		s.setHeader("content-disposition", cd);				//必须设置2
+				
+		FileInputStream f = new FileInputStream(p);
+		ServletOutputStream outputStream = s.getOutputStream();
+		int len = 0;
+		while ((len = f.read(b)) != -1) {
+			outputStream.write(b, 0, len);
+		}
+	}
+	
+================================================================================
+
+request.getHeader可以获取请求头的内容，例如获取ua：
+String a = r.getHeader("user-agent");
+
+================================================================================
+
+js获取时间：new Date()		//Sat Jan 12 2019 13:43:01 GMT+0800 (中国标准时间)
+获取时间戳：new Date().getTime()				//1547271840060		
+
+================================================================================
+
+获取验证码：utils包里的CodeServlet.java，点击验证码刷新需要加上每次都不同参数。
+
+================================================================================
+
+request的方法：
+r.getMethod：获取请求的方法，get/post等；
+r.getContextPath：动态获取项目名，即  /项目名；
+r.getRemoteAddr：获取当前请求者的ip地址；
+r.getQueryString：获取请求链接	/项目名?后的部分，只能获取get的，post获取不到
+
+================================================================================
+
+jsp不能输入中文,修改jsp页面编码即可：
+windows-preferences搜索jsp，修改encoding的值为iso 10646/unicode(utf-8)。
+
+================================================================================
+
+创建cookie：Cookie c=new Cookie("keyc","valuec");
+把cookie给浏览器：	response.addCookie(c);
+获取cookie：
+	Cookie[] cs=request.getCookies();
+	for(Cookie c:cs){
+		System.out.println(c.getName()+":"+c.getValue());
+	}
+	
+设置cookie过期时间：c.setMaxAge(3600);		//1小时
+cookie默认关闭浏览器就过期，设置了时间的话，时间过了才过期，关闭浏览器也不过期。
+删除cookie：		c.setMaxAge(0);	
+删除name=a的cookie(在同路径生成一个新cookie覆盖它，并设置新cookie过期时间0)：
+	Cookie c=new Cookie("a","0_0");
+	c.setPath(路径);c.setMaxAge(0);response.addCookie(c);	
+
+设置cookie路径：c.setPath(request.getContextPath()+"/aa");
+同一个路径下name相同的cookie，后者会覆盖前者；访问某路径时，符合该路径的所有
+cookie都会被浏览器发送给服务器。先设置路径再response.addCookie(c)路径才有效。
+
+cookie不能保存中文，可以用URLEncoder.encode使用utf-8编码中文再写入cookie，
+如果通过getParameter取得中文，已经是utf-8编码再iso8859-1解码，
+只需用iso8859-1编码即可写入cookie。(中文cookie中文)
+
+getParameter可以获取某参数的value，getParameterValues获取value数组。
+	
+================================================================================
+
+session的创建：request.getSession()
+如果在s2的servlet设置request.getSession()，那么访问其他页面都是没有session的，
+直到访问s2，可以在f12的响应体看到set-cookie里有设置sessionid，
+之后访问该项目下任何页面，请求体里的cookie都有sessionid。
+但是访问某些jsp会产生session，看该jsp的源码发现有pageContext.getSession()。
+
+================================================================================
+
+session的关闭：
+1、服务器非正常关闭；
+2、超时。可以在tomcat的web.mxl里设置，默认30分钟。
+	<session-config><session-timeout>30</session-timeout></session-config>；
+	或者手动设置时间r.getSession().setMaxInactiveInterval(paramInt);
+3、手动销毁，r.getSession().invalidate()，几乎不用。
+
+================================================================================
+
+生命周期：创建时间---销毁时间
+request：每次收到请求---响应生成；
+session：r.getSession()---销毁/过期/非正常关闭；
+servletContext：收到第一个请求(服务器启动时)---服务器正常关闭/项目移除；
+
+================================================================================
+
+jsp本质是servlet:
+在tomcat的conf/web.xml里可以看到，所有的*.jsp和*.jspx路径的请求都会被
+org.apache.jasper.servlet.JspServlet(这个类继承了HttpServlet)处理。
+而这些jsp文件如果含有java代码，就会在tomcat/work/catalina下生成对应的
+java文件和class文件，java文件里可以看见内容的拼接代码。
+
+第一次访问服务器中index.jsp的时候，首先会加载服务器中的web.xml文件，通过反射机制找到JspServlet来进行处理，服务器会将index.jsp转换为java文件，服务器会把java文件转换为class文件，服务器执行class文件，产生一个响应把结果传递给服务器，在由服务器响应给浏览器，由浏览器进行解析
+
+jsp文件的<%--%>里的代码会出现在相应的java文件的service方法里，<%=--%>出现在service方法的out.print里。例如<%if(x>1){%> good <%}%>会变成if(x>1){ out.print("good"); }
+
+
+================================================================================
+
+jsp里的html部分的注释会出现在对应的java文件里，所以浏览器查看源码能看到；
+java代码部分的注释不会出现，所以浏览器查看源码看不到；注释的快捷键是c+s+/，
+对html部分会使用出现html的注释<!--内容-->，对java代码使用会出现java的注释<%--内容--%>
+
+================================================================================
+
+jsp的指令：
+page指令：声明当前页面的一些属性和行为		<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>  
+include指令：静态包含，引入其他jsp页面		<%@include file="" %>
+taglib指令：导入标签库		<%@taglib  prefix="" tagdir="" uri=""%>
+	
+================================================================================
+
+动态包含：<jsp:include page="">，效果和静态包含一样，尽量用静态。
+
+================================================================================
+
+重要的page属性(这些属性在page里alt+/会出提示)：
+1、import：如<%@ page import='java.util.ArrayList'%>,可以用eclipse自动补全，
+	方法是在<%List a=new ArrayList(); %>的ArrayList后alt+/，根据提示回车急即可；
+2、pageEncoding：声明当前页面的编码方式；
+3、contentType：设置当前文件的mime类型，通知浏览器用什么编码打开；
+	2和3都指定时各用各的，声明一个时都用那个，都不声明时用iso8859-1。
+	把jsp默认编码改成utf-8，这两个就不用每次都设置了。
+
+其他page属性：
+errorPage：errorPage="error.html"，报错则前往此页面；
+isErrorPage：在error.jsp里设置为true的话，可以使用exception错误，
+		比如<%=exception.getMessage() %>可以在error.jsp显示出错信息。
+
+================================================================================
+
+pageContext.findAttribute(arg0)依次从pageContext，request，session，application
+里查找对应的属性值，找到后立刻返回，找不到返回null；
+pageContext.setAttribute("a", "a2",PageContext.REQUEST_SCOPE);
+pageContext.findAttribute("a")
+
+================================================================================
+
+jsp的请求转发：
+方法1：<jsp:forward page="/2.jsp"></jsp:forward>
+方法2：<%request.getRequestDispatcher("/2.jsp").forward(request,response); %>
+
+================================================================================
+
+el表达式获取数据(不写域的话，会从小到大查找，类似findAttribute)：
+<%pageContext.setAttribute("a1", "x1",1);
+pageContext.setAttribute("a2", "x2",2);
+pageContext.setAttribute("a3", "x3",3);
+pageContext.setAttribute("a4", "x4",4);%><hr>
+
+a1:${pageScope.a1 }<hr>			
+a2:${requestScope.a2 }<hr>
+a3:${sessionScope.a3 }<hr>
+a4:${contextScope.a4 }<hr>
+${a1},${a2},${a3},${a4}<hr>
+
+//输出：x1<hr>x2<hr>x3<hr>x4<hr>x1,x2,x3,x4<hr>
+
+================================================================================
+
+el表达式输出list，map和数组：
+<%int[] s=new int[]{6,7,8}; 
+List x=new ArrayList();x.add(1);x.add(2);x.add(3);
+Map m=new HashMap();m.put("m1","q");m.put("m2","w");m.put(3,"e");m.put("4","r");
+pageContext.setAttribute("a1", x,1);
+pageContext.setAttribute("a2", m,1);
+pageContext.setAttribute("a3", s,1);%><hr>
+
+${a1}--${a1[0]}--${a1.get(0)}<hr>
+${a2 }--${a2.get("m1")}==${a2.m2}<hr>
+${a3 }--${a3[1]}
+
+输出： 		[1, 2, 3]--1--1<hr>{1=q, 2=w, 3=e}--<hr>[I@2b095ed1--7
+
+数组a的方法是a[index]，list b的方法是b[index]和b.get(index)，
+map c和bean c的方法是c.get("m2")和c.m2。但如果key是整数，两种方法都不能取得value。
+如果key是整数型字符串，可以用c.get("4")获取r，不能用c.4或者c."4"，都会报错。
+也就是说list、map、bean都可以用get(index/key)获取。
+如果找不到值，返回""。
+如果有特殊符号，比如request.setAttribute("a.b","here"),使用${requestScope["a.b"]}
+
+================================================================================
+
+el表达式运算：
+<%pageContext.setAttribute("a", 2,1);
+pageContext.setAttribute("b", "3",1);
+pageContext.setAttribute("c", "q",1);
+pageContext.setAttribute("d", "",1);
+pageContext.setAttribute("e", new ArrayList(),1);
+pageContext.setAttribute("f", new int[]{},1);
+pageContext.setAttribute("g", new HashMap(),1);%><hr>
+HttpServlet h=null;pageContext.setAttribute("h", h,1);<hr>
+
+${a+b}--${a<b}<hr>								//5--true
+${b+a}--${a>1}<hr>								//5--true
+${empty d}--${empty e}==${empty h}<hr>			//true--true==true
+${empty f}--${empty g}<hr>${2>1?2:1}			//false--true		//2
+
+只能计算数值和能转成数值的字符串，${a+c}会报错。empty可以判断字符串、数组、
+list和map是否是null和空，但数组有点奇怪。
+
+================================================================================
+
+el表达式内置对象：
+param：获取所有name和值，类似r.getQueryString()，对于一个name有多个值的情况，
+		如checkbox，只能显示一个值。获取某个name的值用${param.name}；
+paramValues：获取所有name和值，值全是数组。获取某个name的值用${param.name[index]}；
+header：请求头。获取ua用${header.get["user-agent"]}，key有多值的情况只能显示一个值；
+headerValues：和header的关系类似paramValues和param的关系；
+cookie:获取cookies。获取cookie的JSESSIONID：${cookie.JSESSIONID}；
+pageContext:获取项目名：${pageContex.request.contextPath}；
+
+================================================================================
+
+jstl笔记：
+
+el是jsp内置的工具，jstl是apache维护的第三方的jsp标签库，使用jstl需要导入jar包，
+在页面上导入<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>，
+在导入javax.servlet.jstl和taglibs.standard后，prefix(前缀)和uri用alt+/获取即可。
+
+<%pageContext.setAttribute("flag", 123,a); %>
+<c:if test="${3>2||4<3}" var="flag" scope="request">good</c:if>
+${flag}
+当a=1时输出：good 123，a=2/3/4时，输出：good true。
+这里c:if的var表示把判断的结果赋值给flag，放在scope(request)里。
+<c:if test="not empty l"></c:if>可以取反。
+
+<%pageContext.setAttribute("l", new int[]{1,3,5,7,9},1); %>
+<c:forEach begin="2" end="22" step="3" var="x">${x},</c:forEach><hr>
+<c:forEach items="${l}" step="2" var="i">${i},</c:forEach>
+输出：2,5,8,11,14,17,20,<hr>1,5,9,
+
+<%Map l=new HashMap();for(int i=0;i<9;i++){l.put(i,(char)(i+65));}
+pageContext.setAttribute("l", l,1); %>
+<c:forEach items="${l}" var="i" >${i.key}:${i.value},</c:forEach><hr>
+<c:forEach items="${l}" var="i" >${i},</c:forEach><hr>
+<c:forEach items="${l}" var="i" step="2">${i},</c:forEach><hr>
+输出：0:A,1:B,2:C,3:D,4:E,5:F,6:G,7:H,8:I,<hr>
+0=A,1=B,2=C,3=D,4=E,5=F,6=G,7=H,8=I,<hr>0=A,2=C,4=E,6=G,8=I,
+step对遍历java数组、list、map、set也有效。
+
+varStatus属性：varStatus="x"，然后可以通过${x.count}获取当前序号，从1开始，
+每次加1，且不受step影响，${x.index}获取当前值在items里的index，受step影响，
+如：<% Map l=new HashMap();for(int i=0;i<9;i++){l.put(i+10,(char)(i+65));}
+pageContext.setAttribute("l", l,1); %>
+<c:forEach items="${l}" var="i" >${i.key}:${i.value},</c:forEach><hr>
+<c:forEach items="${l}" var="i" varStatus="x" >${i}-${x.count}=${x.index},</c:forEach><hr>
+<c:forEach items="${l}" var="i" step="2" varStatus="x" >${i}-${x.count}=${x.index}</c:forEach><hr>
+输入：16:G,17:H,18:I,10:A,11:B,12:C,13:D,14:E,15:F,<hr>
+16=G-1=0,17=H-2=1,18=I-3=2,10=A-4=3,11=B-5=4,12=C-6=5,13=D-7=6,14=E-8=7,15=F-9=8,
+<hr>16=G-1=018=I-2=211=B-3=413=D-4=615=F-5=8
+测试发现在<c:forEach begin="2" end="22" step="3" var="x">${x},</c:forEach>
+里使用varStatus会出现bug。
+
+================================================================================
+
+过滤器filter配置方法：
+1、实现 javax.servlet.Filter接口。
+2、重写doFilter方法，实例如下：
+	public void doFilter(ServletRequest r, ServletResponse s,
+			FilterChain paramFilterChain) throws IOException, ServletException {
+		System.out.println(" filter dofilter come");
+		paramFilterChain.doFilter(r, s);
+		System.out.println(" filter dofilter go away");
+	}
+3、在web.xml里配置filter和filter-mapping，如下：
+	<filter>
+		<filter-name>f1</filter-name>
+		<filter-class>com.action.S5</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>f1</filter-name>
+		<url-pattern>/3.jsp</url-pattern>
+	</filter-mapping>
+过滤器生命周期：同一个链接可以用多个过滤器过滤。创建于服务器启动时，
+init只会被调用一次，每次被触发时都会调用doFilter方法。项目移除和正常关闭服务器时
+调用destroy方法。和servlet的生命周期几乎一样，单实例多线程。
+多个filter按web.xml的filter-mapping的顺序执行。
+	
+filter-mapping的dispatcher可以指定过滤哪种请求：
+	浏览器访问a，服务器在a的servlet请求转发到b
+	REQUEST:默认值,只过滤从浏览器发送过来的请求(拦截a不拦截b)；
+	FORWARD:只过滤转发过来的请求(拦截b不拦截a)；
+	INCLUDE:只过滤包含过来的请求；
+	ERROR:只过滤错误过来的请求；
+同一个请求可以配置多个filter-mapping，所以同时配置REQUEST和FORWARD就能同时拦截a和b。
+
+================================================================================
+
+全局统一错误页面，例如在web.xml里如下配置，
+这样请求任意不存在的页面可以统一返回404.html：
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.html</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/500.html</location>
+	</error-page>
+
+================================================================================
+
+修改filter如下，可以得到FilterConfig对象，它的方法和ServletCOnfig很像，
+如getFilterName(),getInitParameter(paramString),getInitParameterNames(),
+getServletContext()等：
+
+	private FilterConfig c;
+	public void init(FilterConfig paramFilterConfig) throws ServletException {
+		System.out.println(" filter init");
+		this.c = paramFilterConfig;
+	}
+
+================================================================================
+
+使用如下代码可以拦截某些请求，实现未登录就跳转登陆页面：
+需要在web.xml里配置用此拦截器拦截想要拦截的请求。然后在filter里能使用
+getRequestDispatcher和return中断当前请求，通过请求转换跳到其他页面，
+这个是很有意思的。还有这里必须return否则报错，同样如果有进行if判断，
+在选择枝里c.doFilter(r, s)后也要return。
+
+	public void doFilter(ServletRequest r1, ServletResponse s, FilterChain c)
+			throws IOException, ServletException {
+		HttpServletRequest r = (HttpServletRequest) r1;
+		Object u = r.getSession().getAttribute("user");
+		if (u == null) {
+			r.getRequestDispatcher("/1.html").forward(r, s);
+			return;
+		}
+		c.doFilter(r, s);
+	}
+	
+================================================================================
+
+装饰者模式(范例代码)：
+	public class Settt {
+		public static void main(String[] args) {
+			I a = new A();
+			a.f1();
+			I b = new B(a);
+			b.f1();
+		}
+	}
+
+	interface I {
+		public void f1();
+	}
+
+	class A implements I {
+		int t = 1;
+		public void f1() {
+			System.out.println(t);
+		}
+	}
+
+	class B implements I {
+		public I a;
+		public B(I a) {
+			super();
+			this.a = a;
+		}
+		public void f1() {
+			System.out.print("good");
+			a.f1();
+		}
+	}
+	
+================================================================================
+
+监听器listen配制方法：
+实现接口，在web.xml里配置。
+如ServletContextListener监听ServletContext的创建和销毁，web.xml例如下配置：
+<listener><listener-class>com.action.L1</listener-class></listener>，
+创建于服务器启动，销毁于项目移除/服务器正常关闭，生命周期同servlet；
+
+ServletRequestListener监听request的创建和销毁，创建于收到请求，
+销毁于生成response，生命周期同request；HttpSessionListener类似。
+
+ServletContextAttributeListener监听ServletContext属性的增改删，配制方法同上。
+用getName/getValue可以获取发送改变的name/value值，其中增getValue获取增后的value，
+替换获取替换前的value，移除获取移除前的值。
+
+HttpSessionBindingListener可以监听session里javabean的增加和移除，不需要配置xml，
+需要在bean里实现此接口，然后重写valueBound和valueUnbound方法。
+
+钝化活化：用的时候再百度吧。
+
+================================================================================
+
+定时器，下面代码的效果是3s后打印时间戳，每隔2s再打印：
+schedule有4种传参，第一个参数都是task，第二个参数是date/long，指开始时间/多少ms后
+执行，第三个参数是long，可有可无，有的话就表示每间隔多少ms继续执行。
+	public static void main(String[] args) {
+		Timer t = new Timer();
+		TimerTask task = new TimerTask() {
+			@Override
+			public void run() {
+				System.out.println(System.currentTimeMillis());
+			}
+		};
+		t.schedule(task, 3000, 2000);		
+	}
+	
+================================================================================
+
+邮件工具类见utils包的MailUtils.java；
+使用commons-beanutils jar的BeanUtils.populate(bean, map)可以把bean的属性值，
+赋值给map的同名的属性。
+System.out.println(UUID.randomUUID());	//d6197064-0051-4432-82d0-80423be002e9
+
+================================================================================
+
+数据回显的一个范例：
+	@Override
+	protected void doGet(HttpServletRequest r, HttpServletResponse s) throws ServletException, IOException {
+		String u = r.getParameter("u");
+		String p = r.getParameter("p");
+		r.setAttribute("u", u );
+		r.setAttribute("p", p);
+		r.getRequestDispatcher("/4.jsp").forward(r, s);
+	}
+
+================================================================================
+
+jquery的ajax见例子。使用dataType:json时直接传普通字符串会报错，似乎必须传对象转json字符串。对象可以是javabean。jquery绑定时间代码如下：
+	$("input").keyup(function(){
+	  $("input").css("background-color","#D6D6FF");
+	});
+
+================================================================================
+
+从服务器传对象给浏览器，有两种方法，一种是写在域里然后通过jsp获取；
+一种是在浏览器通过ajax获取，用response.getWriter.print(JSPN.toJson(对象))返回，
+也可以用直接用页面获取，不过这样这个页面不能放其他东西。第二种方法浏览器拿到的
+是对象，可以直接使用。
+
+================================================================================
+
+================================================================================
+
+================================================================================
+
+================================================================================
+
+================================================================================
