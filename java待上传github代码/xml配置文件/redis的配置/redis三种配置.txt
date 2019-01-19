@@ -1,5 +1,5 @@
 String url="192.168.153.129";
-
+使用jedis需要导入redis.clients.jedis和org.apache.commons.commons-pool2。
 
 1_：使用jedis：
 		Jedis j = new Jedis(url,6379);

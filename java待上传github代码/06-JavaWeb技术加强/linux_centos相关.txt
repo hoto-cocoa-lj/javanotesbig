@@ -8,23 +8,23 @@ export PATH=$JAVA_HOME/bin:$PATH
 export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 然后source /etc/profile更新配置。
 
-3_输入java version回车(下面全都不会写回车了)。如果报错权限不够，修改lib里所有文件的权限。
+3_下面的步骤直接在虚拟机上操作，别在xftp的控制台操作，否则各自找不到命令：
+输入java version回车(下面全都不会写回车了)。
+如果报错找不到命令，可能是第二部修改有问题。
+如果报错权限不够，修改lib里所有文件的权限。
 xftp右键可修改。如果报错/lib/ld-linux.so.2: bad ELF interpreter: 没有那个文件或目录，
 说明在64位系统安装了32位java，输入sudo yum install glibc.i686回车即可。
 输入java version 成功的话显示java版本。
 
 =========================================================================
 
-安装tomcat：
-复制粘贴到centos的rjb，在lib路径sh startup.sh。
-如果报错Cannot find bin/catalina.sh说明权限不够，把lib下文件权限全部放开。
-成功的话显示tomcat started。
-tail -f logs/catalina.out 查看tomcat日志(当前路径tomcat根目录)
 
 =========================================================================
 
-虚拟机ifconfig不显示127.0.0.0以外的ip：
+网络相关：虚拟机ifconfig不显示127.0.0.0以外的ip：
 一般重启就行了，有一次重启了也无效。重启网络服务service network start，
+报错with error code.see 'systemctl status network.service'，
+输入systemctl status network.service回车，
 报错 Failed to start LSB: Bring up/down networking，解决方式：禁用NetworkManager，
 1. systemctl stop NetworkManager
 2. systemctl disable NetworkManager 
@@ -35,6 +35,11 @@ tail -f logs/catalina.out 查看tomcat日志(当前路径tomcat根目录)
 
 =========================================================================
 
+=========================================================================
+
+开启zookeeper：
+cd /usr/local/rjb/registry-zookeeper/bin-->./zkServer.sh start。
+查看zookeeper开启状态./zkServer.sh status。
 
 =========================================================================
 
@@ -45,9 +50,22 @@ com.alibaba.citrus.service.uribroker.impl.URIBrokerServiceImpl$URIBrokerInfo
 如果报错 Starting ZkClient event thread说明 zookeeper没有启动，启动即可。
 如果报错端口占用，查询端口的pid关闭即可，经常是java占用了。
 
-=========================================================================InnoDB: Plugin initialization aborted with error Generic error
+=========================================================================
 
-查看ip：ip add
+安装数据库：
+详情见E:\GitHub\reboot_and_tools\Centos7安装并配置mysql5.6完美教程 - CSDN博客.html,，
+原帖地址：https://blog.csdn.net/qq_17776287/article/details/53536761，
+原帖名字：Centos7安装并配置mysql5.6完美教程，
+安装时完全按照作者说的，不要修改任何路径，不要思考(解压和写文件部分可以自己搞)。
+mysql我安装的是mysql-5.6.30-linux-glibc2.5-x86_64.tar.gz，已经保存在百度云。
+开启远程访问我是在mysql -uroot进入mysql后运行grant all privileges on *.* to 'root'。
+
+
+数据库mysql：
+
+似乎默认账号root没有密码。
+
+查看ip：ip add或者ifconfig
 centos账号密码：root/shuang
 
 rpm -qa | grep mysql							查看CentOS自带的mysql
@@ -69,7 +87,6 @@ centos7防火墙操作：
 几条关于防火墙的命令：
 
 
-
 2.关闭防火墙：systemctl stop firewalld.service 
 3.开机不启动防火墙：systemctl disable firewalld.service
 
@@ -86,7 +103,7 @@ systemctl start firewalld						开启防火墙
 systemctl enable firewalld
 chkconfig iptables on
 
-
+该端口开启的话，在主机上tenlet ip port(如telnet 10.20.66.37 8090)可以进入。
 
 firewall-cmd --reload                          ##重新载入配置，比如添加规则之后，需要执行此命令
 firewall-cmd --get-zones                       ##列出支持的zone
@@ -109,9 +126,15 @@ mysql -uroot  -h192.168.88.130					#远程登陆mysql，-uroot表示用户名roo
 ========================================================================
 
 
-启动tomcat	
+安装tomcat：
+复制粘贴到centos的rjb，在bin路径sh startup.sh。
+如果报错Cannot find bin/catalina.sh说明权限不够，把bin下文件权限全部放开。
+成功的话显示tomcat started。
+tail -f logs/catalina.out 查看tomcat日志(当前路径tomcat根目录)
+
+开启tomcat：
 cd /usr/local/rjb/apache-tomcat-7.0.57/bin
-./startup.sh
+sh startup.sh
 将war文件放在/usr/local/rjb/apache-tomcat-7.0.57/webapps即可，
 war文件会不封装java文件保证源码安全
 配置tomcat后，用workbench导出导入数据库即可，导入时需要先建数据库，选定后再导入
@@ -123,12 +146,30 @@ tail -f logs/catalina.out 查看tomcat日志(当前路径tomcat根目录)
 
 =========================================================================
 
-修改redis.conf里damonize为yes					#设置后台启动
+安装redis：https://www.cnblogs.com/zuidongfeng/p/8032505.html
+yum安装gcc依赖：yum install gcc
+进入到解压目录：cd redis-3.0.0
+执行make编译Redis：make MALLOC=libc，报错的话可能是权限不够，改相应文件成777；
+继续完成安装：sudo make install
 
-./bin/redis-server redis.conf					
+
+修改redis.conf里daemonize no为yes				#设置后台启动
+
+开启redis：（2步）
+1、src/redis-server /usr/local/rjb/redis-3.0.0/redis.conf --port 6379
+		#设置后台启动并开放端口，可以远程连接。（先到redis目录）
+2、src/redis-cli 								#开启redis，先启动服务
+src/redis-cli shutdown						#关闭redis
+
+直接在虚拟机上开启使用redis：
+cd /usr/local/rjb/redis-3.0.0/src
+./redis-cli
+
+
+./redis-server /usr/local/redis-4.0.6/redis.conf			#后台启动			
 #启动redis（redis账号密码都是root？？，先到redis目录，我装在rjb同级目录，redis.conf放在根目录）
 
-./bin/redis-cli
+./redis-server 									#普通启动
 127.0.0.1:6379> keys *							#打开客户端，并查看所有keys
 
 netstat -lntp | grep 6379						#检测6379端口是否被占用
@@ -139,7 +180,9 @@ kill -9 进程id									#发现某进程占用端口后，关闭该进程
 192.168.88.130:6379>							#输入ping返回pong表示连接正常
 
 ps -ef | grep redis								#使用命令查看6379端口是否启动
-./bin/redis-cli shutdown						#关闭redis（先到redis目录）
+
+
+
 
 
 redis持久化
@@ -159,10 +202,31 @@ https://www.cnblogs.com/AndyAo/p/8135980.html
 
 查看java版本：	java -version
 
-=========================================================================
+========================================================================
 
-开启zookeeper：
-cd /usr/local/rjb/registry-zookeeper/bin-->./zkServer.sh start。
-查看zookeeper开启状态./zkServer.sh status。
+关于“该虚拟机似乎正在使用中”的解决方法
+https://blog.csdn.net/Ethan706/article/details/41451467
+今天，在没有关闭虚拟机的情况下关闭了电脑，造成的影响就是，重新开机并启动虚拟机后，ubuntu不能正常打开了，提示“该虚拟机似乎正在使用中”。
 
+解决方法是删除掉虚拟机ubuntu安装目录中的.lck文件，然后重启虚拟机就可以了。
+
+这个.lck文件是虚拟机的磁盘锁文件。虚拟机的磁盘和主机的磁盘是共存的，只是由于采用了特定的虚拟机制，使得两者互不影响。在使用虚拟机时，vmware就会生成若干磁盘锁文件，用于保护当前虚拟机占用的磁盘不会被主机或者其他虚拟机占用修改。在正常关闭虚拟机后，vmware会自动删除这个锁。可是在少数情况下，例如主机突然崩溃、非正常关机等，vmware就不能删除.lck磁盘锁文件了。所以下次再启动虚拟机时，vmware还会误以为需要启动的虚拟系统已经正在运行中了，就会出现提示。因此删除磁盘锁文件之后就恢复正常了。
+
+========================================================================
+
+
+========================================================================
+
+
+
+========================================================================
+
+
+========================================================================
+========================================================================
+========================================================================
+========================================================================
+========================================================================
+========================================================================
+========================================================================
 ========================================================================

@@ -1,21 +1,171 @@
 第6章
 ================================================================================
+linux语法见第六章笔记。
+redis基础类型语法见day22--linux软件安装&Redis入门.pdf，高级语法见day23--Redis.pdf。
+================================================================================
+redis语法简介：
 
+String：
+set a 1/get a/del a：设置a=1/获取a的值(1)/删除a=1
+incr a/desc a：给a的值加/减1，a不是数值则报错，不存在则初始化a=1/-1
+incrby a 3/decrby a 4：给a的值加3/减4，a不是数值则报错，不存在则初始化a=3/-4
+append a fuck：给a后面加上字符串fuck
+
+hash：(相当于dict/map)
+hset h1 a 1/hmset h1 b 2 c 3：给map h1 put(a,1)/put(b,2)和put(c,3)
+hget h1 a/hmget h1 b c：h1.get(a)/h1.get(b) h1.get(c)
+hdel h1 a b/del h1：h1.delete(a) h1.delete(b)/删除整个h1
+hincrby h1 a 3：给h1的a增加3，报错和初始化情况同incrby
+hexists h1 a/hlen h1：h1里有没有a这个key/h1的长度
+hkeys h1/hvals h1：h1的所有key/value
+
+lpush l a b c/rpush l x y z：左/右边依次插入
+lrange l 0 -1：遍历全部l，输出c b a x y z
+lpop l /rpop l：弹出一个元素
+llen l：l的长度
+lpushx l a/rpushx l x：当l存在是插入，不存在时不处理
+
+sadd s a b c/srem s a：往集合s里添加a,b,c/从s移除'a'
+smembers s/sismember s c：获取s的所有元素/判断c是不是s的元素
+scard s：获取s的元素的数量
+sdiff/sinter/sunion：返回几个集合的差集/交集/并集
+
+通用方法：
+keys *：所有key
+del key1 key2：删除key1和key2
+exists key：key是否存在
+rename oldkey newkey：重命名
+type key：返回类型(list/hash/string/set/zset)
+
+select 1：使用1号数据库
+move xx 1：把当前数据库的xx移动到1号数据库
+quit：退出连接
+dbsize：获取当前数据库的keys的数量
+info：获取服务器的信息
+flushdb：删除当前数据库的所有key
+flushall：删除所有数据库的所有key
+subscibe cctv1：订阅cctv1
+psubscibe cctv*：订阅cctv*，如cctv1，cctvaaa等
+publish cctv1 aaa/publish cctv1 'aaa bbb'：在cctv1发送信息，能被订阅者收到
 
 ================================================================================
 
+redis事务，使用方法和mysql基本一样，测试有效，全部成功或者全部失败，
+但是如果不是java报错，而是让redis报错，比如multi.incr("a")，程序不会报错，
+所以全部成功：
+	@Test
+	public void t7() throws SQLException {
+		Jedis j = jedisPool.getResource();
+		j.select(1);
+		Transaction multi = j.multi();
+		try {
+			multi.set("a", "1");
+			System.out.println(1 / 0);
+			multi.set("b", "2");
+			multi.exec();
+		} catch (Exception e) {
+			e.printStackTrace();
+			multi.discard();
+		}
+	}
+	
 ================================================================================
+
+动态代理：newProxyInstance方法用来返回一个代理对象，这个方法总共有3个参数，
+ClassLoader loader用来指明生成代理对象使用哪个类装载器，
+Class<?>[] interfaces用来指明生成哪个对象的代理对象，通过接口指定，
+InvocationHandler h用来指明产生的这个代理对象要做什么事情。
+所以我们只需要调用newProxyInstance方法就可以得到某一个对象的代理对象了。
+
+Class<?>[] interfaces = p.getClass().getInterfaces()表示增强p的所有接口的方法，
+如果只需要增强部分接口，比如接口Person，可以写Person.getInterfaces()。
+但是如果p实现了多个接口，代理类不能用p的类接收，所以似乎实现所以接口没有意义？？
+	public void t1() {
+		final Person p = new NormalPerson();
+		ClassLoader loader = p.getClass().getClassLoader();
+		Class<?>[] interfaces = p.getClass().getInterfaces();
+		Person n = (Person) Proxy.newProxyInstance(loader, interfaces, new InvocationHandler() {
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				if ("f".equals(method.getName())) {
+					System.out.println("增强了f方法");
+					return method.invoke(p, args);					
+				} else {
+					System.out.println("增强start----->");
+					Object o=method.invoke(p, args);
+					System.out.println("<------增强over");
+					return o;
+				}
+			}
+		});
+		n.f("111");
+		n.g("222");
+	}
+
+更详细的内容见 第6章的day04_框架学习之webjava基础加强笔记.txt。
+	
+================================================================================
+
+在filter里用动态代理解决乱码问题：
+	public void doFilter(ServletRequest r, ServletResponse s, FilterChain c) throws IOException, ServletException {
+		final HttpServletRequest r1 = (HttpServletRequest) r;
+		HttpServletRequest r2 = r1;
+		String method = r1.getMethod();
+		if ("get".equalsIgnoreCase(method)) {
+			r2 = (HttpServletRequest) Proxy.newProxyInstance(
+					r1.getClass().getClassLoader(),
+					r1.getClass().getInterfaces(), 
+					new InvocationHandler() {
+						public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+							String name = method.getName();
+							if ("getParameter".equals(name)) {
+								String v = (String) method.invoke(r1, args);
+								return new String(v.getBytes("iso8859-1"), "utf-8");
+							} else {
+								return method.invoke(r1, args);
+							}
+						}
+					});
+		} else if ("post".equalsIgnoreCase(method)) {
+			r2.setCharacterEncoding("utf-8");
+		}
+		HttpServletResponse s2 = (HttpServletResponse) s;
+		s2.setContentType("text/html;charset=utf-8");
+		c.doFilter(r2, s2);
+	}
+	
+================================================================================
+
+注解配置servlet，需要导入org.apache.tomcat.tomcat-servlet-api：
+	@WebServlet(urlPatterns = "/fff")
+	public class S7 extends HttpServlet {
+		@Override
+		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+			resp.getWriter().write("fff");
+		}
+	}
+	
+================================================================================
+
+类加载器：
+把java文件加载到内存里形成class对象的过程叫做类加载，做这件事的对象就是类加载器。
+类加载器的组成：
+	引导类加载器(c语言的)：加载rt.jar(在jre system library里看)
+	应用类加载器AppClassLoad：加载自己写的类
+	扩展类加载器ExtClassLoad：加载ext.jar
 
 ================================================================================
 
-================================================================================
+第7章：
+熟悉项目：
+1、熟悉这个项目有多少个模块，熟悉模块功能
+2、熟悉数据库已经数据库的表
+3、熟悉每一个模块功能的数据crud和哪些表有关
 
 ================================================================================
-================================================================================
 
-================================================================================
-
-================================================================================
+https://blog.csdn.net/qq_40693828/article/details/81005811
+JAVA反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法；这种动态获取的以及动态调用对象的方法的功能称为java语言的反射机制。
+Java反射机制主要提供了以下功能：在运行时判定任意一个对象所属的类；在运行时构造任意一个类的对象；在运行时判定任意一个类所具有的成员变量和方法；在运行时调用任意一个对象的方法；生成动态代理。
 
 ================================================================================
 ================================================================================
