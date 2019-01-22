@@ -1,0 +1,44 @@
+hibernate本身的包：9个
+	jboss-logging-3.3.0.Final
+	javassist-3.18.1-GA
+	jandex-2.0.0.Final
+	hibernate-jpa-2.1-api-1.0.0.Final
+	hibernate-commons-annotations-5.0.1.Final
+	hibernate-core-5.0.7.Final
+	geronimo-jta_1.1_spec-1.1.1
+	dom4j-1.6.1
+	antlr-2.7.7
+	
+整合c3p0的包：3个
+	c3p0-0.9.2.1
+	hibernate-c3p0-5.0.7.Final
+	mchange-commons-java-0.2.3.4
+日志相关的包：3个
+	log4j-1.2.16
+	slf4j-api-1.6.1
+	slf4j-log4j12-1.7.2
+数据库驱动包：
+	mysql-connector-java-5.1.37-bin
+：
+	hibernate-entitymanager-5.0.7.Final
+	
+	
+配置hbm映射文件，配置规则在hibernate-core包的org.hibernate最下面的
+hibernate-mapping-3.0.dtd。实际项目复制粘贴即可，样本就在当前文件夹下。
+配置hibernate.cfg.xml。(测试时狂报错找不到javassist，重新安装到本地就好了)
+
+测试：
+	public void test1(){
+			//把hibernatec.cfg.xml放在src/main/resource下即可
+		Configuration configuration = new Configuration();
+		configuration.configure();
+		SessionFactory sessionFactory = configuration.buildSessionFactory();
+		Session se = sessionFactory.openSession();
+		Transaction tx = se.beginTransaction();
+		Customer c = se.get(Customer.class, 1L);
+		c.setCust_name("name222");
+		c.setCust_phone("222");
+		se.save(c);
+		tx.commit();
+		se.close();
+	}

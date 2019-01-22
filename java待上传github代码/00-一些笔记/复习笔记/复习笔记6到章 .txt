@@ -168,13 +168,80 @@ JAVA反射机制是在运行状态中，对于任意一个类，都能够知道�
 Java反射机制主要提供了以下功能：在运行时判定任意一个对象所属的类；在运行时构造任意一个类的对象；在运行时判定任意一个类所具有的成员变量和方法；在运行时调用任意一个对象的方法；生成动态代理。
 
 ================================================================================
-================================================================================
+
+右键项目名称,web deployment assembly，add-->java build path entries，
+每次在maven里update project都要重复这个操作。
 
 ================================================================================
 
-================================================================================
+商城项目笔记：
+1、购物车和购物项不应该设置public getTotal，所有价格相关的都不能设置set方法！！
+2、购物项用map比list更好管理，但由于购物项应该有序，所以用LinkedHashMap
+
 
 ================================================================================
+
+文件上传：
+前端：	
+	<form enctype="multipart/form-data" method="post" 	action='/d2/product?method=pic'>
+		<input type='file' name='fn'/>upload
+		<input type='text' name='u' value='u1'/>
+		<input type='submit' value='submit'/>
+	</form>
+这个请求会先通过baseservlet处理，得到method(pic)后调用productservlet的pic方法，
+但是enctype="multipart/form-data"的表单无法通过request.getParameter获取，
+所以action=/d2/product然后用隐藏域提交method=pic会无法进入pic方法，
+这里写成了/d2/product?method=pic。
+
+后台代码(fc,upload,fileitem都来自commons-fileupload包)：
+public String pic(HttpServletRequest r, HttpServletResponse s) throws Exception {
+		String u = r.getParameter("u");
+		String fn = r.getParameter("fn");
+			//始终打印null --null
+		System.out.println(u + "\t--" + fn);
+		DiskFileItemFactory fc = new DiskFileItemFactory();
+		ServletFileUpload upload = new ServletFileUpload(fc);
+		List<FileItem> list = upload.parseRequest(r);
+		Map<String, List<FileItem>> map = upload.parseParameterMap(r);
+			//list能获取到，map是null
+		System.out.println(list);
+		System.out.println(map);
+		for (FileItem item : list) {
+				// 文件的输出是			fn:一堆乱码		01.jpg:false
+				// u=1111的输出是		u:u1111 		null:true
+			System.out.print(item.getFieldName() + ":" + item.getString());
+			System.out.println("\t"+item.getName() + ":" + item.isFormField());
+			if (!item.isFormField()) {
+				File file = new File( "e:/" + item.getName());
+				InputStream in = item.getInputStream();
+				FileOutputStream out = new FileOutputStream(file);
+				byte[] b = new byte[1024];
+				int len = 0;
+				while ((len = in.read(b)) != -1) {
+					out.write(b, 0, len);
+				}
+				in.close();
+				out.close();
+			}
+		}
+		return null;
+	}
+	
+	
+================================================================================
+
+第8章：
+xml约束本地配置：
+dtd：window-->preferences-->xml catalog-->add，key type选uri，
+key是网络的地址，location填对应dtd文件在本地的地址，可以用file system查找。
+xsd：基本同上，不过key type选 Schema Location 。
+
+================================================================================
+
+hibernate：
+get：调用方法时立即发送sql语句查询，找不到数据时返回null
+load：延时查询，调用对应属性时再查，找不到数据时报错
+
 
 ================================================================================
 

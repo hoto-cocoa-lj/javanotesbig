@@ -1,0 +1,247 @@
+
+ee分3层:
+	 web层
+		 struts2
+		beanutils工具类  可以将map的数据给javabean
+	 service层
+		spring
+	 dao层
+		hibernate
+
+第三阶段的学习: 框架
+
+16天
+	 hibernate  4天
+
+	 struts2    4天
+
+	 spring     5天
+
+	 crm(客户关系管理系统) 3天
+
+
+					 
+					 hibernate框架
+
+
+4天的知识点学习方案:
+	          
+		  第一天: hibernate的入门(框架的环境搭建)
+ 
+		  第二天: 持久化类的编写和一级缓存
+
+		  第三天: hibernate的关联关系(一对多 多对多的关系)
+
+		  第四天: hibernate的JPA
+
+					
+
+
+
+
+今日内容:
+	 使用hibernate完成单表数据的crud(增删改查)操作
+		 ps: hibernate就是在dao层操作数据库数据的
+
+
+		在dao层操作数据库的技术:
+		     jdbc+连接池(c3p0 dbcp)
+			 创建连接 0.1秒
+			 销毁连接 0.1秒
+			0.1*10000000=1000000w秒
+
+
+		     apache组织: dbutils工具类  封装了jdbc和连接池
+		     QueryRunner qr=new QueryRunner(连接池);
+
+
+		     hibernate
+		
+		
+		    图
+
+												     												     .
+
+
+技术分析: hibernate的入门
+		
+		1 什么是hibernamte框架?
+			Hibernate就是一个持久层的ORM的框架。对JDBC做了封装
+				只要java代码想连接上数据库,就一定要使用jdbc
+
+持久层: hibernate作用在dao
+
+ORM框架:
+	 Object Relational Mapping
+				----对象关系映射
+
+ORM框架:对象关系映射框架
+
+ORM思想:
+对象关系映射框架: 
+		想将对象和数据库的表建立映射关系
+
+	 好处: 想操作对象就相当于操作数据库的表数据了
+
+ORM框架市面上有很多,hibernate只是它其中的一种
+
+
+如果hibernate属于ORM框架,我们要想玩hibernate
+		就必须要将对象和数据库的表创建一种映射关系
+
+
+举例说明:
+	jdbc+c3po
+		最底层用来操作数据库数据的方式 但是步骤太繁琐
+
+
+	Dbutis工具类
+		 往user表中插一条数据  user表的字段是20个
+		
+		QueryRunner qr=  new QueryRunner(连接池);
+		String sql="insert into user values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		qr.update(对象.get属性1,对象.get属性2,对象.get属性3,对象.get属性4,对象.get属性5,对象.get属性6....)
+
+
+	hibernate   User类  -------做映射---- user表
+		      username			username
+		 往user表中插一条数据  user表的字段是20个
+
+		 hibernate.save(user);
+
+		
+       		2  hibernate框架的作用?
+			
+			1 简化了Dao层的编码工作  
+			   大大简化了数据访问层繁琐的重复性代码,加快了运行效率
+			
+			2 程序更加面向对象
+		           可以不需要编写SQL语句，只需要操作相应的对象就可以完成数据库数据的crud操作
+			   ps: sql语句不再需要自己写了,都是hibernate底层写好了 (针对的是单表的crud操作)
+
+
+
+	       
+	  就是用hibernate来操作数据库的数据:
+		将hibernate和项目集成(环境搭建):
+		        将hibernate的开发环境包:hibernate-release-5.0.7.Final.zip
+				解压后的效果:
+				documentation		:Hibernate的开发规范和文档
+				lib			:Hibernate的开发使用的jar包(重点关注 required optional)
+				project			:Hibernate的提供测试的工程。
+				     
+				
+				hibernate-release-5.0.7.Final\lib\required\*  所有包
+				
+				hibernate-release-5.0.7.Final\lib\optional\c3p0\* 所有包
+
+				hibernate在运行的过程中会加载一个日志包  
+					               企业开发用的日志包:  apacha-log4j.jar
+
+				required下面的所有包:9个
+				c3p0下面的所有包:3个
+				apache提供的日志包:3个
+				要连接的数据库驱动包(mysql) 1个
+
+				hibernate的环境搭建:16个
+
+				
+
+
+				将一个对象(Cutomer)和一张数据库(cus_customer)的表做映射关系?
+				        作关系:
+						 得创建一个xml的配置文件
+						 文件的名称可以是任意值
+						 但是建议起名叫: 类名.hbm.xml (由自己加载)
+
+				     在类名.hbm.xml做3步:
+					  1 做类名和表名的映射
+
+					  2 做主键和属性的映射	
+						    顺便让主键自增
+
+					  3 做其它属性和其它字段的映射
+
+
+				    做数据库的核心配置信息(xml) hibernate.cfg.xml
+					    要求: 在src下面 有一个名叫:hibernate.cfg.xml文件 (由程序自动加载)
+					          所有的数据库连接信息都在:hibernate-release-5.0.7.Final\project\etc\hibernate.properties
+		
+						   数据库的驱动
+						   数据库的地址
+						   数据库的用户名
+						   数据库的密码
+						   数据库的方言
+
+						   c3p0的配置
+						   控制显示sql语句
+						   让sql语句格式化
+						   
+						   让hibernate根据映射内容创建数据库的表
+
+
+
+				2块: 配置文件
+					 映射关系文件
+					 
+					 数据库核心配置文件
+
+
+				     hibernate的api
+		
+
+
+	
+总结:
+	核心配置文件 hibernate.cfg.xml
+			10个
+
+	映射文件: 类名.hbm.xml
+		     1 做类名和表名的映射
+
+		     2 做主键和属性的映射	
+				 顺便让主键自增
+
+		     3 做其它属性和其它字段的映射 
+
+
+	hibernate提供API详解:
+		作业:
+		 使用工具类能操作表的crud 
+		 save()
+		 get()或load() 主键查询
+			get和load的区别
+
+		 
+		 update()
+			----先查再该
+		 delete()
+			----先查再删
+			
+
+
+		所有的crud都是session
+		操作增删改 hibernate会自动生成sql 
+		
+		而对于查 只提供了主键查询的sql语句 get load
+
+		分页查 条件查 排序查 全查都得自己写(还按照人家的规范写  qbc语句 和 hql语句)
+		
+
+
+
+
+
+	
+			
+
+
+
+
+
+
+		
+
+
+
+

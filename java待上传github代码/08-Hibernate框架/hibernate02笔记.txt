@@ -1,0 +1,198 @@
+						
+						hibernate_02
+
+今日内容介绍:
+		1 持久化类的编写规范
+
+		2 持久化类的标识属性(OID属性)
+
+		3 主键的生成策略(重点)
+
+		4 持久化类的三种状态以及三种状态的互相转换(面试题 --了解)
+
+		5(重点)hibernate的一级缓存(重点)
+
+		6 session与当前线程的绑定(ThreadLocal)
+
+		7 hibernate的批量查询(HQL查询,QBC查询)(重点) --练习2遍
+				QBC查询 --第四天
+
+
+
+1 持久化类的编写规范	
+	持久化类: 与配置文件做映射的类就可以称为持久化类 
+					例如:Customer
+		   java类+配置文件
+
+	
+	
+	
+	
+	
+	hibernate对持久化类的要求规范:
+				1 需要提供一个无参的构造方法   hibernate是通过无参构造器来实例化对象的
+				2 所有属性都要私有化  
+				3 需要对外提供set/get方法
+				4 基本类型(int)和包装类型(integer),建议全部包装类型
+
+				
+				5 持久化类不能被final修饰  hibernate的优化手段就失效 延迟加载就会失效变成立即加载
+						load查询返回的是代理对象
+						而这个代理对象是持久化类的子类生出来的
+				
+				6 持久化类必须要有标识属性(OID属性)  
+					  标识属性(OID属性):就是与表主键创建了关系的属性 我们就可以把该属性称为标识属性或则oid属性
+
+
+	ps: 如果一个类与一张表做了映射 我们可以把这个类称为持久化类
+	    如果一个类中的属性和一张表中的主键字段做了映射,我们可以把这个属性称为标识属性或则OID属性
+
+	    
+	    
+	
+	标识属性(oid属性)的作用在哪里?  面试题
+
+		标识属性: Object Identifie  简称OID属性
+
+		作用: 可以让hibernate来区分多个对象是否是同一个对象
+			
+		     ps:每个技术对于多个对象是否为同一个的判断凭据不同
+			 jvm: 是根据内存地址
+				  如果内存地址相同 多个对象它会认为是同一个
+
+			
+			 数据库: 是根据主键
+				  如果主键相同 多个对象它会认为是同一个
+
+
+			 hibernate:是根据oid
+				  如果oid相同 多个对象它会认为是同一个
+
+
+	结论是: hibernate必须得有一个oid属性,而且这个oid属性还不能相同
+
+
+	问题: 怎么保证每个对象oid属性的不同?
+			使用就是hibernate提供的一门技术: 主键生成策略来保证
+			
+
+
+主键的生成策略:
+	总结: 以后如果针对是数值型,选择用native 
+	      如果是varchar类型,可以选择用uuid    
+	      但是也可以不用hibernate维护,自己在程序中手动设定唯一非空(assigned)uuid
+		
+		
+
+
+4 持久化类的三种状态以及三种状态的互相转换(面试题 --了解)
+
+	 瞬时态: 当前持久化类 没有oid属性 没有被session操作管理
+	 持久态: 当前持久化类 有oid属性 有被session操作管理
+	 脱管态(离线态)当前持久化类 有oid属性 没有被session操作管理
+	     例子:
+		public void test4()
+		{
+			Session session = HibernateUtils.openSession();
+			Transaction tx = session.beginTransaction();
+			// 瞬时态
+			Customer customer = new Customer(); // oid属性没有值  session没有管理
+			
+			customer.setCust_name("abcd"); 
+			
+			// 持久态
+			session.save(customer); // oid属性被生成策略(uuid)设置了 而且也被session管理
+			
+			tx.commit();
+			session.close();
+			
+			// 脱管态 (离线态)
+			System.out.println(customer.getCust_id()); //有oid属性值  没有被session操作管理
+		}
+
+
+	
+
+	持久态: 只要涉及到查询返回的就都是持久化类的持久态对象
+		特点: 如果持久态对象修改完属性,不需要执行更新操作,会自动更新数据库数据
+
+		例子:
+		public void test1()
+		{
+			Session session = HibernateUtils.openSession();
+			Transaction tx = session.beginTransaction();
+			
+			// 先获取持久态对象: 只要涉及到查询返回的就都是持久化类的持久态对象
+			Customer customer = session.get(Customer.class,"abcdefg");
+			customer.setCust_name("hhhhhhhhhhhhh");
+			
+		/*	session.update(customer);*/
+			
+			tx.commit();
+			session.close();
+		}
+			
+
+
+
+为什么持久化类的持久态对象 在修改完了属性之后,不需要update也能自动更新到数据库?
+
+
+原因: 一级缓存的存在  证明确实存在
+
+
+
+原理:
+	session.get(Customer.class,"abcdefg");  // 去数据库查询,查完了之后放在一级缓存中
+							一级缓存
+								存储区
+									放一份
+								快照区
+									备份一份
+
+	ct.setCust_name("rose1234");   // 去一级缓存中的存储区修改了内容,但是快照区不修改
+							一级缓存
+								存储区
+									修改了
+								快照区
+									以前的
+
+
+	tx.commit();      // 去一级缓存中,将存储区和快照区的数据都拿出来对比
+				一致: 什么都不做
+				不一致: 自动发送update语句做数据的数据更新
+
+	
+
+
+
+关闭缓存的方法:
+	  session.close()   session关闭 以及缓存也销毁
+	  session.clear()   clear可以清空一级缓存的所有数据
+	  
+	  session.evict()   可以清空一级缓存的某一个对象的数据
+
+
+
+
+
+
+hibernate的批量查询:
+	  我们只玩过oid查询  根据主键查询该条数据  sql语句会自动生成
+
+
+
+2种批量查询方式:
+		 Query方式    : 如果是使用这种方式做查询,又被称作为HQL查询  
+								查的是对象和属性
+
+		
+		 Criteria方式 : 如果是使用这种方式做查询,又被称作为QBC查询
+								第四天
+	 
+	  
+	  全查
+	  条件查
+	  批量查
+	  分页查
+	  ....

@@ -12,19 +12,34 @@
 		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/hibernate1?characterEncoding=UTF-8</property>
 		<property name="hibernate.connection.username">root</property>
 		<property name="hibernate.connection.password"></property>
+		
+		<!-- 配置方言，比如分页sql语句不同的数据库不一样-->
 		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
 		
+		<!-- 可选属性 -->
+		<!-- 显示SQL -->
 		<property name="hibernate.show_sql">true</property>
+		<!-- 格式化SQL -->
 		<property name="hibernate.format_sql">true</property>
 		<property name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
 	
 		<!-- 配置和当前线程绑定的session是否开启，和spring配合使用时要去掉-->
 		<property name="hibernate.current_session_context_class">thread</property>
 		
-		
+		<!-- 是否让hibernate根据表结构的变化来生成DDL语句
+			 DDL:数据定义语言
+			 hibernate可以根据映射文件来为我们生成数据库的表结构。但是他不能生成数据库。
+			hbm2ddl.auto的取值
+				* none:不用Hibernate自动生成表.
+				* create:每次都会创建一个新的表.(测试)
+				* create-drop:每次都会创建一个新的表，执行程序结束后删除这个表.(测试)
+				* update:如果数据库中有表，使用原来的表，如果没有表，创建一个新表.可以更新表结构。
+				* validate:默认值，只会使用原有的表.对映射关系进行校验.没有表也不创建。
+
+		-->
 		<property name="hibernate.hbm2ddl.auto">update</property>
 	
-	
+		<!-- 加载映射文件: -->
 		<mapping resource="com/domain/Customer.hbm.xml"/>
 		<mapping resource="com/domain/Linkman.hbm.xml"/>	
 		

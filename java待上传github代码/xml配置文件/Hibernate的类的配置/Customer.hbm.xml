@@ -5,9 +5,13 @@
 <hibernate-mapping> 
 	<class name="com.domain.Customer" table="cst_customer1">
 		<id name="cust_id" column="cust_id">
+		
+		<!--hibernate在操作数据库时一般使用native,assigned,uuidid主键生成策略:
+		第一种：assigned主键策略需要在添加数据时自己设置id，因为它不能自动生成id，	第二种：native为id自动生成策略，生成的是数字id，添加数据到mysql数据库时不需要设置id的值，使用方法如下，实体类id属性为int类型。	第三种：uuid会自动生成32进制uuid主键，添加数据到mysql数据库时不需要设置id的值，如果将id设置为这种策略，那么实体类id属性必须要定义成字符串string类型。-->
 			<generator class="native"></generator>
 		</id>
 		
+		<!-- name和column一样时，column可以省略不写 -->
 		<property name="cust_name" column="cust_name"></property>
 		<property name="cust_source" column="cust_source"></property>
 		<property name= "cust_industry" column="cust_industry"></property>
@@ -16,7 +20,7 @@
 		<property name="cust_phone"></property>
 		
 		<!-- 配置一对多的关系 集合 对象是linkman -->	
-<!-- 		name：集合的名字，
+		<!-- name：集合的名字，
 			设置inverse="true"使其放弃外键维护，否则会在设置外键时出现冗余sql代码
 			保存时先保存1再保存多，不然还是会出现update代码。
 			在一的一方设置cascade="save-update"，保存一的一方数据时会自动多方的数据
