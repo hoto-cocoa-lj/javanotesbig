@@ -1,0 +1,155 @@
+测试用的url：http://localhost:8080/s/t1?u=1&b=2&b=3&user.age=3&user.name=方法
+
+
+public class A1 extends ActionSupport {
+
+	private String u;
+
+	public String getU() {
+		System.out.println("getuuu=" + u);
+		return u;
+	}
+
+	public void setU(String u) {
+		System.out.println("setuuu=" + u);
+		this.u = u;
+	}
+
+	private User user;
+
+	public User getUser() {
+		System.out.println("getuser====" + user);
+		return user;
+	}
+
+	public void setUser(User user) {
+		System.out.println("setuser===" + user);
+		this.user = user;
+	}
+
+	public String t1() {
+		ActionContext c = ActionContext.getContext();
+		Map<String, Object> m = c.getParameters();
+		for (String s : m.keySet()) {
+			String[] x = (String[]) m.get(s);
+			System.out.print(s + ":" + Arrays.toString(x) + "\t");
+		}
+		System.out.println("\nt1 user=" + user + "\tu=" + u);	
+		return null;
+		
+		//必须设置成同名的属性/对象，例如本例中页面种需要有u和user.name，
+		user.age，这里用url代替了。		//属性需要set方法，对象需要set/get方法，因为对象在传第2个(或者更多)的属性时，需要用get方法获得已经传递第一个值的对象。
+		
+		//setuuu=1
+		//getuser====null
+		//setuser===User [name=null, age=0]
+		//getuser====User [name=null, age=3]
+		//b:[2, 3]	u:[1]	user.age:[3]	user.name:[??????]
+		//t1 user=User [name=??????, age=3]	u=1
+	}
+	
+	
+	
+测试url：http://localhost:8080/s/t1?age=3&name=abc
+modeldriver模型封装：
+	public class A1 extends ActionSupport implements ModelDriven<User> {
+		private User u = new User();
+		public String t1() {
+			System.out.println(u);			//User [name=asd, age=3]
+			return "t1t1";
+		}
+		@Override
+		public User getModel() {
+			// TODO Auto-generated method stub
+			return u;
+		}
+	}
+	
+	
+============================================================================
+	
+后台通过值栈传递数据到页面：
+1、设置action的成员属性，和set/get方法，代码如下：
+	public class A1 extends ActionSupport {
+		private User u = new User();
+		private String a;
+		public User getU() {
+			return u;
+		}
+		public void setU(User u) {
+			this.u = u;
+		}
+		public String getA() {
+			return a;
+		}
+		public void setA(String a) {
+			this.a = a;
+		}
+		public String t1() {
+			System.out.println("u=" + u + "\ta=" + a);
+			u.setAge(111);
+			u.setName("111name");
+			a = "aaa";
+			return "t1t1";
+		}
+	}
+
+	前端代码如下：
+	<s:debug></s:debug> <br>
+	<s:property value="u"/> <br>
+    <s:property value="u.name"/>: <s:property value="name"/> <br>
+    <s:property value="u.age"/>: <s:property value="age"/> <br> 
+     <s:property value="a"/>: <s:property value="b"/> <br>
+	
+	url=http://localhost:8080/s/t1?u.name=name222&u.age=222&a=kkk时前台输出：
+	User [name=111name, age=111] 
+	111name: 
+	111: 
+	aaa: 
+	后台输出：u=User [name=name222, age=222]	a=kkk
+	从s:debug可以看到，此时u和a都在值栈的root的me.web.A1的property name里，
+	说明直接用u和a的名字可以获取到后台传来的值，获取值必须实现相应get方法，
+	即获取a需要有getA，获取u需要有getU，没有的话debug里提示没有get方法；
+	实现set方法就可以从后台获取到前台传过去的参数，如果将url改成
+	http://localhost:8080/s/t1?u.name=name222&age=222会获取不到age，如果没有
+	set方法全部都获取不到，且u必须同时实现get/set方法，才能得到完整的u，
+	这个前面已经有笔记了，原因是有get方法才能保证把参数给同一个u。
+	
+	
+2、push和set方法：
+	public class A1 extends ActionSupport {
+		public String t1() {
+			User u = new User();
+			u.setAge(111);
+			u.setName("111name");
+			String a = "aaa";
+			ValueStack v = ActionContext.getContext().getValueStack();
+			v.push(u);
+			v.push(a);
+			v.set("a", "bbb");
+			return "t1t1";
+		}
+	}
+	url=http://localhost:8080/s/t1时前台输出：
+	: 111name 
+	: 111 
+	: bbb 
+	此时u在值栈的root的me.web.A1，u.name和u.age在property name里，所以直接
+	用name和age可以获取这两个属性。
+	
+	
+============================================================================	
+	
+ognl表达式表达list和map：
+	
+	<s:iterator value="{1,3,'d'}" var="l">
+		<s:property value="#l"/>
+	</s:iterator><hr>
+
+	<s:iterator value="#{1:2,3:6,'d':'dd'}" var="l">
+		<s:property value="#l.key"/>:<s:property value="#l.value"/>---
+	</s:iterator><hr>
+		
+	输出：
+	1 3 d
+	1:2--- 3:6--- d:dd---

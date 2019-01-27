@@ -1,0 +1,48 @@
+测试用的url：http://localhost:8080/s/t1?a=1&b=2&b=3&c=方法
+
+
+import org.apache.struts2.ServletActionContext;
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+
+public class A1 extends ActionSupport {
+
+	//方法1
+	public String t1() {
+		ActionContext c = ActionContext.getContext();
+		Map<String, Object> m = c.getParameters();
+		for (String s : m.keySet()) {
+			String[] x = (String[]) m.get(s);
+			System.out.print(s + ":" + Arrays.toString(x) + "\t");
+		}
+		// a:[1] b:[2, 3] c:[??????]
+		//把值放入request的map
+		c.put("r", "requestV啊");
+		//把值放入session的map，这里获取到的是map，不是session本身，
+		//所以不能使用session的方法，只能传递数据，其他两个方法一样
+		c.getSession().put("r", "sessionV是");
+		//把值放入servletContext的map
+		c.getApplication().put("r", "applciationV到是");
+		return "t1t1";
+	}
+
+	//方法2
+	public String t2() {
+		//这里获取的r/se/sc分别是3个域，可以用各自的方法
+		HttpServletRequest r = ServletActionContext.getRequest();
+		HttpSession se = r.getSession();
+		ServletContext sc = ServletActionContext.getServletContext();
+		Map<String, Object> m = r.getParameterMap();
+		for (String s : m.keySet()) {
+			String[] x = (String[]) m.get(s);
+			System.out.print(s + ":" + Arrays.toString(x) + "\t");
+		}
+		// a:[1] b:[2, 3] c:[??????]
+		r.setAttribute("r", "requestV啊");
+		se.setAttribute("r", "sessionV是");
+		sc.setAttribute("r", "applciationV到是");
+		return "t1t1";
+	}
+	
+	//方法3：实现各自Aware接口，几乎不用，详情见本章的笔记
+}

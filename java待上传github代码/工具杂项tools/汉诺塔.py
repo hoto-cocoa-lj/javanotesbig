@@ -1,4 +1,4 @@
-x,n=0,8
+x,n=0,3
 a=list(range(1,1+n))
 a.reverse()
 b,t=[],[]

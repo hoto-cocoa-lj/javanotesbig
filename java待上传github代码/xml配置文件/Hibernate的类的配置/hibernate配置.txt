@@ -19,7 +19,7 @@ hibernate本身的包：9个
 	slf4j-log4j12-1.7.2
 数据库驱动包：
 	mysql-connector-java-5.1.37-bin
-：
+hibernate实现jpa的包，如果不用jpa写代码可以不导入：
 	hibernate-entitymanager-5.0.7.Final
 	
 	
@@ -31,6 +31,7 @@ hibernate-mapping-3.0.dtd。实际项目复制粘贴即可，样本就在当前�
 	public void test1(){
 			//把hibernatec.cfg.xml放在src/main/resource下即可
 		Configuration configuration = new Configuration();
+			//源码可以看见configure()加载了"hibernate.cfg.xml"
 		configuration.configure();
 		SessionFactory sessionFactory = configuration.buildSessionFactory();
 		Session se = sessionFactory.openSession();
@@ -38,7 +39,17 @@ hibernate-mapping-3.0.dtd。实际项目复制粘贴即可，样本就在当前�
 		Customer c = se.get(Customer.class, 1L);
 		c.setCust_name("name222");
 		c.setCust_phone("222");
-		se.save(c);
+			//save方法返回保存的id值
+		Serializable save = se.save(c);
+		System.out.println(save);
 		tx.commit();
 		se.close();
 	}
+	
+	
+半xml半注解+jpa配置：
+注解部分似乎必须用entitymanager这个包读取，且此时hibernate.cfg.xml
+里没有配置mapping，所以必须配置jpa。增删改查等语法见注解加jpa的代码部分。
+使用半xml半注解不需要hibernate.cfg.xml和**.hbm.xml，后者用类里的注解代替，
+前者用persistence.xml代替，此文件必须放在META-INF文件夹里，
+使用maven配置时放在/src/main/resources/META-INF/persistence.xml。

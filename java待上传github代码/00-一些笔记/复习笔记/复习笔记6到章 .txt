@@ -234,30 +234,181 @@ public String pic(HttpServletRequest r, HttpServletResponse s) throws Exception 
 xml约束本地配置：
 dtd：window-->preferences-->xml catalog-->add，key type选uri，
 key是网络的地址，location填对应dtd文件在本地的地址，可以用file system查找。
-xsd：基本同上，不过key type选 Schema Location 。
+xsd：基本同上，不过key type选Schema Location 。
 
 ================================================================================
 
-hibernate：
+hibernate主键生成策略：
+自增的数值型，使用native(mysql用identity，orcale用sequence，native会自动选择)；
+varchar用uuid由hibernate生成主键，如果要自己生成就用assigned；
+
+不使用increment的原因：hibernate找最大的的主键+1作为新主键，线程不安全。
+	可用两个test debug验证。
+
 get：调用方法时立即发送sql语句查询，找不到数据时返回null
 load：延时查询，调用对应属性时再查，找不到数据时报错
 
+================================================================================
+
+hibernate对持久化类的要求规范：
+1、提供一个无参的构造方法
+2、所有属性私有化
+3、提供get/set方法
+4、不能用final修饰，否则延迟加载失效
+5、必须有标识属性(即oid属性，设置表的主键和类的关系)
 
 ================================================================================
 
+HQL查询：
+	接收一个HQL进行查询：HQL-Hibernate Query Language Hibernate查询语言，与SQL语言语法很相似的一个语言。面向对象。
+	@Test
+	/** * Query接口	 * HQL面向对象的查询.查询都是对象	 */
+	public void demo1(){
+		Session session = HibernateUtils.getCurrentSession();
+		Transaction transaction = session.beginTransaction();
+		
+		// 查询全部客户信息：
+		/*Query query = session.createQuery("from Customer");
+		List<Customer> list = query.list();
+		
+		for (Customer customer : list) {
+			System.out.println(customer);
+		}*/
+		
+		// 条件查询
+		/*Query query = session.createQuery("from Customer where cust_name like ?");
+		// 设置参数
+		query.setParameter(0, "郝%");
+		List<Customer> list = query.list();
+		for (Customer customer : list) {
+			System.out.println(customer);
+		}*/
+		
+		// 分页查询:
+		Query query = session.createQuery("from Customer");
+		// 从哪开始的
+		query.setFirstResult(3);
+		// 每页显示记录数
+		query.setMaxResults(3);
+		
+		List<Customer> list = query.list();
+		for (Customer customer : list) {
+			System.out.println(customer);
+		}
+		transaction.commit();
+	}
+	
+	
+QBC查询：
+	QBC-Query By Criteria 条件查询。更加面向对象化查询语言。
+	@Test
+	/**	 * QBC查询：Query By Criteria	 */
+	public void demo2(){
+		Session session = HibernateUtils.getCurrentSession();
+		Transaction transaction = session.beginTransaction();
+		
+		// 查询全部:
+	/*	Criteria criteria = session.createCriteria(Customer.class);
+		List<Customer> list = criteria.list();
+		for (Customer customer : list) {
+			System.out.println(customer);
+		}*/
+		
+		// 条件查询
+	    /**
+		* == 	eq		 * >	gt			* >= ge		* < lt		
+		 * <=	le		 * <>	ne			* in in		* like like		 */
+
+		/*Criteria criteria = session.createCriteria(Customer.class);
+		// criteria.add(Restrictions.eq("cust_name", "郝天一"));
+		criteria.add(Restrictions.like("cust_name", "郝%"));
+		List<Customer> list = criteria.list();
+		for (Customer customer : list) {
+			System.out.println(customer);
+		}*/
+		
+		// 分页查询
+		Criteria criteria = session.createCriteria(Customer.class);
+		criteria.setFirstResult(3);
+		criteria.setMaxResults(3);
+		List<Customer> list = criteria.list();
+		for (Customer customer : list) {
+			System.out.println(customer);
+		}		
+		transaction.commit();
+	}
+详细代码见第二天讲义。
+hibernate的一对多和多对多的配置和代码，见xml配置/hibernate配置的xml文件。
+关联级别的延迟加载：lazy=false见customer.hbm.xml。
+	
 ================================================================================
 
-================================================================================
-================================================================================
+hibernate有一套orm的增删改查方法，然后出现了jpa接口，hibernate又实现了jpa，
+所有hibernate有两套orm方法。
 
 ================================================================================
 
-================================================================================
+第9章：struts2
+前端控制器模型思想：
+很多servlet有共性的内容，比如处理乱码，上传文件，把这些部分抽取出来统一处理，
+处理它们的就是前端控制器。struts2使用的是StrutsPrepareAndExecufilter，
+springMVC使用的是baseServlet。
+
+struts2在web.xml配置StrutsPrepareAndExecufilter，用它拦截访问(比如配置成/*)，
+然后取struts.xml里找对应的action进行处理，不再使用servlet。
 
 ================================================================================
-================================================================================
+
+org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter：
+init方法在服务器启动时执行，只执行一次，主要作用是加载大量的配置文件；
+dofilter方法：每次访问都会执行一次dofilter方法，请求转发/重定向额外执行。
 
 ================================================================================
+
+线程危机：什么情况容易遇到线程危机？
+	多个线程操作共享的数据，就容易遇到线程危机。举例：
+		多人用同一个对象的成员属性(单实例)，成员属性属于共享数据，有线程危机；
+		多人用某对象的成员属性(多实例)，每个对象有自己的成员属性，无线程危机；
+	serlvet是单实例，所以几乎不在servlet定义成员属性，否则有线程危机；
+	action是多实例，在action里写一个无参的构造方法，可以发现每次访问
+		该action都会调用这个方法，说明是多实例。
+	单实例的好处是无需创建多个实例，减少了时间和空间消耗。
+	
+================================================================================
+
+ValueStack值栈是struts2提供的一个接口，我们用的是它的实现类OgnlValueStack，
+这个由struts2创建。
+在javaweb，我们使用域作为数据中转站  数据-->域-->页面(el,jstl)；
+在struts2，我们使用值栈作为数据中转站  数据-->值栈对象-->页面(ognl,el也可以)。
+
+浏览器访问action时，被StrutsPrepareAndExecuteFilter拦截并创建值栈对象，
+每次访问都会创建。创建后，当前action对象会放入值栈，还会将request,session,
+servletContext的底层用来封装数据的map集合也放入值栈，这里放的是地址。
+action执行完毕后销毁，值栈也跟着销毁，所以值栈的生命周期和action一样。
+
+================================================================================
+
+ognl表达式：不能在struts2中单独使用，需要嵌套进struts2内置标签中使用，
+可以在jsp里获取值栈的数据，需要如下配置：
+在jsp里<%@taglib prefix="s" uri="/struts-tags" %>
+
+<s:property value="'heee'.length()"/><hr>	//4
+
+================================================================================
+
+获得valueStack对象的两种方法：
+	public String t1() {
+		ActionContext c = ActionContext.getContext();
+		ValueStack vs1 = c.getValueStack();
+		HttpServletRequest r = ServletActionContext.getRequest();
+		Object vs2 = r.getAttribute(ActionContext.VALUE_STACK);
+		System.out.println(vs1 == vs2);					//true
+		return "t1t1";
+	}
+	
+================================================================================
+
+
 
 ================================================================================
 

@@ -16,7 +16,7 @@
 
 		
 		<!-- 配置多对多的关系 集合 对象是role
-		name：集合的名字，
+		name：集合的名字，name="sr"表示User类里有private Set<Role> sr = new HashSet<Role>();
 		table：中间表的名字
 
 		set：key：自己在中间表的外键字段名

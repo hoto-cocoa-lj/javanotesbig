@@ -21,9 +21,14 @@
 		<property name="hibernate.show_sql">true</property>
 		<!-- 格式化SQL -->
 		<property name="hibernate.format_sql">true</property>
+		
+		<!-- 选择使用C3P0连接池 -->
 		<property name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
 	
 		<!-- 配置和当前线程绑定的session是否开启，和spring配合使用时要去掉-->
+		<!-- 设置了这个才能使用sessionFactory的getCurrentSession()，
+		使用这个获得的session能进行事务，因为它使用的也是threadlocal，
+		而且用完后自动关闭，否则报错No CurrentSessionContext configured-->
 		<property name="hibernate.current_session_context_class">thread</property>
 		
 		<!-- 是否让hibernate根据表结构的变化来生成DDL语句
@@ -39,9 +44,12 @@
 		-->
 		<property name="hibernate.hbm2ddl.auto">update</property>
 	
-		<!-- 加载映射文件: -->
+		<!-- 加载映射文件: 这些文件可以放在对应的类同一个包下，也可以放在
+		resources里同样路径的包(即src/main/resources/com/domain，需手动创建)-->
 		<mapping resource="com/domain/Customer.hbm.xml"/>
 		<mapping resource="com/domain/Linkman.hbm.xml"/>	
+		<mapping resource="com/domain/Role.hbm.xml"/>	
+		<mapping resource="com/domain/User.hbm.xml"/>	
 		
 		
 	</session-factory>

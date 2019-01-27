@@ -1,0 +1,398 @@
+
+					
+					hibernate04-jpa
+
+
+Hibernate中有两套实现数据库数据操作的方式：
+		hibernate前3天讲解的都是：hibernate自己的操作方式 (全是xml配置方式)
+		
+		今天讲解的是基于JPA的操作方式(使用注解来替代之前的部分xml方式)
+
+
+
+	今日内容介绍:
+		1 JPA概述
+		2 JPA的环境搭建
+		3 基于JPA的单表数据的CRUD操作
+		
+		4 基于JPA的一对多映射以及操作
+		5 基于JPA的多对多映射以及操作
+
+		6 QBC查询
+
+
+
+1 JPA概述:
+	   JPA: Java Persistence Api
+			-- java的持久化规范
+
+	   hibernate和JPA的关系?
+		  JPA是一套接口
+		  hibernate是实现
+
+		  所有的ORM框架都可以实现JPA接口
+
+		  hibeernate:    save  
+		  别的orm框架:   add  adds  addss 
+
+		  所有的ORM框架制作者就研究出来了一套接口: JPA
+								persist
+								remove
+		  好处在于所有ORM框架都能实现这套接口规范
+
+				persist() 增
+				remove() 删除
+				find() 查
+				...
+
+
+
+		
+JPA的使用: 
+	   JPA是通过注解的方式来描述 对象和表的映射关系
+	   之前的对象和表的映射关系配置是通过XML,今天要替换成注解的方式
+
+
+注释: 给程序员看的
+注解: 以@+英文字符的组合
+      给程序看的
+
+对于注解的学习: 
+	        1 记
+		2 知道这个干啥用的
+		3 知道定义在哪个地方
+
+注解出现的目的:
+	       为了完全取代xml
+
+	       以后企业的开发:
+		               1 全xml的方式   前3天
+			       2 半xml半注解的方式 今天
+
+		对象和表的映射关系以前是用xml
+		今天是用注解
+
+		数据库的核心配置文件还得用xml方式
+				
+		  
+			
+
+	JPA环境搭建:
+		  1 16个hibernate的环境包
+
+		  2  1个JPA的包
+
+		  
+		  3 2个文件 映射  数据库核心
+
+		  使用直接替代xxx.hbm.xml映射的配置文件
+			
+			类上:
+			@Entity // 当前类是持久化类
+			@Table(name="表名") //当前持久化类和哪个表做映射
+
+			属性:
+			@Id //当前的属性是oid属性
+			@Column(name="主键名")// 和表的哪个字段做映射
+			@GeneratedValue(strategy=GenerationType.IDENTITY) //指定oid的增长策略
+
+
+			 @Column(name="字段名") // 其它属性和表中的字段映射
+
+
+		数据库核心文件:
+			 1 在src下面 有一个META-INF的文件夹
+			 2 在这个文件夹下面 有一个persistence.xml的文件
+					 约束:hibernate-entitymanager-5.0.7.Final.jar
+								-----org.hibernate.jpa
+										---persistence_2_0.xsd
+											---24行到26行
+
+			 3 所有的数据库信息配置都在这个文件中来配置
+
+
+
+
+	
+
+
+	
+
+
+
+
+
+
+
+
+
+		
+
+
+
+
+
+
+
+
+
+今日任务:
+	 通过jpa的注解方式来替代之前的配置文件方式  对象和表的映射
+
+	 数据库的核心配置  ---XML方式
+
+	 注解+XML配置文件方式
+		
+	
+
+
+
+2 JPA的环境搭建
+		1 hibernate的环境(16个包)
+		2 JPA的环境(1个包)
+
+
+
+
+3 基于JPA的单表数据的CRUD操作
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+JPA的环境搭建:
+		
+
+		
+
+
+
+
+
+		
+
+
+
+
+
+
+
+
+
+总结: 
+	JPA的作用?
+		给所有的orm框架提供了一套接口
+	好处: 所有的ORM框架只要实现了这个JPA接口,用来操作数据库数据的方式和方法以及注解都一致了
+
+
+	jpa的环境搭建: 在hibernate的环境基础上多加一个包--hibernate-entitymanager-5.0.7.Final.jar
+
+
+	单表的映射
+		@Entity  实体类
+		@Table(name="cst_customer")  与表的映射
+		@Id   指定OID属性
+		@Column(name="cust_id") 指定映射的字段
+		@GeneratedValue(strategy=GenerationType.IDENTITY)  指定主键的生成策略
+
+	crud:
+		persist()
+			----保存
+
+		find()  : 立即加载
+		getReference():延迟加载
+			-----单条数据的oid查询
+
+		merge()
+			---修改
+
+		
+		remove()
+			---删除
+
+	
+	批量查询:
+		  类似之前的query方式
+
+
+	一对多:
+		一: @OneToMany(targetEntity=LinkMan.class,mappedBy="customer")
+		多: @ManyToOne(targetEntity=LinkMan.class)
+			一对多的关系配置:
+				@JoinColumn(name="lkm_cust_id",referencedColumnName="cust_id")
+
+
+	多对多:
+		多(被动): @ManyToMany(targetEntity=User.class,mappedBy="roles")
+		多(主动): @ManyToMany(targetEntity=Role.class)
+			 多对多的关系配置:
+				@JoinTable(name="中间表的名称",joinColumns="自己在中间表的配置(数组)"
+				inverseJoinColumns="对方在中间表的配置(数组)")
+
+
+	级联:
+		cascade=CascadeType.ALL  做级联保存以及级联删除
+		cascade=CascadeType.PERSIST 只做级联保存
+		cascade=CascadeType.REMOVE 只做级联删除
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		 
+		
+
+
+
+
+
+

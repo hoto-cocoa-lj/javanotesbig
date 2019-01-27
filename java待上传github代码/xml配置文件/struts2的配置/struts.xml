@@ -28,7 +28,7 @@
 <struts>
 	
 	
-	<!-- 可以覆盖前面加载的配置文件内容 -->
+	<!-- 可以覆盖前面加载的配置文件内容，下面这句表示只过滤.action页面-->
 	<!-- <constant name="struts.action.extension" value="action"></constant> -->
 	
 	<!-- 使用动态方法
@@ -45,24 +45,46 @@
 	<!-- <package name="test1" extends="struts-default" namespace="/">
 		 做action的地址访问路径 
 		 	name:action的名字  和浏览器访问地址相关
-		 	 	 namespace和name 组成了当前action的访问地址
+			
+		 	namespace和action的name：组成了当前action的访问地址，比如/user/add
+			和/user/delete两个页面，可以放在同一个package，该package
+			的namespace是/user，两个action的name分别是/add和/delete。
+			name不能有层级关系，比如name=/add/one不会处理/user/add/one。
+				 
 		 	class:全限定名
 		 	method: 可以不写 默认就是执行叫一个execute的方法，不用写括号和参数。。。
 		
 		 <action name="hello" class="cn.itcast.action.ActionDemo1" >
-		 	result: 接收返回值 
-		 		name:返回的别名对比
-		 	
+		 	result: 接收返回值 		 	
+			name:action执行方法返回abc，则会返回abc对应的/jsp/demo.jsp
 		 	<result name="abc">/jsp/demo.jsp</result>
 		 </action>
 	</package> -->
 	
+	
+	
+	
 	<!-- 引入外部的action配置  -->
-	<!-- <include file="struts_user.xml"></include> -->
+	<include file="struts_user.xml"></include> 
 	
 	
 	<!-- action的3种创建方式 -->
 	<package name="test3" extends="struts-default" namespace="/">
+	
+		<!--全局结果页面global-results：如下配置的话，该package处理的所有方法
+		只要返回success就会跳转/error.jsp，某action覆盖它则该action走自己的;
+		result的type定义跳转页面的方式，常见的有:
+		dispatcher：默认，请求转发
+		redirect：重定向
+		chain：请求转发到action，比如<result name="a" type="chain">b</result>
+			表示返回值为a的请求，用<result name="b">处理,如果
+			<result name="b">/index.jsp</result>，则返回/index.jsp
+		redirectAction：重定向到action		
+		stream:文件下载，这个没用过								-->
+		<global-results>
+			<result name="success" type="redirect">/error.jsp</result>
+		</global-results>
+		
 		<action name="hello2" class="cn.itcast.action.ActionDemo2" >
 			<result name="success">/jsp/demo.jsp</result>
 		</action>
@@ -71,7 +93,7 @@
 			
 		</action>
 		
-	<!-- action的3种访问方式 -->
+		<!-- action的3种访问方式 -->
 		<!-- method方式 -->
 		<action name="product_save" class="cn.itcast.action.ActionDemo4" method="save" >
 	 	</action>
@@ -92,11 +114,12 @@
 	 	
 	 	-->				 
 	 	<action name="product_*" class="cn.itcast.action.ActionDemo4" method="{1}" ></action>
+		 
 		<action name="*_*" class="cn.itcast.action.{1}"  method="{2}" ></action>
 	 	
 	 	<!-- 动态方法方式(了解) 
 	 			1 动态方法方式默认是关闭的  需要开启   default.properties
-	 			2 页面要使用特殊写法
+	 			2 页面要使用特殊写法，比如/user!add
 	 	-->
 	 	<action name="product" class="cn.itcast.action.ActionDemo4" ></action>
 			 
@@ -123,16 +146,13 @@
 		<action name="Customer_*" method="{1}_action" class="com.web.action.CustomerAction">
 			<result name="{1}">/index.jsp</result>
 			
-			<!-- 拦截器的引用方法1，这里引入自定义拦截器后，必须手动引入默认拦截器defaultStack -->
+			<!-- 拦截器的引用方法1，这里引入自定义拦截器后，
+			必须手动引入默认拦截器defaultStack -->
 			<interceptor-ref name="defaultStack"></interceptor-ref>
 			<interceptor-ref name="i2"></interceptor-ref>
 			<interceptor-ref name="i1"></interceptor-ref>
 		</action>
-	</package>
-	
-	
-	
-	
+	</package>	
 	
 	
 	<package name="A" extends="struts-default" namespace="/">
@@ -160,9 +180,6 @@
 			<interceptor-ref name="myStack"></interceptor-ref>
 		</action>	
 	</package>
-	
-	
-	
 	
 	
 	<!--
@@ -196,12 +213,44 @@
 			<result name="fff">/WEB-INF/2.jsp</result>
 			<result type="redirectAction">a_f</result>
 
-			<interceptor-ref name="i1">
+			<interceptor-ref name="i1">			
+				<!--excludeMethods这个参数，只能用于继承MethodFilterInterceptor 类的拦截器上-->
 				 <param name="excludeMethods">a1,a2</param>
 			</interceptor-ref>
 			<interceptor-ref name="i2"></interceptor-ref>
 			<interceptor-ref name="defaultStack"></interceptor-ref>
 		</action>	
 	</package>
+	
+	<!--上面配置的都是局部拦截器，即每个action要用的拦截器在自己里面配置，
+	全局拦截器可以使该package下所有action都使用此拦截器。	首先配置一个package，让它继承struts-default。然后配置自己的拦截器和global-results，因为这里会拦截下很多请求，需要处理。如果action没有配置局部拦截器，则走全局；如果配置了局部，就只走局部，不走全局。-->
+	<package name="all" extends="struts-default">
+        <interceptors>
+            <!-- 自定义的拦截器 -->
+            <interceptor name="mi" class="cn.me.MyInterceptor"></interceptor>
+            <!-- 定义拦截器栈 -->
+            <interceptor-stack name="ms">
+                <!-- 默认拦截器 -->
+                <interceptor-ref name="defaultStack"></interceptor-ref>
+                <!-- 自定义拦截器 -->
+                <interceptor-ref name="mi"></interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+        <!-- 默认拦截器 -->
+        <default-interceptor-ref name="ms"></default-interceptor-ref>
+        <!-- 全局结果集 -->
+        <global-results>
+            <result name="login">/index.jsp</result>
+        </global-results>
+    </package>
+	<!--接下来就就跟平常写配置文件没啥区别了，只是让其它包继承自我们自己的加了拦截器的包就可以了-->
+	<package name="Struts" extends="all">
+        <action name="Test" class="con.me.action.TestAction">
+            <result name="success">/success.jsp</result>
+            <result name="erroe">/error.jsp</result>
+        </action>
+    </package>
+
+
 	
 </struts>

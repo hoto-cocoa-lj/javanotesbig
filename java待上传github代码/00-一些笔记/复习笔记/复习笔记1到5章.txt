@@ -434,6 +434,13 @@ InputStreamReader可以把字节流转成字符流，查源码发现FileReader�
 第二章无，第三章：
 ================================================================================
 
+JDBC（Java DataBase Connectivity,java数据库连接）
+是一种用于执行SQL语句的Java API，然后各数据库商提供驱动实现该接口，
+下面的代码使用mysql的驱动。
+后面hibernate里要学jpa，JPA是Java Persistence API的简称，中文名Java持久层API，
+是JDK 5.0注解或XML描述对象－关系表的映射关系，
+并将运行期的实体对象持久化到数据库中。可以通过修改对象直接增删改查数据库。
+
 	@Test
 	public void t1() throws SQLException, ClassNotFoundException {
 		// 1、 加载com.mysql.jdbc.Driver类，该类会注册驱动
@@ -885,6 +892,13 @@ jsp文件的<%--%>里的代码会出现在相应的java文件的service方法里
 
 maven项目里导入jasper包可能会报错catalina.deploay.webxml addFilter，原因是
 jar包冲突，在tomcat-->conf-->context.xml的context下加上<Loader delegate='true'/>。
+
+jsp所在包的坐标如下，不导入这个包，jsp文件全部会报错。
+	<dependency>
+		<groupId>javax.servlet.jsp</groupId>
+		<artifactId>jsp-api</artifactId>
+		<version>2.0</version>
+	</dependency>
 
 ================================================================================
 

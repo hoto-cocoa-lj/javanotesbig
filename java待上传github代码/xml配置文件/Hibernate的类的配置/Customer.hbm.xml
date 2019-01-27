@@ -19,16 +19,39 @@
 		<property name="cust_address"></property>
 		<property name="cust_phone"></property>
 		
-		<!-- 配置一对多的关系 集合 对象是linkman -->	
-		<!-- name：集合的名字，
+		<!-- 配置一对多的关系 customer对象是linkman-->	
+		<!-- name：集合的名字，即Cutomer类里private Set<Linkman> SerLinkman；		
+			实际测试一定要Set，private List<Linkman> SerLinkman这么配置会报错。
 			设置inverse="true"使其放弃外键维护，否则会在设置外键时出现冗余sql代码
 			保存时先保存1再保存多，不然还是会出现update代码。
 			在一的一方设置cascade="save-update"，保存一的一方数据时会自动多方的数据
-		set：key：外键字段名
-		set：class：多的一方的全限定名 -->
-		<set name="slm" inverse="true" cascade="save-update">
+		key-column：外键字段名，会出现在多表，需要设置和linkman.hbm.xml的many-to-one
+			的column一样，不然会在多表出现两个外键
+		set：class：多的一方的全限定名（类的全名） -->
+		<set name="SetLinkman" inverse="true" cascade="save-update,delete"
+			 lazy="false">
 			<key column="wj_cust_id"></key>
 			<one-to-many class="com.domain.Linkman"/>
 		</set>	
+		<!--linkman的外键设置非空可以发现：
+		如果代码是c.getSet().add(l)，则会在保存c和l后update l加上外键，
+		此时一定会导致冗余sql，c和l的保存顺序看代码怎么写。		如果代码是l.setCustomer(c)，会先保存c再保存l，且l已经设置好外键，没有冗余。
+		如果在c方设置inverse="true"会是c.getSet().add(l)失效，从而达到没有冗余
+		的效果，实际上只要保证不用c.getSet().add(l)就不会出现冗余。-->
+
+		<!-- 同时在c设置inverse="true"和cascade="save-update"，
+		c.getSet().add(l)然后save(c)会保存c和l，但是没有外键关系，
+		l.setCustomer(c)然后save(c)会保存c不保存l。多对多的情况一样。
+		多对多不用级联，尤其要避免级联删除。
+		-->		
+		<!--lazy="false"用于确定是否延迟跨表查询。默认true，即延迟。
+		如果在customer里设置需要设在set上，表示查询customer时不会马上
+		查询它有哪些linkman，需要用SetLinkman再查询。
+		如果在linkman里设置需要设在many-to-one上，表示查询linkman时不会马上
+		查询它的customer，需要用customer时再查询。如果当前session已经查询过
+		该customer，则直接使用，不会去数据库查询。
+		调试时发现一件事，比如customer设置了延迟，那么在使用前用鼠标查看该
+		customer，程序会马上发送查询语句查看SetLinkman。-->			
+
 	</class>
 </hibernate-mapping>

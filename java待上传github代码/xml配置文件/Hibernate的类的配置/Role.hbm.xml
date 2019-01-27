@@ -13,7 +13,7 @@
 
 		
 		<!-- 配置多对多的关系 集合 对象是role
-		name：集合的名字，
+		name：集合的名字，name=su表示Role类里有private Set<User> su = new HashSet<User>();
 		table：中间表的名字
 
 		set：key：自己在中间表的外键字段名
@@ -25,9 +25,12 @@
 		但由于不管理外键，所以中间表不会有数据，即相当于r1和u1没有建立外键关系。
 		由于设置了delete，删除某role会在user表删除其关联的所有user，并在中间表删除相关的所有数据。
 		 -->
-		<set name="su" table="sys_user_role" inverse="true"  cascade="save-update,delete">
+		<set name="su" table="sys_user_role" inverse="true"  cascade="save-update">
 			<key column="wj_role_id"></key>
 			<many-to-many class="com.domain.User" column="wj_user_id"/>
 		</set>	
-	</class>
+		<!-- 比如r1的set有u1,u2,u3，r2的set有u1,u2，那么删除u1的r1权限，
+		只需将r1.getSu().remove(u1)再update r1，或者u1.getSr().remove(r1)
+		再update u1提交即可，但是现在r1不管理外键，所以只能用后者。添加权限
+		类似只用后者，修改权限则是先删除后添加。-->
 </hibernate-mapping>

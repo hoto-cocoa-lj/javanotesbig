@@ -40,9 +40,10 @@
 	<!-- 
 		放在src里，加载方法有两种：
 		String x = "applicationContext.xml";
+		//String x = "classpath:applicationContext.xml";
 		String x1 = "/src/applicationContext.xml";
-		// ClassPathXmlApplicationContext c = new ClassPathXmlApplicationContext(x); 			第一种
-		// FileSystemXmlApplicationContext c = new FileSystemXmlApplicationContext(x1);			第二种
+		// ClassPathXmlApplicationContext c = new ClassPathXmlApplicationContext(x); 		//从src(classpath)加载
+		// FileSystemXmlApplicationContext c = new FileSystemXmlApplicationContext(x1);		//从磁盘路径加载
 		 
 		 
 		FileSystemXmlApplicationContext c = new FileSystemXmlApplicationContext(x1);
@@ -129,8 +130,8 @@
    	  </bean>
    		
    	<!-- 
-   			DI的注入方式:
-   				   1 构造器的方式
+   			DI的注入方式1:
+   				    构造器的方式
    				   	     条件:需要有参构造方法
    	
    	 -->
@@ -145,8 +146,8 @@
    	 </bean> -->
    	 
    	 	<!-- 
-   			DI的注入方式:
-   				   1 set属性的方式
+   			DI的注入方式2:
+   				    set属性的方式
    				   	     条件:属性必须要有set方法
    				 name:要赋值的属性名
    	 			 value:要赋的值 (针对的是基本类型和String类型)
@@ -163,8 +164,8 @@
    		
    	
 	   	<!-- 
-	   			DI的注入方式:
-	   				   1 p名称空间的方式
+	   			DI的注入方式3:
+	   				    p名称空间的方式
 	   				   	     条件: 在配置文件中有p的名称空间
 	   				   	                  底层set方式  属性还是得有set方法
    	     				  语法:

@@ -1,0 +1,135 @@
+struts2要导入的包：13个
+
+	<dependency>
+		<groupId>javax.servlet</groupId>
+		<artifactId>servlet-api</artifactId>
+		<version>2.5</version>
+		<scope>provided</scope>
+	</dependency>
+
+	<dependency>
+		<groupId>asm</groupId>
+		<artifactId>asm</artifactId>
+		<version>3.3</version>
+	</dependency>
+	<dependency>
+		<groupId>asm</groupId>
+		<artifactId>asm-commons</artifactId>
+		<version>3.3</version>
+	</dependency>
+	<dependency>
+		<groupId>asm</groupId>
+		<artifactId>asm-tree</artifactId>
+		<version>3.3</version>
+	</dependency>
+	<dependency>
+		<groupId>commons-fileupload</groupId>
+		<artifactId>commons-fileupload</artifactId>
+		<version>1.3.1</version>
+	</dependency>
+	<dependency>
+		<groupId>commons-io</groupId>
+		<artifactId>commons-io</artifactId>
+		<version>2.2</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-lang3</artifactId>
+		<version>3.2</version>
+	</dependency>
+	<dependency>
+		<groupId>org.freemarker</groupId>
+		<artifactId>freemarker</artifactId>
+		<version>2.3.22</version>
+	</dependency>
+	<dependency>
+		<groupId>javassist</groupId>
+		<artifactId>javassist</artifactId>
+		<version>3.11.0.GA</version>
+	</dependency>
+	<dependency>
+		<groupId>ognl</groupId>
+		<artifactId>ognl</artifactId>
+		<version>3.0.6</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.struts</groupId>
+		<artifactId>struts2-core</artifactId>
+		<version>2.3.24.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.struts.xwork</groupId>
+		<artifactId>xwork-core</artifactId>
+		<version>2.3.24.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-api</artifactId>
+		<version>2.2</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-core</artifactId>
+		<version>2.2</version>
+	</dependency>
+
+修改web.xml，加上
+	  <filter>
+		<filter-name>strust2_3</filter-name>	<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+	  </filter>
+	  
+	  <filter-mapping>
+		<filter-name>strust2_3</filter-name>
+		<url-pattern>/*</url-pattern>
+	  </filter-mapping>
+	  
+	
+创建/复制粘贴修改struts.xml，放在src/main/resources下配置完毕。
+
+action的编写方式有3种：
+1、不继承任何类，不实现任何接口
+2、实现com.opensymphony.xwork2.Action接口
+3、继承com.opensymphony.xwork2.ActionSupport类，推荐用这个，因为能使用父类的东西
+
+
+
+struts2的前端控制器(StrutsPreparedAndExecuteFilter)的init方法:
+	init方法:服务器启动执行 执行一次
+	主要作用: 用来加载整个struts2的配置文件的 
+	按照顺序一个一个的加载:
+		     
+		     struts2自动写好的配置文件:
+		     
+		     1  default.properties         struts-core/org/apache/struts2/default.properties
+			          已经配置好的键值对信息(action的后缀名地址访问 上传文件的大小控制....)
+				 struts.action.extension = action,,
+		      
+		     2 struts-default.xml	   struts-core/struts-default.xml
+				  struts2的默认包:struts-default
+					 大量拦截器
+
+		     3 struts-plugin.xml  struts2整合spring需要用到的一个配置文件
+				暂时不用 到后面整合3大框架的时候 会导一个包 struts2-spring-plugin-2.3.24.jar    
+				这个配置文件就是struts2-spring-plugin-2.3.24.jar包里面的
+
+
+		     加载我们配置的:
+		
+		     4 struts.xml  action的浏览器访问路径配置文件
+			     struts.action.extension=abc
+
+		     5 struts.properties(企业从来不用)
+				struts.action.extension=bcd
+
+		     6 加载StrutsPrepareAndExecuteFilter的初始化参数值
+				<init-param>
+					<param-name>struts.action.extension</param-name>
+					<param-value>bbb</param-value>
+ 				</init-param>
+
+		
+
+	按照顺序加载这个配置文件的好处:
+		     
+		     如果前面的配置文件内容与后面的配置文件内容一致了
+		     以后面的配置文件内容为主,可以覆盖前面的内容

@@ -17,7 +17,7 @@
 		<property name="lkm_memo"></property>
 		
 		<!-- 配置一对多的关系 对象是custmer 
-		name：自己的一方对象的属性名		
+		name：自己的一方对象的属性名，即linkman类里有private Customer ct。		
 		class：一的一方的全限定名
 		column：指定外键字段名
 		这里可以不设置cascade="save-update"

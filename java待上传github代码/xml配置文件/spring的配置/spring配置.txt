@@ -1,0 +1,47 @@
+ioc(控制反转)要导的包：4个
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-beans</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-context</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-core</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-expression</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
+
+日志包：2个(只导上面4个不导日志包容易报错)
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+		<version>1.1.1</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.apache.log4j</groupId>
+		<artifactId>com.springsource.org.apache.log4j</artifactId>
+		<version>1.2.15</version>
+	</dependency>
+
+
+aop(面向切面编程)要导的包：
+aop‘aspects’instrumentation
+
+data access/integration：
+jdbc/orm/oxm/jms/transactions
+
+web(mvc/remoting)：
+web/servlet/porlet/struts
