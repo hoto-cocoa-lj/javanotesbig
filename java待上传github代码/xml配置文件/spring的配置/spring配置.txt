@@ -161,8 +161,13 @@ spring使用jdbc的包：事务spring-tx,spring-jdbc,加上ioc的包(这4个包s
 
 ================================================================
 	
-web(mvc/remoting)：
-web/servlet/porlet/struts
+web(mvc/remoting)：    web/servlet/porlet/struts
+整合web项目的包：1个
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-web</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
 
 ================================================================	
 
