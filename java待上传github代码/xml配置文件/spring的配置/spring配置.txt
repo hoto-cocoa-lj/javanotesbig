@@ -23,6 +23,8 @@ ioc(控制反转)要导的包：4个
 		<version>4.2.4.RELEASE</version>
 	</dependency>
 
+================================================================
+	
 日志包：2个(只导上面4个不导日志包容易报错)
 	<dependency>
 		<groupId>org.apache.commons</groupId>
@@ -36,12 +38,149 @@ ioc(控制反转)要导的包：4个
 		<version>1.2.15</version>
 	</dependency>
 
+================================================================
 
-aop(面向切面编程)要导的包：
-aop‘aspects’instrumentation
+ioc使用注解：1个包
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-aop</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
 
-data access/integration：
-jdbc/orm/oxm/jms/transactions
+================================================================
+	
+spring整合junit测试：3个包(spring-test  junit  spring-aop)
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-test</artifactId>
+		<version>4.2.2.RELEASE</version>
+	</dependency>
+	<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+		<version>4.9</version>
+	</dependency>
+		<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-aop</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
 
+================================================================
+	
+aop(面向切面编程)要导的包：4个(aop联盟  spring-aop  aspects  spring-aspects)
+spring-aop实现了aop的规范，效果不好，aspects实现效果好，纳入
+		<dependency>
+			<groupId>org.aopalliance</groupId>
+			<artifactId>com.springsource.org.aopalliance</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>4.2.4.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>com.springsource.org.aspectj.weaver</artifactId>
+			<version>1.6.8.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>4.2.4.RELEASE</version>
+		</dependency>
+
+		
+aop的xml配置：更多的例子和全注解配置见  xml配置文件/spring的配置/aop代码
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd   
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!--使用这个配置aop的话，必须在相应的类的上配置@Component("z")等
+	<context:component-scan base-package="com"></context:component-scan>
+	-->	
+	<bean id="ss" class="com.interception.SS"></bean>
+	<bean id="z" class="com.interception.Z"></bean>		
+
+	<aop:config>
+		<aop:aspect ref="z">
+			<!--给需要增强的方法设置引用ref，减少代码量，也可以不设置-->	
+			<aop:pointcut expression="execution(* com.interception.SS.*(..))" id="all1"/>
+			
+			<!--最常用这个，void表示此方法没有返回值，用*表示可以更好，
+			包括所有返回值和没有返回值。g(..)里的..表示任意参数-->
+			<aop:after-returning method="af" pointcut="
+			execution(void com.interception.SS.g())" /> 
+			
+			<!--常用这个，表示com.interception的所有子包的所有类的所有方法-->
+			<aop:after method="md" pointcut="execution(* com.interception..*.*(..))" />
+			
+			<!--表示com.interception的类的所有方法-->
+			<aop:after method="md" pointcut="execution(* com.interception.*.*(..))" />
+			
+			<!--表示com.interception的SS类的所有方法-->
+			<aop:after method="md" pointcut="execution(* com.interception.SS.*(..))" /> 
+			
+			<!--表示com.interception的SS类的以g为第一个字面的方法-->
+			<aop:around method="md" pointcut="execution(* com.interception.SS.g*(..))" />
+			
+			<!--使用pointcut引用的配置-->
+			<aop:around method="md"  pointcut-ref="all1"/>
+		</aop:aspect>
+	</aop:config>
+	<!-- before:之前，可以用权限拦截  after:之后执行，即使报错，类似finally after-returning:被增强方法不报错后执行，可用于日志输出 after-throwing:被增强方法报错后执行 
+		around:在增强方法内部执行被增强方法，可用于性能检测 -->
+</beans>
+
+================================================================		
+
+data access/integration：	jdbc/orm/oxm/jms/transactions
+
+spring使用jdbc的包：事务spring-tx,spring-jdbc,加上ioc的包(这4个包spring项目必须)
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-tx</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-jdbc</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
+
+
+================================================================
+	
 web(mvc/remoting)：
 web/servlet/porlet/struts
+
+================================================================	
+
+================================================================	
+
+================================================================	
+================================================================	
+
+================================================================	
+
+================================================================	
+================================================================	
+
+================================================================	
+
+================================================================	
+
+================================================================	
+
+================================================================	
+================================================================	

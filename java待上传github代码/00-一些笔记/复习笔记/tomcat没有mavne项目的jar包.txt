@@ -1,0 +1,2 @@
+右键项目名称,web deployment assembly，add-->java build path entries，
+每次在maven里update project都要重复这个操作。
