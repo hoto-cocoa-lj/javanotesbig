@@ -171,6 +171,14 @@ web(mvc/remoting)：    web/servlet/porlet/struts
 
 ================================================================	
 
+整合hibernate的包：1个
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-orm</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
+
+
 ================================================================	
 
 ================================================================	

@@ -1,4 +1,4 @@
-使用 servlet + hibernate + spring开发项目：
+使用 servlet + jdbctemplate + spring开发项目：
 
 web层使用了servlet，servlet不受spring管理，所以要手动注入，
 使用方法是重写init方法，
