@@ -17,7 +17,7 @@
 	<property name="driverClass" value="${c3p0.driver}"></property>
 	<property name="jdbcUrl" value="${c3p0.url}"></property>
 </bean>
-<bean id="JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 	<property name="dataSource" ref="c3p0"></property>
 </bean>
 

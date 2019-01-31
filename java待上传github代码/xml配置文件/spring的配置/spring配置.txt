@@ -146,7 +146,9 @@ aop的xml配置：更多的例子和全注解配置见  xml配置文件/spring�
 
 data access/integration：	jdbc/orm/oxm/jms/transactions
 
-spring使用jdbc的包：事务spring-tx,spring-jdbc,加上ioc的包(这4个包spring项目必须)
+spring使用jdbc：事务spring-tx,spring-jdbc,加上ioc的包(这4个包spring项目必须)，
+	jdbc的事务管理包是DataSourceTransactionManager
+
 	<dependency>
 		<groupId>org.springframework</groupId>
 		<artifactId>spring-tx</artifactId>
@@ -158,6 +160,28 @@ spring使用jdbc的包：事务spring-tx,spring-jdbc,加上ioc的包(这4个包s
 		<version>4.2.4.RELEASE</version>
 	</dependency>
 
+(或者)使用hibernate：要导入hibernate的所有包
+整合hibernate的包：1个spring-orm，HibernateTemplate在这个包，hibernate的事务
+	管理包是HibernateTransactionManager，导错包的话不会操作数据库会自动回滚
+	
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-orm</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
+	
+使用hibernate在web层会遇到延迟加载报错no session的问题，解决方法有两个：
+	1、所有1对多或者多对多都配置lazy=false，这样查询效率很低；	2、在web.xml里配置如下过滤器，作用是在过滤器中关闭session。配置的时候需要把这个过滤器的配置放在struts2等前端框架的过滤器之前，因为web.xml中的执行顺序是从上到下，回来的时候是从下往上关闭的。如果反过来，就会出现过滤器中关闭session了才在action里查询。
+
+  <!-- 解决延迟加载问题的过滤器，这是spring提供的解决方法 -->
+  <filter>
+  	<filter-name>OpenSessionInViewFilter</filter-name>	<filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
+  </filter> 
+  
+  <filter-mapping>
+  	<filter-name>OpenSessionInViewFilter</filter-name>
+  	<url-pattern>*.action</url-pattern>
+  </filter-mapping>
 
 ================================================================
 	
@@ -169,18 +193,35 @@ web(mvc/remoting)：    web/servlet/porlet/struts
 		<version>4.2.4.RELEASE</version>
 	</dependency>
 
+在web.xml里如下配置：spring加载时会加载contextConfigLocation的值指向的xml文件，
+源码可以发现DEFAULT_CONFIG_LOCATION = "/WEB-INF/applicationContext.xml"，
+是contextConfigLocation的默认值，需要修改
+
+	<listener>							
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext.xml</param-value>
+	</context-param>
+	
 ================================================================	
 
-整合hibernate的包：1个
+
+
+
+================================================================
+
+整合struts的包：1个，作用是把action的创建交给spring(还有struts2自己的包)，
+这个包里有这个配置<constant name='struts.objectFactory' value='spring' />
 	<dependency>
-		<groupId>org.springframework</groupId>
-		<artifactId>spring-orm</artifactId>
-		<version>4.2.4.RELEASE</version>
+		<groupId>org.apache.struts</groupId>
+		<artifactId>struts2-spring-plugin</artifactId>
+		<version>2.3.24</version>
 	</dependency>
-
-
-================================================================	
-
+	
 ================================================================	
 ================================================================	
 

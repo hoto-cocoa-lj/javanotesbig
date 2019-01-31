@@ -6,6 +6,8 @@
 <struts>
 		<constant name="struts.objectFactory" value="spring"></constant>
 		 
+		 
+		<!--class="userAction"的userAction是spring配置出来的id，这里是个引用-->
 		<package name="test" extends="struts-default" namespace="/">
 			<action name="user_*" class="userAction" method="{1}">
 				<result name="success">/success.jsp</result>

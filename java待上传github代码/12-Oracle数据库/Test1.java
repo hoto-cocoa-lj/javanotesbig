@@ -50,7 +50,6 @@ public class Test1 {
 	
 	@Test
 	public void test1() throws Exception{
-		//forname方法原来是这么用的。
 //		Test1 t=(Test1) Class.forName("cc.test.Test1").newInstance();
 //		t.test1();
 		call = c.prepareCall("select * from emp");

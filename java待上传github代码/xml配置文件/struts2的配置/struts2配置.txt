@@ -73,16 +73,43 @@ struts2要导入的包：13个
 		<version>2.2</version>
 	</dependency>
 
-修改web.xml，加上
+struts2注解包：1个	
+		<dependency>
+			<groupId>org.apache.struts</groupId>
+			<artifactId>struts2-convention-plugin</artifactId>
+			<version>2.3.24</version>
+		</dependency>
+
+修改web.xml，加上：
 	  <filter>
-		<filter-name>strust2_3</filter-name>	<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+		<filter-name>strust2_3</filter-name>	
+		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
 	  </filter>
 	  
 	  <filter-mapping>
 		<filter-name>strust2_3</filter-name>
 		<url-pattern>/*</url-pattern>
 	  </filter-mapping>
+	使用spring整合struts2，必须加上：  
+	<filter>
+	  	<filter-name>struts2</filter-name>
+	  	<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+	  	<init-param>
+	  		<param-name>struts.objectFactory</param-name>
+	  		<param-value>spring</param-value>
+	  	</init-param>
+	  	<init-param>
+	  		<param-name>struts.convention.package.locators</param-name>
+	  		<param-value>web</param-value>
+	  	</init-param>
+  </filter>
+  <filter-mapping>
+  		<filter-name>struts2</filter-name>
+  		<url-pattern>/*</url-pattern>
+  </filter-mapping>
 	  
+	
+	
 	
 创建/复制粘贴修改struts.xml，放在src/main/resources下配置完毕。
 

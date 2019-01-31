@@ -17,7 +17,7 @@
     	<property name="password" value="1234"></property>
 	</bean>
 
-	<!-- 配置sessionFactory -->
+	<!-- 配置sessionFactory，和线程绑定的设置需要去掉，因为spring会处理 -->
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
 			 <property name="dataSource" ref="c3p0"></property>
 			 <property name="hibernateProperties">

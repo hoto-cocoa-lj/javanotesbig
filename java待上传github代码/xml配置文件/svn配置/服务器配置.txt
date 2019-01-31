@@ -1,0 +1,32 @@
+项目结构：
+	repositories
+		c1
+			t1
+				branches
+				tags
+				trunk
+					ssh1
+					ssh2
+					ssh3
+	users
+	groups
+	
+repositories是数据存放的仓库，users管理用户，groups管理组。
+
+在仓库某文件夹上右键设置属性，可以添加用户/组的权限，添加后该文件夹上有红色标记。
+比如有user a,b,c，group A(a,b),C(c)，在ssh1上设置A，ssh2设置b，ssh3设置c，
+那么a用户只能操作ssh1，b用户ssh1和ssh2，c用户ssh3，a用户操作ssh3的话会报错。
+文件夹的址在该文件夹上右键选择复制地址即可获得。
+
+电脑上操作svn：
+在空文件夹右键checkout可下载svn仓库。
+svn-->setting-->saved data-->authentication data-->clear可以删除保存好的账号。
+
+eclipse安装svn插件，在svn资源库通过新建/废弃/重新定位来增加/删除/修改仓库地址，
+导入svn项目的方法是package explore里右键import-->从svn检出项目，默认确认即可。
+
+右键项目名称-->team，update更新到最新版，commit提交自己的修改。
+打开项目后先更新，更新后到自己修改提交之间的时间，如果别人有修改并提交，会提交失败并报错。解决方法是先更新，更新后会发现冲突文件下生成了几个名字相同但有mine等奇怪后缀的文件，右键冲突文件-->team-->编辑冲突，可以看到别人版本和自己的区别，修改所有的区别，保留别人的增加自己的，保存，再右键-->team-->标记已解决，选第一个(默认值，表示当前文件已经解决冲突)，提交选择刚刚解决的冲突文件。然后一个一个解决即可。
+
+共享项目到svn：
+项目右键-->share project-->svn

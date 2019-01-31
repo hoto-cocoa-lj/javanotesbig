@@ -24,10 +24,14 @@ import cc.domain.BaseDict;
 import cc.domain.Customer;
 
 import cc.service.UserService;
+
 @Component("ua")
 @Scope("prototype")
 @ParentPackage(value = "struts-default")
 @Namespace(value = "/")
+
+//全局result
+@Result(name="delete",location = "/delete.jsp")
 public class UserAction extends ActionSupport implements ModelDriven<Customer>{
 	
 	private Customer c=new Customer();
