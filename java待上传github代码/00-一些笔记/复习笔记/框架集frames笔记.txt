@@ -1,0 +1,49 @@
+
+
+使用框架集frameset时页面不显示，原因是html文件中只能同时包含body标签或者frameset标签其中之一，去掉frame外面的body即可
+
+
+1.jsp是个框架集构成的页面，index2.jsp是1.jsp的各个框架页面的src。
+
+获取框架页面：
+top.frames[0]或者top.frames['aa']可以获得第一个框架，[]里是框架的name或者序号。
+top是window属性
+
+框架页面跳转：
+top.bb.location.href='http:www.baidu.com'表示第二个页面跳转baidu，不能用top.bb.src。
+
+获取框架页面的内容：
+top.frames[0].docuemnt，例如$(top.frames['cc'].document).find("#did").prop('class')的值是div，找到的是index2.jsp的div的classname。
+
+控制其他框架页面跳转：
+<a href='http://www.hupu.com' target='cc'>xx</a>表示点击a标签可以使框架集页面里name=cc的页面跳转hupu。
+
+
+	1.jsp：
+		<%@ page contentType="text/html; charset=utf-8"%>
+		<%@include file="/WEB-INF/pages/base.jsp" %>
+		<html>
+		<head>
+		<script type="text/javascript" src="${ctx}/components/jquery-ui/jquery3.3.1.js"></script>
+		</head>
+		<script type="text/javascript">
+		$(function(){alert(9);})
+		</script>
+		<frameset rows="125,*" name="xx" border="0">
+			<frame name="aa" scrolling="no"  target="middleFrameSet" src="${ctx}/index2.jsp">	
+			<frameset cols="30%,*" height="100%"  name="yy">
+				<frame  src="${ctx}/index2.jsp" name='bb' id='bid'/>
+				<frame  src="${ctx}/index2.jsp" name='cc'/>
+			</frameset>
+		</frameset>
+		<!-- top.bb.location.href='http:www.baidu.com' -->
+		</html>
+
+	index2.jsp：
+		<%@ page contentType="text/html; charset=utf-8"%>
+		<html><head></head>
+		<body>
+			<div class='div' id='did'>请先退出系统，</div>
+			<a href='http://www.hupu.com' target='cc'>切换账户并重新登录</a>
+			<a href="logout.action">退出系统</a>
+		</body></html>

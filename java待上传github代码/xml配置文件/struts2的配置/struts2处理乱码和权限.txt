@@ -1,0 +1,98 @@
+乱码：我是用maven的tomcat运行项目，而maven里设置了	
+			<plugin>	
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <port>8000</port>
+                    <path>/ps</path>
+                    <uriEncoding>UTF-8</uriEncoding>
+                    <server>tomcat7</server>
+                </configuration>
+            </plugin>
+	而且jsp页面也默认utf-8，所以没有乱码问题。去掉<uriEncoding>UTF-8</uriEncoding>
+	的话用其他方式依旧乱码。放linux跑的话修改tomcat的server.xml的编码就行了。
+	<Connector port="8080"  protocol="HTTP/1.1" connectionTimeout="20000" redirectPort="8443" URIEncoding="UTF-8" />
+
+
+使用全局拦截器配置登陆才能访问：
+做法是struts.xml配置全局拦截器，让其他action都继承它以拦截所有action。拦截器使用自己创建的类拦截，类里判断sessin有没有登陆信息，有就放行，没有就跳转login。login必须在全局拦截器所在的package设置。这里发现几个关于struts2理解上错误，第一个是
+<result name="a" type="chain">c</result>的c必须是action的name，例如是			<action name="c" class="cn.me.what" ></action>的c，而不是<result name="d">/1.jsp</result>的d；第二个是action的@Action(value = "c")的c，既相当于
+<result name="c">/2.jsp</result>，又是url，即既可以通过<result name="a" type="chain">c</result>这样的chain方法访问，又可以通过/namespace/c访问。
+最后全局拦截器不能拦截login，否则会无限递归报错。
+
+
+	struts.xml:
+	<struts>
+		<constant name="struts.action.extension" value="action"></constant>
+		<!--上面配置的都是局部拦截器，即每个action要用的拦截器在自己里面配置， 全局拦截器可以使该package下所有action都使用此拦截器。 
+			首先配置一个package，让它继承struts-default。然后配置自己的拦截器和global-results，因为这里会拦截下很多请求，需要处理。如果action没有配置局部拦截器，则走全局；如果配置了局部，就只走局部，不走全局。 -->
+		<package name="all" extends="struts-default">
+			<interceptors>
+				<!-- 自定义的拦截器 -->
+				<interceptor name="mi" class="cn.me.interceptor.MyInterceptor"></interceptor>
+				<!-- 定义拦截器栈 -->
+				<interceptor-stack name="ms">
+					<!-- 默认拦截器 -->
+					<interceptor-ref name="defaultStack"></interceptor-ref>
+					<!-- 自定义拦截器 -->
+					<interceptor-ref name="mi">
+						  <param name="excludeMethods">login1</param> 
+					</interceptor-ref>
+				</interceptor-stack>
+			</interceptors>
+			<!-- 默认拦截器 -->
+			<default-interceptor-ref name="ms"></default-interceptor-ref>
+			<!-- 全局结果集 -->
+			<global-results>
+				<result name="login2">/login.jsp</result>
+				<result name="login" type="chain">login1</result>				
+			</global-results>
+		</package>
+	</struts>
+	
+	上面的MethodFilterInterceptor代码：
+	public class MyInterceptor extends MethodFilterInterceptor {
+		@Override
+		protected String doIntercept(ActionInvocation invocation) throws Exception {
+			HttpServletRequest r = ServletActionContext.getRequest();
+			Object u = r.getSession().getAttribute("u");
+			if (u == null) {
+				return "login";
+			}
+			return invocation.invoke();
+		}
+	}
+	
+	action：
+	@Controller
+	@Scope("prototype")
+	@Namespace("/")
+	@ParentPackage("all")
+	@Result(name = "s", location = "/index.jsp")
+	public class UserAction extends ActionSupport implements ModelDriven<User> {
+		private User u = new User();
+		@Autowired
+		private UserService us;
+
+		@Action(value = "s")
+		public String s() {
+			Long id = u.getId();
+			System.out.println(this + "\t" + us + "web save1111\t" + u);
+			us.save();
+			ServletActionContext.getRequest().getSession().setAttribute("user", u);
+			if (id > 0) {
+				return null;
+			} else {
+				return "s";
+			}
+		}
+		@Action(value = "login1")
+		public String login2() {
+			return "login2";
+		}
+		@Override
+		public User getModel() {
+			return u;
+		}
+	}

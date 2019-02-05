@@ -1,448 +1,91 @@
-第6章
-================================================================================
-linux语法见第六章笔记。
-redis基础类型语法见day22--linux软件安装&Redis入门.pdf，高级语法见day23--Redis.pdf。
-================================================================================
-redis语法简介：
 
-String：
-set a 1/get a/del a：设置a=1/获取a的值(1)/删除a=1
-incr a/desc a：给a的值加/减1，a不是数值则报错，不存在则初始化a=1/-1
-incrby a 3/decrby a 4：给a的值加3/减4，a不是数值则报错，不存在则初始化a=3/-4
-append a fuck：给a后面加上字符串fuck
-
-hash：(相当于dict/map)
-hset h1 a 1/hmset h1 b 2 c 3：给map h1 put(a,1)/put(b,2)和put(c,3)
-hget h1 a/hmget h1 b c：h1.get(a)/h1.get(b) h1.get(c)
-hdel h1 a b/del h1：h1.delete(a) h1.delete(b)/删除整个h1
-hincrby h1 a 3：给h1的a增加3，报错和初始化情况同incrby
-hexists h1 a/hlen h1：h1里有没有a这个key/h1的长度
-hkeys h1/hvals h1：h1的所有key/value
-
-lpush l a b c/rpush l x y z：左/右边依次插入
-lrange l 0 -1：遍历全部l，输出c b a x y z
-lpop l /rpop l：弹出一个元素
-llen l：l的长度
-lpushx l a/rpushx l x：当l存在是插入，不存在时不处理
-
-sadd s a b c/srem s a：往集合s里添加a,b,c/从s移除'a'
-smembers s/sismember s c：获取s的所有元素/判断c是不是s的元素
-scard s：获取s的元素的数量
-sdiff/sinter/sunion：返回几个集合的差集/交集/并集
-
-通用方法：
-keys *：所有key
-del key1 key2：删除key1和key2
-exists key：key是否存在
-rename oldkey newkey：重命名
-type key：返回类型(list/hash/string/set/zset)
-
-select 1：使用1号数据库
-move xx 1：把当前数据库的xx移动到1号数据库
-quit：退出连接
-dbsize：获取当前数据库的keys的数量
-info：获取服务器的信息
-flushdb：删除当前数据库的所有key
-flushall：删除所有数据库的所有key
-subscibe cctv1：订阅cctv1
-psubscibe cctv*：订阅cctv*，如cctv1，cctvaaa等
-publish cctv1 aaa/publish cctv1 'aaa bbb'：在cctv1发送信息，能被订阅者收到
-
+第14章：国际物流云商项目：
 ================================================================================
 
-redis事务，使用方法和mysql基本一样，测试有效，全部成功或者全部失败，
-但是如果不是java报错，而是让redis报错，比如multi.incr("a")，程序不会报错，
-所以全部成功：
-	@Test
-	public void t7() throws SQLException {
-		Jedis j = jedisPool.getResource();
-		j.select(1);
-		Transaction multi = j.multi();
-		try {
-			multi.set("a", "1");
-			System.out.println(1 / 0);
-			multi.set("b", "2");
-			multi.exec();
-		} catch (Exception e) {
-			e.printStackTrace();
-			multi.discard();
-		}
-	}
-	
-================================================================================
+day01：
+1、测试发现在父项目的pluginManagement配置jdk1.7插件，子项目子模块都不需要再配置
 
-动态代理：newProxyInstance方法用来返回一个代理对象，这个方法总共有3个参数，
-ClassLoader loader用来指明生成代理对象使用哪个类装载器，
-Class<?>[] interfaces用来指明生成哪个对象的代理对象，通过接口指定，
-InvocationHandler h用来指明产生的这个代理对象要做什么事情。
-所以我们只需要调用newProxyInstance方法就可以得到某一个对象的代理对象了。
+2、框架集笔记见 \00-一些笔记\复习笔记\框架集笔记
 
-Class<?>[] interfaces = p.getClass().getInterfaces()表示增强p的所有接口的方法，
-如果只需要增强部分接口，比如接口Person，可以写Person.getInterfaces()。
-但是如果p实现了多个接口，代理类不能用p的类接收，所以似乎实现所以接口没有意义？？
-	public void t1() {
-		final Person p = new NormalPerson();
-		ClassLoader loader = p.getClass().getClassLoader();
-		Class<?>[] interfaces = p.getClass().getInterfaces();
-		Person n = (Person) Proxy.newProxyInstance(loader, interfaces, new InvocationHandler() {
-			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				if ("f".equals(method.getName())) {
-					System.out.println("增强了f方法");
-					return method.invoke(p, args);					
-				} else {
-					System.out.println("增强start----->");
-					Object o=method.invoke(p, args);
-					System.out.println("<------增强over");
-					return o;
-				}
+3、以前ssh使用LocalSessionFactoryBean创建hibernateTemplate并使用相应的事务管理和在web.xml里配置延迟加载，这次使用LocalContainerEntityManagerFactoryBean，事务管理和延迟加载都要用和这个对应的，jpa要额外配置：
+	<jpa:repositories base-package="cn.itcast.dao"
+		transaction-manager-ref="transactionManager"
+		entity-manager-factory-ref="entityManagerFactory"></jpa:repositories>
+
+4、Struts2配置文件动态传参(即怎么把action的参数传到result)：
+	xml方法：
+		第一个Action有如下代码：
+		 private String url; private String name; private String id;
+		 必须有相应的get set方法;根据动态url跳转到不同的Action；
+		配置文件如下代码如下： 
+		 <action name="..." class="...">
+			<result name="aaa">${url}?name=${name}&amp;id=${id}</result>
+		 </action>
+	注解方法：
+		@Namespace("/")
+		@Result(name = "tomain", location ="/${moduleName}/main.jsp")
+		public class HomeAction extends BaseAction {
+			private String moduleName; 
+			public String getModuleName() {
+				return moduleName;
 			}
-		});
-		n.f("111");
-		n.g("222");
-	}
+			public void setModuleName(String moduleName) {
+				this.moduleName = moduleName;
+			}	
 
-更详细的内容见 第6章的day04_框架学习之webjava基础加强笔记.txt。
+================================================================================
+
+day02：
+1、在base.jsp里如下配置，然后其他页面<%@ include file="base.jsp"%>，可以获取通用的资源和变量
+	<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+	<%@ page language="java" isELIgnored="false" pageEncoding="UTF-8"%>
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+	<%@ taglib uri="/struts-tags" prefix="s" %>
+	<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+
+	<link rel="stylesheet" rev="stylesheet" type="text/css" href="${ctx}/skin/default/css/default.css" media="all"/>
+	<link rel="stylesheet" rev="stylesheet" type="text/css" href="${ctx}/skin/default/css/table.css" media="all"/>
+	<script language="javascript" src="${ctx}/js/common.js"></script>
+
+测试发现如果a.jsp里include b.jsp，<%@ page language="java" pageEncoding="UTF-8"%>这种标签需要在a和b里都写，不写的话该页面报错中文会提示，<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>也必须写，不写的页面不能使用jstl标签库，像css、js这些静态资源只能写在一个页面，否则后面的页面会多次引用。
+
+2、spring data jpa是spring框架提供的持久层的解决方案，jpa是sun推出的标准，hibernate有两种操作数据库的方案(sessionfactory/session和entitymanagerfactory/entitymanager)，两种方法在web.xml的配置大致相同，只是spring data jpa需要多配置一个	
+	<jpa:repositories base-package="cn.itcast.dao"
+		transaction-manager-ref="transactionManager"
+		entity-manager-factory-ref="entityManagerFactory">
+	</jpa:repositories>，这样可以不用写dao的实现类。
 	
-================================================================================
+3、配置实体类，@GeneratedValue的标签有4种参数，mysql用identity，oracle用sequence，没有uuid，所以要使用hibernate的uuid主键生成方式，配置方法如下：
+	@GeneratedValue(generator = "system-uuid")
+	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	private String id;// 编号
 
-在filter里用动态代理解决乱码问题：
-	public void doFilter(ServletRequest r, ServletResponse s, FilterChain c) throws IOException, ServletException {
-		final HttpServletRequest r1 = (HttpServletRequest) r;
-		HttpServletRequest r2 = r1;
-		String method = r1.getMethod();
-		if ("get".equalsIgnoreCase(method)) {
-			r2 = (HttpServletRequest) Proxy.newProxyInstance(
-					r1.getClass().getClassLoader(),
-					r1.getClass().getInterfaces(), 
-					new InvocationHandler() {
-						public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-							String name = method.getName();
-							if ("getParameter".equals(name)) {
-								String v = (String) method.invoke(r1, args);
-								return new String(v.getBytes("iso8859-1"), "utf-8");
-							} else {
-								return method.invoke(r1, args);
-							}
-						}
-					});
-		} else if ("post".equalsIgnoreCase(method)) {
-			r2.setCharacterEncoding("utf-8");
-		}
-		HttpServletResponse s2 = (HttpServletResponse) s;
-		s2.setContentType("text/html;charset=utf-8");
-		c.doFilter(r2, s2);
-	}
-	
-================================================================================
+4、使用spring-data-jpa写接口就可，不用写实现类。接口需要继承JpaRepository和JpaSpecificationExecutor，分别用来操作数据库和创建Specification封装查询条件。
 
-注解配置servlet，需要导入org.apache.tomcat.tomcat-servlet-api：
-	@WebServlet(urlPatterns = "/fff")
-	public class S7 extends HttpServlet {
-		@Override
-		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-			resp.getWriter().write("fff");
-		}
-	}
-	
-================================================================================
+5、配置jpa报错No property ... found for...Did you mean '...'?原因是dao接口里方法定义有问题，比如方法名或者参数，导致spring-data-jpa无法实现它
 
-类加载器：
-把java文件加载到内存里形成class对象的过程叫做类加载，做这件事的对象就是类加载器。
-类加载器的组成：
-	引导类加载器(c语言的)：加载rt.jar(在jre system library里看)
-	应用类加载器AppClassLoad：加载自己写的类
-	扩展类加载器ExtClassLoad：加载ext.jar
+6、jpa使用sql语句查询，这里是oracle数据库：
+	@Query(value = "select * from Dept_p where dept_Name like ? and parent_id=?", nativeQuery = true) 
+	public List<Dept> f(String s1, String s2);
+
+7、翻页代码：点击翻页触发js方法提交表单到action，相关的全部js代码在后台代码里封装，
+包括action的地址，以前试过很多情况下前台js获取不到当前地址，这次的获取方法是top.frames[2].location.href。
 
 ================================================================================
 
-第7章：
-熟悉项目：
-1、熟悉这个项目有多少个模块，熟悉模块功能
-2、熟悉数据库已经数据库的表
-3、熟悉每一个模块功能的数据crud和哪些表有关
+day03：
+1、<s:select name="parent.id" list="deptList" headerKey="fuckyou" headerValue="--请选择--" listKey="id" listValue="deptName"></s:select>
+在页面上显示：
+	<select name="parent.id" id="parent_id">
+		<option value="fuckyou">--请选择--</option>
+		<option value="40289181670ca07601670ca07e400000">测试部门</option>
+		<option value="4028827c4fb6202a014fb6209c730000">总裁办</option>
+		<option value="4028827c4fb633bd014fb64467470000">财务部</option>
+		<option value="402891816724e769016724e78a050000">测试部门</option>
+	</select>
+select的id是由name生成的，deptList是put在值栈的，listKey是option的value，listValue是option的文本。
 
-================================================================================
-
-https://blog.csdn.net/qq_40693828/article/details/81005811
-JAVA反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法；这种动态获取的以及动态调用对象的方法的功能称为java语言的反射机制。
-Java反射机制主要提供了以下功能：在运行时判定任意一个对象所属的类；在运行时构造任意一个类的对象；在运行时判定任意一个类所具有的成员变量和方法；在运行时调用任意一个对象的方法；生成动态代理。
-
-================================================================================
-
-右键项目名称,web deployment assembly，add-->java build path entries，
-每次在maven里update project都要重复这个操作。
-
-================================================================================
-
-商城项目笔记：
-1、购物车和购物项不应该设置public getTotal，所有价格相关的都不能设置set方法！！
-2、购物项用map比list更好管理，但由于购物项应该有序，所以用LinkedHashMap
-
-
-================================================================================
-
-文件上传：
-前端：	
-	<form enctype="multipart/form-data" method="post" 	action='/d2/product?method=pic'>
-		<input type='file' name='fn'/>upload
-		<input type='text' name='u' value='u1'/>
-		<input type='submit' value='submit'/>
-	</form>
-这个请求会先通过baseservlet处理，得到method(pic)后调用productservlet的pic方法，
-但是enctype="multipart/form-data"的表单无法通过request.getParameter获取，
-所以action=/d2/product然后用隐藏域提交method=pic会无法进入pic方法，
-这里写成了/d2/product?method=pic。
-
-后台代码(fc,upload,fileitem都来自commons-fileupload包)：
-public String pic(HttpServletRequest r, HttpServletResponse s) throws Exception {
-		String u = r.getParameter("u");
-		String fn = r.getParameter("fn");
-			//始终打印null --null
-		System.out.println(u + "\t--" + fn);
-		DiskFileItemFactory fc = new DiskFileItemFactory();
-		ServletFileUpload upload = new ServletFileUpload(fc);
-		List<FileItem> list = upload.parseRequest(r);
-		Map<String, List<FileItem>> map = upload.parseParameterMap(r);
-			//list能获取到，map是null
-		System.out.println(list);
-		System.out.println(map);
-		for (FileItem item : list) {
-				// 文件的输出是			fn:一堆乱码		01.jpg:false
-				// u=1111的输出是		u:u1111 		null:true
-			System.out.print(item.getFieldName() + ":" + item.getString());
-			System.out.println("\t"+item.getName() + ":" + item.isFormField());
-			if (!item.isFormField()) {
-				File file = new File( "e:/" + item.getName());
-				InputStream in = item.getInputStream();
-				FileOutputStream out = new FileOutputStream(file);
-				byte[] b = new byte[1024];
-				int len = 0;
-				while ((len = in.read(b)) != -1) {
-					out.write(b, 0, len);
-				}
-				in.close();
-				out.close();
-			}
-		}
-		return null;
-	}
-	
-	
-================================================================================
-
-第8章：
-xml约束本地配置：
-dtd：window-->preferences-->xml catalog-->add，key type选uri，
-key是网络的地址，location填对应dtd文件在本地的地址，可以用file system查找。
-xsd：基本同上，不过key type选Schema Location 。
-
-================================================================================
-
-hibernate主键生成策略：
-自增的数值型，使用native(mysql用identity，orcale用sequence，native会自动选择)；
-varchar用uuid由hibernate生成主键，如果要自己生成就用assigned；
-
-不使用increment的原因：hibernate找最大的的主键+1作为新主键，线程不安全。
-	可用两个test debug验证。
-
-get：调用方法时立即发送sql语句查询，找不到数据时返回null
-load：延时查询，调用对应属性时再查，找不到数据时报错
-
-================================================================================
-
-hibernate对持久化类的要求规范：
-1、提供一个无参的构造方法
-2、所有属性私有化
-3、提供get/set方法
-4、不能用final修饰，否则延迟加载失效
-5、必须有标识属性(即oid属性，设置表的主键和类的关系)
-
-================================================================================
-
-HQL查询：
-	接收一个HQL进行查询：HQL-Hibernate Query Language Hibernate查询语言，与SQL语言语法很相似的一个语言。面向对象。
-	@Test
-	/** * Query接口	 * HQL面向对象的查询.查询都是对象	 */
-	public void demo1(){
-		Session session = HibernateUtils.getCurrentSession();
-		Transaction transaction = session.beginTransaction();
-		
-		// 查询全部客户信息：
-		/*Query query = session.createQuery("from Customer");
-		List<Customer> list = query.list();
-		
-		for (Customer customer : list) {
-			System.out.println(customer);
-		}*/
-		
-		// 条件查询
-		/*Query query = session.createQuery("from Customer where cust_name like ?");
-		// 设置参数
-		query.setParameter(0, "郝%");
-		List<Customer> list = query.list();
-		for (Customer customer : list) {
-			System.out.println(customer);
-		}*/
-		
-		// 分页查询:
-		Query query = session.createQuery("from Customer");
-		// 从哪开始的
-		query.setFirstResult(3);
-		// 每页显示记录数
-		query.setMaxResults(3);
-		
-		List<Customer> list = query.list();
-		for (Customer customer : list) {
-			System.out.println(customer);
-		}
-		transaction.commit();
-	}
-	
-	
-QBC查询：
-	QBC-Query By Criteria 条件查询。更加面向对象化查询语言。
-	@Test
-	/**	 * QBC查询：Query By Criteria	 */
-	public void demo2(){
-		Session session = HibernateUtils.getCurrentSession();
-		Transaction transaction = session.beginTransaction();
-		
-		// 查询全部:
-	/*	Criteria criteria = session.createCriteria(Customer.class);
-		List<Customer> list = criteria.list();
-		for (Customer customer : list) {
-			System.out.println(customer);
-		}*/
-		
-		// 条件查询
-	    /**
-		* == 	eq		 * >	gt			* >= ge		* < lt		
-		 * <=	le		 * <>	ne			* in in		* like like		 */
-
-		/*Criteria criteria = session.createCriteria(Customer.class);
-		// criteria.add(Restrictions.eq("cust_name", "郝天一"));
-		criteria.add(Restrictions.like("cust_name", "郝%"));
-		List<Customer> list = criteria.list();
-		for (Customer customer : list) {
-			System.out.println(customer);
-		}*/
-		
-		// 分页查询
-		Criteria criteria = session.createCriteria(Customer.class);
-		criteria.setFirstResult(3);
-		criteria.setMaxResults(3);
-		List<Customer> list = criteria.list();
-		for (Customer customer : list) {
-			System.out.println(customer);
-		}		
-		transaction.commit();
-	}
-详细代码见第二天讲义。
-hibernate的一对多和多对多的配置和代码，见xml配置/hibernate配置的xml文件。
-关联级别的延迟加载：lazy=false见customer.hbm.xml。
-	
-================================================================================
-
-hibernate有一套orm的增删改查方法，然后出现了jpa接口，hibernate又实现了jpa，
-所有hibernate有两套orm方法。
-
-================================================================================
-
-第9章：struts2
-前端控制器模型思想：
-很多servlet有共性的内容，比如处理乱码，上传文件，把这些部分抽取出来统一处理，
-处理它们的就是前端控制器。struts2使用的是StrutsPrepareAndExecufilter，
-springMVC使用的是baseServlet。
-
-struts2在web.xml配置StrutsPrepareAndExecufilter，用它拦截访问(比如配置成/*)，
-然后取struts.xml里找对应的action进行处理，不再使用servlet。
-
-================================================================================
-
-org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter：
-init方法在服务器启动时执行，只执行一次，主要作用是加载大量的配置文件；
-dofilter方法：每次访问都会执行一次dofilter方法，请求转发/重定向额外执行。
-
-================================================================================
-
-线程危机：什么情况容易遇到线程危机？
-	多个线程操作共享的数据，就容易遇到线程危机。举例：
-		多人用同一个对象的成员属性(单实例)，成员属性属于共享数据，有线程危机；
-		多人用某对象的成员属性(多实例)，每个对象有自己的成员属性，无线程危机；
-	serlvet是单实例，所以几乎不在servlet定义成员属性，否则有线程危机；
-	action是多实例，在action里写一个无参的构造方法，可以发现每次访问
-		该action都会调用这个方法，说明是多实例。
-	单实例的好处是无需创建多个实例，减少了时间和空间消耗。
-	
-================================================================================
-
-ValueStack值栈是struts2提供的一个接口，我们用的是它的实现类OgnlValueStack，
-这个由struts2创建。
-在javaweb，我们使用域作为数据中转站  数据-->域-->页面(el,jstl)；
-在struts2，我们使用值栈作为数据中转站  数据-->值栈对象-->页面(ognl,el也可以)。
-
-浏览器访问action时，被StrutsPrepareAndExecuteFilter拦截并创建值栈对象，
-每次访问都会创建。创建后，当前action对象会放入值栈，还会将request,session,
-servletContext的底层用来封装数据的map集合也放入值栈，这里放的是地址。
-action执行完毕后销毁，值栈也跟着销毁，所以值栈的生命周期和action一样。
-
-================================================================================
-
-ognl表达式：不能在struts2中单独使用，需要嵌套进struts2内置标签中使用，
-可以在jsp里获取值栈的数据，需要如下配置：
-在jsp里<%@taglib prefix="s" uri="/struts-tags" %>
-
-<s:property value="'heee'.length()"/><hr>	//4
-
-================================================================================
-
-获得valueStack对象的两种方法：
-	public String t1() {
-		ActionContext c = ActionContext.getContext();
-		ValueStack vs1 = c.getValueStack();
-		HttpServletRequest r = ServletActionContext.getRequest();
-		Object vs2 = r.getAttribute(ActionContext.VALUE_STACK);
-		System.out.println(vs1 == vs2);					//true
-		return "t1t1";
-	}
-	
-================================================================================
-
-增强方法：具体代码在见例子
-1、继承		2、jdk动态代理		3、cglib动态代理		4、装饰者模式
-
-================================================================================
-
-接口I有方法f1、f2，类L实现了I，用代码d增强f1。
-连接点：可以被增强的方法，即f1,f2
-切入点：要被增强的方法，即f1
-通知/增强：用来增强别人的代码，即d
-切面：切入点+通知，即f1+d
-织入：切入点集成到切面的过程，即实现'代码d增强f1'的过程
-
-================================================================================
-
-spring测试如果要加载applicationContexnt.xml，千万要使用spring整合junit测试，
-手动ApplicationContext c = new ClassPathXmlApplicationContext(配置文件)的话，
-注解配置的类经常会返回null。
-
-================================================================================
-
-spring-jdbc的crud代码见  xml配置文件\spring的配置\Jdbc代码
-
-================================================================================
-
-================================================================================
-================================================================================
-
-================================================================================
-
-================================================================================
-
-================================================================================
-================================================================================
-
-================================================================================
+2、
 
 ================================================================================
 

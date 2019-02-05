@@ -20,7 +20,7 @@ tomcat运行到Initializing Spring root WebApplicationContext就卡住，
 流程：
 1_创建ilcbs_parent主程序，选pom。
 2_选择ilcbs_parent主程序，创建其他子模块。子模块里jms和两个web选war，其他都默认。
-3_dao和jms都依赖cache,exception,utils，web再依赖domain，service依赖对应的dao，
+3_dao和jms都依赖cache,exception,utils，dao再依赖domain，service依赖对应的dao，
 web依赖对应的service。（即server依赖server，client依赖client）。
 4_参考下面
 
@@ -40,3 +40,4 @@ src/main/resources文件夹下。
 
 
 =======================================================================
+

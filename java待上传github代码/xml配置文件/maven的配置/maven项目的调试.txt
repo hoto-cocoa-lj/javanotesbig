@@ -1,6 +1,4 @@
-用myeclipse的tomcat，直接打断点调试即可。教程里用了很多部，原因可能老师用的是eclipse。
-
-如果要用maven的tomcat，需要右键项目名，在debug as选debug configuration，
+使用maven的debug，需要右键项目名，在debug as选debug configuration，
 左侧maven build里选择对应的项目，输入tomcat7:run，勾选debug output和skip tests，
 然source里remove-->default，add-->project(这里一定要选project不能选java project，
-不然报错，原因不明)，选择对应的源码，debug即可。
+不然报错，原因不明，这里选择workspace folder也行)，选择对应的源码，debug即可。

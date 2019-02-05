@@ -104,9 +104,23 @@ hibernate本身的包：9个
 			<version>5.1.32</version>
 		</dependency>
 		
+========================================================================
+		
 hibernate实现jpa的包，如果不用jpa写代码可以不导入：
-	hibernate-entitymanager-5.0.7.Final
-	
+jpa是sun推出的标准，hibernate有两种操作数据库的方案，使用自己的方案(sessionfactory/session)不需要这个包，使用实现jpa的方案(entitymanagerfactory/entitymanager)需要这2个包，hibernate-entitymanager用来生成entitymanagerfactory进行各种操作/配置，spring-data-jpa用来创建JpaRepository和JpaSpecificationExecutor的子类在dao层写接口。JpaRepository用来操作数据库，JpaSpecificationExecutor用来生成Specification(spec)，spec可以加入各种条件进行查询。 
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>5.0.7.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+			<version>1.9.0.RELEASE</version>
+		</dependency>
+
+========================================================================		
 	
 配置hbm映射文件，配置规则在hibernate-core包的org.hibernate最下面的
 hibernate-mapping-3.0.dtd。实际项目复制粘贴即可，样本就在当前文件夹下。

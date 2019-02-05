@@ -1,5 +1,69 @@
 第一章
 ================================================================================
+类A有成员属性int a和类B b，将A的实例a1做参数传给方法f，测试发现在f里修改a1的任何成员属性，f外面a1也被修改，因为a1是个地址。如果在f里使a1指向其他A的实例，将不会对a1产生任何影响。
+
+	public class T1 {
+		static A a1,a2;static B b1;
+		static {
+			a1 = new A();		a1.a = 1;		a2=a1;
+			b1 = new B();		b1.bb = 2;		a1.b = b1;	
+		}
+
+		@Test
+		public void t1() {
+			System.out.println("t1 before:a=" + a1);			t21(a1);
+			System.out.println("t1 after:a=" + a1);
+			// t1 before:a=A [a=1, b=B [bb=2]] A [a=1, b=B [bb=2]]
+			// t2:a=A [a=100, b=B [bb=200]]
+			// t1 after:a=A [a=100, b=B [bb=200]] A [a=100, b=B [bb=200]]
+		}
+
+		@Test
+		public void t2() {
+			System.out.println("t1 before:a=" + a1);			t22(a1);
+			System.out.println("t1 after:a=" + a1);
+			// t1 before:a=A [a=1, b=B [bb=2]] A [a=1, b=B [bb=2]]
+			// t2:a=A [a=0, b=null]
+			// t1 after:a=A [a=1, b=B [bb=2]] A [a=1, b=B [bb=2]]
+		}
+		
+		@Test
+		public void t3() {
+			System.out.println("t1 before:a=" + a1 + "\t" + a2);
+			A a3 = new A();		a3.a = 0;		a1 = a3;
+			System.out.println("t1 after:a=" + a1 + "\t" + a2);
+			// t1 before:a=A [a=1, b=B [bb=2]] A [a=1, b=B [bb=2]]
+			// t1 after:a=A [a=0, b=null] A [a=1, b=B [bb=2]]
+		}
+
+		public void t21(A a) {
+			a.a = 100;		a.b.bb = 200;
+			System.out.println("t2:a=" + a);
+		}
+
+		public void t22(A a) {
+			a = new A();		a.a = 0;
+			System.out.println("t2:a=" + a);
+		}
+	}
+
+	class A {
+		public int a,B b;
+		@Override
+		public String toString() {
+			return "A [a=" + a + ", b=" + b + "]";
+		}
+	}
+
+	class B {
+		public int bb;
+		@Override
+		public String toString() {
+			return "B [bb=" + bb + "]";
+		}
+	}
+
+================================================================================
 
 相对路径是相对于项目的根目录，例如maven项目day01的任意包下创建如下测试类，
 运行后会在day01的根目录生成1.txt。
@@ -1247,6 +1311,6 @@ jquery的ajax见例子。使用dataType:json时直接传普通字符串会报错
 
 ================================================================================
 
-================================================================================
+
 
 ================================================================================
