@@ -71,6 +71,12 @@ day02：
 7、翻页代码：点击翻页触发js方法提交表单到action，相关的全部js代码在后台代码里封装，
 包括action的地址，以前试过很多情况下前台js获取不到当前地址，这次的获取方法是top.frames[2].location.href。
 
+8、获取dept的list的思路：
+自己创建Page对象，默认curentPage=1，pageSize=5，在action设置private Page page=new Page()和相应的set/get方法，页面如果传来curentPage和pageSize会自动赋值，这个Page对象来自工具类，主要作用是生成分页组件。然后执行下面代码：
+Pageable pageable = new PageRequest(page.getPageNo() - 1, page.getPageSize());
+org.springframework.data.domain.Page<Dept> page2 = ds.findPage(spec, pageable);
+Pageable是spring-data-domain包里一个接口，用PageRequest生成其对象，然后用ds.findPage调用spring-data-jpa实现的方法获取page2，把page2的内容赋值给page，把page push到值栈即可。
+
 ================================================================================
 
 day03：
@@ -85,17 +91,95 @@ day03：
 	</select>
 select的id是由name生成的，deptList是put在值栈的，listKey是option的value，listValue是option的文本。
 
-2、
+2、orcale里设置删除级联：
+表A的列a指向表B的列b，查看表A的key可以看到此外键，修改on delete成cascade即可。测试发现删除表A的数据不会级联删除B的，删除B的会删除A的。
+
+3、hibernate保存/修改外键：
+d是页面获取到的对象，只有deptName和parent.id的值，所以修改时要通过id查询到对应的d1，然后修改d1的deptName和parent再保存。下面代码在保存外键时用来两种方法，一种是直接在d1设置parent为d的parent，debug发现parent只有id属性；一种是用parent的id查询到parent对象d2，然后在d1设置parent为d2为parent，两种方法都可以，第一种更简单，教程使用第一种。而且目前写的dept/user/userinfo/mpdule/role之间一对多/多对多都没有级联保存，新建/修改时外键的数据已经存在了，即使修改了外键，只保存当前对象，不影响其外键的对象，所以第一种方法不会出现外键对象属性被清空的情况(测试发现如果设置了级联，第一种方法会清空外键对象的属性)。user和userinfo之间1对1有all级联，只保存user会同时保存userinfo，修改时由于是获取再修改且在页面不会修改userinfo的属性，所以不会影响userinfo。
+
+	public String update() {
+		String id = d.getId();
+		Dept parent = d.getParent();
+		// String id2 = parent.getId();
+		// Dept d2 = ds.get(id2);
+		if (id == null || id.trim() == "") {
+			// d.setParent(d2);
+			ds.saveOrUpdate(d);
+			return "list1";
+		}
+		Dept d1 = ds.get(id);
+		d1.setDeptName(d.getDeptName());
+		d1.setDeptName(parent);
+		// d1.setParent(d2);
+		ds.saveOrUpdate(d1);
+		return "list1";
+	}
+
+4、写完dept后，role和user的dao/service/action层复制粘贴，修改dept成role/user就差不多了。
+
+5、@MappedSuperclass：
+要(domain层的)子类继承父类的注解，需要在父类上加上这个；使用环境：
+1.@MappedSuperclass注解使用在父类上面，是用来标识父类的
+2.@MappedSuperclass标识的类表示其不能映射到数据库表，因为其不是一个完整的实体类，但是它所拥有的属性能够隐射在其子类对用的数据库表中
+3.@MappedSuperclass标识得嘞不能再有@Entity或@Table注解
+
+================================================================================
+
+day04：
+1、再谈页面结构：
+	默认打开index.jsp，此页面有js代码self.location.href = "loginAction_login"，这是相对路径，会访问loginAction_login，没有登陆的话跳转login.jsp，这时登陆表单所在页面，有js代码if(self.location!=top.location){top.location = self.location;}，即判断这个页面如果是在一个框架页面里，则top变成登陆页面，这样可以解决页面嵌套的bug。登陆表单提交给loginAction_login。登陆成功则返回fmain.jsp，这个页面有3个框架页面，上左右，上通过点击按钮修改模块名触发js代码同时控制左右，控制方法是触发tomodule方法，代码是		
+	function toModule(moduleName){
+			top.leftFrame.location.href = 'homeAction_toleft.action?moduleName=' + moduleName;
+			top.main.location.href = 'homeAction_tomain.action?moduleName=' + moduleName;
+			linkHighlightMenu(this);
+	}，
+	action内部是请求转发所以不修改url地址，左通过a标签和target控制右，fmain.jsp默认的左右的模块名是home。点击上的按钮，由于shiro不拦截/home*，所以上面的页面都能正常显示(包括进入触发其他模块的tomodule)。但是如果点击左侧按钮a标签，href="/ps/sysadmin/deptAction_list"，会被shiro拦截，跳转回index.jsp。
+	
+2、shiro认证和权限的配置见 xml配置文件\shiro的配置
+
+================================================================================
+
+day05：
+1、@RequiresPermissions注解目前还不能直接写在类上，只能针对某个方法进行注解，如果写在service层，service不能配置事务，否则授权无效。如果配在controller层，不管配置哪个方法，该层所有方法都不能获取@autowire的注入。原因在https://www.iteye.com/problems/94322完全看不懂，解决方法是给ModuleServiceImpl设置@Service("ms")，ModuleAction的private ModuleService ds去掉@Autowired设置get/set方法，配置<bean	class="cn.me.web.ModuleAction"><property name="ds" ref="ms"></property></bean>。
+
+2、jstl语法<c:forEach>等见 00-一些笔记\复习笔记day14--JSP模式&EL&jstl.pdf
+
+3、	user的roles有@OrderBy("ORDER_NO")，user的modules也有@OrderBy("ORDER_NO")，所以动态获取左侧权限菜单时能保证有序。遍历代码：
+            <c:set var="aaa" value=""/>
+            <!-- 遍历当前登录用户的角色列表 -->
+			<c:forEach items="${_CURRENT_USER.roles }" var="role">
+			       <!-- 遍历每个角色下的模块 -->
+			       <c:forEach items="${role.modules }" var="module">
+			            <!-- 如果该模块没有输出过，则要进行输出，否则这个模块就不输出 -->
+			            <c:if test="${(moduleName eq module.remark) and module.ctype==1  }">
+				               <c:if test="${fn:contains(aaa,module.cpermission) eq false }">
+				                  <c:set var="aaa" value="${aaa},${module.cpermission }"/>
+			                      <li><a href="${ctx}/${module.curl}" onclick="linkHighlighted(this)" target="main" id="aa_1">${module.cpermission }</a></li>
+			                 </c:if>  
+			            </c:if>
+			            
+			       </c:forEach>
+			</c:forEach>
+aaa用来保存已经展示的菜单，一开始没有值，每展示一个就多一个值。
+
+4、页面传来多个checkbox的值，可以用String接收，数据是"a, b, c"这样的。也可以用String[]接收,数据是["a","b","c"]这样的。
+
+5、ztree的数据模板{id:1,pId:0,name:"随意勾选 1",checked:true}，pid是指父元素的id。前端组件用法：复制demo进项目，跑通了再慢慢搞。
+
+================================================================================
+
+day06：
+1、发送邮件，工具类见例子。spring整合发邮件功能需要导入包spring-context-supprot，配置applicationContext-mail.xml，详情见 xml配置文件\spring的配置\配置文件
+
+2、userserviceimpl里，给新注册用户发送邮件，这里要接收错误而不是抛出，
+(报错原因是因为邮件发送的问题而不是用户的问题)
+因为抛出的话会回滚事务造成用户注册信息不被保存。
 
 ================================================================================
 
 ================================================================================
 
 ================================================================================
-
-================================================================================
-
-================================================================================================================================================================
 
 ================================================================================
 

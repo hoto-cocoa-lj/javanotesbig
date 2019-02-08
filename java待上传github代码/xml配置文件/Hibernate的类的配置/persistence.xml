@@ -19,6 +19,11 @@ http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 				<property name="hibernate.show_sql" value="true"/>
 				<property name="hibernate.format_sql" value="true"/>
 				<property name="hibernate.hbm2ddl.auto" value="update"/>
+				
+				  <!-- Set the entities package to scan -->
+				<property name="packagesToScan" value="cn.me.domain" />
+       
+	   
 				<!-- <property name="hibernate.current_session_context_class" value="thread"/>教程里没有这个，不知道能不能用-->
 			
 			</properties>

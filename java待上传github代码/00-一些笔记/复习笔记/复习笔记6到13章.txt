@@ -466,6 +466,19 @@ select的id是由name生成的，deptList是put在值栈的，listKey是option�
 	
 ======================================================================
 
+struts2处理ajax：不需要其他任何配置
+	@Action(value = "roleAction_ajax")
+	public String ajax() throws IOException {
+		Set<Module> mm = ds.get(d.getId()).getModules();
+		HttpServletResponse r = ServletActionContext.getResponse();
+		String s = JSON.toJSONString(mm);
+		r.setCharacterEncoding("utf-8");
+		r.getWriter().write(s);
+		return null;
+	}
+
+======================================================================
+
 增强方法：具体代码在 /00-一些笔记\复习笔记\例子
 1、继承		
 2、jdk动态代理(java.lang.reflect.Proxy)

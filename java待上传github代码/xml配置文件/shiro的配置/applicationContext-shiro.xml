@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans    
+	http://www.springframework.org/schema/beans/spring-beans.xsd    
+	http://www.springframework.org/schema/aop    
+	http://www.springframework.org/schema/aop/spring-aop.xsd    
+	http://www.springframework.org/schema/tx    
+	http://www.springframework.org/schema/tx/spring-tx.xsd    
+	http://www.springframework.org/schema/context    
+	http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	<!-- 配置Spring整合shiro -->
+
+
+	<!-- 密码比较器类，用来合成 MyAuthRealm,需要继承SimpleCredentialsMatcher  -->
+	<bean id="passwordMatcher" class="cn.me.web.shiro.MyPasswordMatcher" />
+
+
+	<!-- 编写realm类，用来合成securityManager,需要继承AuthorizingRealm或者AuthenticatingRealm，
+	前者可以认证和授权，后者只能授权，而且后者继承了前者 -->
+	<!-- 注入密码比较器对象credentialsMatcher,不需要自己设置credentialsMatcher对象和get/set方法，
+	因为	AuthenticatingRealm有credentialsMatcher和get/set方法 -->
+	<!-- 这里MyAuthRealm是必须设置的，因为它可以获取登陆info来判断是否能通过验证，
+	MyPasswordMatcher不是必须的，不重写会调用父类的方法 -->
+	<bean id="authRealm" class="cn.me.web.shiro.MyAuthRealm">
+		 <property name="credentialsMatcher" ref="passwordMatcher" /> 
+	</bean>
+
+
+	<!-- 配置安全管理器，用来合成ShiroFilterFactoryBean-->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<!-- 自己编写一个realm域对象 -->
+		 <property name="realm" ref="authRealm" />
+	</bean>
+	
+
+	<!-- Spring框架需要整合shiro安全框架 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<!-- 注入安全管理器 -->
+		<property name="securityManager" ref="securityManager" />
+		<!-- 登录页面，没有登陆时访问需要认证的页面也会跳转这里 -->
+		<property name="loginUrl" value="/index.jsp" />
+		<!-- 认证成功了跳转的页面,现在无效，因为action也设置了跳转页面-->
+		<property name="successUrl" value="http://www.baidu.com"/>
+		<!-- 没有权限的跳转页面,即访问没有权限的页面会跳转这个页面 -->
+		<property name="unauthorizedUrl" value="/index2.jsp" />
+		<!-- 定义访问的规则 -->
+		<property name="filterChainDefinitions">
+			<!-- 范围小的放上面(/home*比/*范围小)，value里面的别乱改 -->
+			<!-- /**代表下面的多级子目录,/index.jsp* = anon的*可以不写，
+			anon表示shiro不拦截，authc需要认证，perms需要权限 -->
+			<value>
+				/index.jsp* = anon
+				/home* = anon
+				/sysadmin/login/login.jsp* = anon
+				/sysadmin/login/loginAction_logout* = anon
+				/login* = anon
+				/logout* = anon
+				/components/** = anon
+				/css/** = anon
+				/img/** = anon
+				/js/** = anon
+				/plugins/** = anon
+				/images/** = anon
+				/js/** = anon
+				/make/** = anon
+				/skin/** = anon
+				/stat/** = anon
+				/ufiles/** = anon
+				/validator/** = anon
+				/resource/** = anon
+				/sysadmin/deptAction* = perms["部门管理"]
+				/** = authc
+				/*.* = authc
+			</value>
+		</property>
+	</bean>
+
+
+	<!-- 教程说使用shiro的注解必须配置下面3项，复制粘贴即可，暂时不管原理 -->
+	<!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<!-- 生成代理，通过代理进行控制 -->
+	<bean
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+		depends-on="lifecycleBeanPostProcessor">
+		<property name="proxyTargetClass" value="true" />
+	</bean>
+
+	<!-- 安全管理器，使用了上面的securityManager -->
+	<bean
+		class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+</beans>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

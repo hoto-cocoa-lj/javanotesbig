@@ -1,0 +1,19 @@
+d是页面获取到的对象，只有deptName和parent.id的值，所以修改时要通过id查询到对应的d1，然后修改d1的deptName和parent再保存。下面代码在保存外键时用来两种方法，一种是直接在d1设置parent为d的parent，debug发现parent只有id属性；一种是用parent的id查询到parent对象d2，然后在d1设置parent为d2为parent，两种方法都可以，第一种更简单，教程使用第一种。而且目前写的dept/user/userinfo/mpdule/role之间一对多/多对多都没有级联保存，新建/修改时外键的数据已经存在了，即使修改了外键，只保存当前对象，不影响其外键的对象，所以第一种方法不会出现外键对象属性被清空的情况(测试发现如果设置了级联，第一种方法会清空外键对象的属性)。user和userinfo之间1对1有all级联，只保存user会同时保存userinfo，修改时由于是获取再修改且在页面不会修改userinfo的属性，所以不会影响userinfo。
+
+	public String update() {
+		String id = d.getId();
+		Dept parent = d.getParent();
+		// String id2 = parent.getId();
+		// Dept d2 = ds.get(id2);
+		if (id == null || id.trim() == "") {
+			// d.setParent(d2);
+			ds.saveOrUpdate(d);
+			return "list1";
+		}
+		Dept d1 = ds.get(id);
+		d1.setDeptName(d.getDeptName());
+		d1.setDeptName(parent);
+		// d1.setParent(d2);
+		ds.saveOrUpdate(d1);
+		return "list1";
+	}

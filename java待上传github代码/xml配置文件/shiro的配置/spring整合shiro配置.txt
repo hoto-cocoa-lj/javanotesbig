@@ -1,0 +1,41 @@
+1、导包
+	     <dependency>
+	    	<groupId>org.apache.shiro</groupId>
+	    	<artifactId>shiro-all</artifactId>
+	    	<version>1.2.3</version>
+	     </dependency>
+
+2、 
+	web.xml里struts配置前面(注意顺序)加上：
+			<!-- Shiro Security filter filter-name这个名字的值将来还会在spring中用到 -->
+			<filter>
+				<filter-name>shiroFilter</filter-name>
+				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+				<init-param>
+					<param-name>targetFilterLifecycle</param-name>
+					<param-value>true</param-value>
+				</init-param>
+			</filter>
+			<filter-mapping>
+				<filter-name>shiroFilter</filter-name>
+				<url-pattern>/*</url-pattern>
+			</filter-mapping>
+			
+	这里<filter-name>shiroFilter</filter-name>这个名字和applicationContext-shiro.xml的ShiroFilterFactoryBean的id必须一致，
+	即<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">。
+	
+3、配置applicationContext-shiro.xml，例子在根目录，里面有配置的笔记，记得被applicationContext.xml导入。
+
+4、配置applicationContext-shiro.xml里需要的MyAuthRealm和MyPasswordMatcher，例子在根目录。
+
+5、配置token生成的代码，放在LoginAction，例子在根目录。
+
+
+6、3,4,5是认证部分，下面是授权部分。授权触发有3种方法，第1种是xml文件里配置/a perms['权限名']，访问/a就会触发；第2种是页面导入<%@ taglib uri="http://shiro.apache.org/tags" prefix="shiro" %>，然后某些地方设置了    <shiro:hasPermission name="系统首页">...
+</shiro:hasPermission>，就在这些元素时会触发。第3种是在controller层使用@RequiresPermissions注解(还有其他一些注解也可以)。要注意第1种和第3种可以确实的拦截，对方只要没有权限一定无法访问；第2种只能隐藏，对方没有权限就看不见该组件，但是只要知道访问的地址依旧可以访问。
+
+7、在MyAuthRealm里写doGetAuthorizationInfo方法，详情见MyAuthRealm.java，里面有大量笔记。
+		
+
+注解配置：	@RequiresPermissions注解目前还不能直接写在类上，只能针对某个方法进行注解，如果写在service层，service不能配置事务，否则授权无效。如果配在controller层，不管配置哪个方法，该层所有方法都不能获取@autowire的注入。原因在https://www.iteye.com/problems/94322完全看不懂，解决方法是给ModuleServiceImpl设置@Service("ms")，ModuleAction的private ModuleService ds去掉@Autowired设置get/set方法，配置<bean	class="cn.me.web.ModuleAction"><property name="ds" ref="ms"></property></bean>。
+		

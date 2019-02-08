@@ -107,7 +107,7 @@ hibernate本身的包：9个
 ========================================================================
 		
 hibernate实现jpa的包，如果不用jpa写代码可以不导入：
-jpa是sun推出的标准，hibernate有两种操作数据库的方案，使用自己的方案(sessionfactory/session)不需要这个包，使用实现jpa的方案(entitymanagerfactory/entitymanager)需要这2个包，hibernate-entitymanager用来生成entitymanagerfactory进行各种操作/配置，spring-data-jpa用来创建JpaRepository和JpaSpecificationExecutor的子类在dao层写接口。JpaRepository用来操作数据库，JpaSpecificationExecutor用来生成Specification(spec)，spec可以加入各种条件进行查询。 
+jpa是sun推出的标准，hibernate有两种操作数据库的方案，使用自己的方案(sessionfactory/session)不需要这个包，使用实现jpa的方案(entitymanagerfactory/entitymanager)需要这2个包，hibernate-entitymanager用来生成entitymanagerfactory进行各种操作/配置，spring-data-jpa用来创建JpaRepository和JpaSpecificationExecutor的子类在dao层写接口。JpaRepository用来操作数据库，JpaSpecificationExecutor用来生成Specification(spec)，spec可以加入各种条件进行查询。 自己写的接口需要继承JpaRepository和JpaSpecificationExecutor两个接口，这样自己的接口不写任何方法也有默认的方法可以调用。
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -147,8 +147,5 @@ hibernate-mapping-3.0.dtd。实际项目复制粘贴即可，样本就在当前�
 	
 	
 半xml半注解+jpa配置：
-注解部分似乎必须用entitymanager这个包读取，且此时hibernate.cfg.xml
-里没有配置mapping，所以必须配置jpa。增删改查等语法见注解加jpa的代码部分。
-使用半xml半注解不需要hibernate.cfg.xml和**.hbm.xml，后者用类里的注解代替，
-前者用persistence.xml代替，此文件必须放在META-INF文件夹里，
-使用maven配置时放在/src/main/resources/META-INF/persistence.xml。
+jpa配置必须用entitymanager这个包，jpa增删改查等语法见注解加jpa的代码部分。
+这个配置**.hbm.xml用实体类里的注解代替，hibernate.cfg.xml用persistence.xml代替，此文件必须放在META-INF文件夹里，使用maven配置时放在/src/main/resources/META-INF/persistence.xml，ssh整合时persistence.xml可以配置到applciationContextx.xml里。

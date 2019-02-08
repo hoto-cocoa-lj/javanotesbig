@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd"> 
+
+
+	
+	<!-- 
+	spring配置bean时尽量将id设成需要被引用的项的成员属性，例如
+	<bean id="sessionFactory" class="....hibernate5.LocalSessionFactoryBean"></bean>	
+	<bean id="customerDao" class="com.itheima.ssh.dao.impl.CustomerDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>，不要将id和ref简化（例如sf），
+	不然可能No bean named 'sessionFactory' is defined的错误，
+	原因应该是spring暗中创建其他对象时要setSessionFactory，
+	但配置名叫sf所以没找到sessionFactory而报错。
+	
+	
+	在和struts2配合使用时要配置Spring的核心监听器，
+	默认加载/WEB-INF/applicationContext.xml，所以要设置context-param修改路径--> 
+    <!--<listener>
+    	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <context-param>
+    	<param-name>contextConfigLocation</param-name>
+    	<param-value>classpath:applicationContext.xml</param-value>
+    </context-param>--> 
+    <!-- 配置Spring的核心监听器 完毕--> 
+	
+	
+		
+	<!-- 让spring能够加载jdbc.properties文件，放在src目录
+		 spring提供了一个标签 可以加载外部的properties文件内容
+		 导context的名称空间和约束 才会有提示
+		 如果不用这个加载，需要在这个xml里填写数据库配置信息
+	-->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	
+	
+	
+	<!-- DBCP数据库配置 -->
+<!-- 	<bean id="dbcp" class="org.apache.tomcat.dbcp.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean> -->
+	
+
+	<!-- C3P0的数据库配置，c3p0用来getsession连接数据库 -->
+	<bean id="c3p0" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driver}"></property>
+		<property name="jdbcUrl" value="${jdbc.url}"></property>
+		<property name="user" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+
+
+	<!-- 创建dao -->
+	<bean id="userDao" class="cn.itcast.daoimpl.UserDaoImpl"></bean>
+
+	<!-- 创建service -->
+    <bean id="userService"  class="cn.itcast.serviceimpl.UserServiceImpl">
+    	<property name="name" value="要开始访问dao了"></property>
+    	<property name="userDao" ref="userDao"></property>
+    </bean>
+
+	
+		<!-- 配置扫描 -->
+	<context:component-scan base-package="cn.itcast"></context:component-scan>
+</beans>

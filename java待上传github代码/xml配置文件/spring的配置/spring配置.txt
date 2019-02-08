@@ -147,7 +147,7 @@ aop的xml配置：更多的例子和全注解配置见  xml配置文件/spring�
 data access/integration：	jdbc/orm/oxm/jms/transactions
 
 spring使用jdbc：事务spring-tx,spring-jdbc,加上ioc的包(这4个包spring项目必须)，
-	jdbc的事务管理包是DataSourceTransactionManager
+	jdbc的事务管理包是DataSourceTransactionManager，applicationContext.xml里需要配置datasource,jdbcTemplate(需要dataSource),transactionManager(需要dataSource),tx:annotation-driven(需要transactionManager),context:component-scan。
 
 	<dependency>
 		<groupId>org.springframework</groupId>
@@ -162,7 +162,9 @@ spring使用jdbc：事务spring-tx,spring-jdbc,加上ioc的包(这4个包spring�
 
 (或者)使用hibernate：要导入hibernate的所有包
 整合hibernate的包：1个spring-orm，HibernateTemplate在这个包，hibernate的事务
-	管理包是HibernateTransactionManager，导错包的话操作数据库会自动回滚不保存
+	管理包是HibernateTransactionManager，导错包的话操作数据库会自动回滚不保存，配制方法有两种，
+	旧版使用sessionfactory，applicationContext.xml里需要配置datasource,sessionFactory(需要dataSource等),hibernateTemplate(需要sessionFactory),transactionManager(需要sessionFactory),tx:annotation-driven(需要transactionManager),context:component-scan。service层需要配置@Transactional
+	新版使用entityManagerFactory，applicationContext.xml里需要配置datasource,entityManagerFactory(需要dataSource等),jpa:repositories,transactionManager(需要entityManagerFactory),tx:annotation-driven(需要transactionManager),context:component-scan。service层需要配置@Transactional
 	
 	<dependency>
 		<groupId>org.springframework</groupId>
@@ -222,11 +224,6 @@ web(mvc/remoting)：    web/servlet/porlet/struts
 	
 ================================================================	
 
-
-
-
-================================================================
-
 整合struts的包：1个，作用是把action的创建交给spring(还有struts2自己的包)，
 这个包里有这个配置<constant name='struts.objectFactory' value='spring' />
 	<dependency>
@@ -253,7 +250,19 @@ web(mvc/remoting)：    web/servlet/porlet/struts
 			<url-pattern>/*</url-pattern>
 	  </filter-mapping>
 	
-================================================================	
+================================================================
+
+spring发邮件：1个
+		<dependency>
+		  <groupId>org.springframework</groupId>
+		  <artifactId>spring-context-support</artifactId>
+		  <version>4.2.4.RELEASE</version>
+		</dependency>
+
+		
+		
+================================================================
+	
 ================================================================	
 
 ================================================================	

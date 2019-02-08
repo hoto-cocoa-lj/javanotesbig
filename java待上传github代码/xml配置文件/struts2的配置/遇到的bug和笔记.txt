@@ -10,3 +10,16 @@ web.xml和UserAction.java如外面两个文件一样配置，
 值栈里root区域的数据，可以用${fuck}直接取。
 例如比如a=1,Customer c,c.setName("fuck")，
 那么${a}=1，${name}=“fuck”。
+
+
+
+struts2处理ajax：不需要其他任何配置
+	@Action(value = "roleAction_ajax")
+	public String ajax() throws IOException {
+		Set<Module> mm = ds.get(d.getId()).getModules();
+		HttpServletResponse r = ServletActionContext.getResponse();
+		String s = JSON.toJSONString(mm);
+		r.setCharacterEncoding("utf-8");
+		r.getWriter().write(s);
+		return null;
+	}
