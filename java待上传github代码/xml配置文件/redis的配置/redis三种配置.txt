@@ -59,7 +59,7 @@ String url="192.168.153.129";
 		<!-- redis end  -->
 		
 		
-在applicationContext.xml里导入applicationContext-redis.xml(a)，a的配置：
+在applicationContext.xml里导入applicationContext-redis.xml(外面有)：
 
 
     <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">  

@@ -1,0 +1,40 @@
+1、导包，cxf-rt-frontend-jaxws是cxf框架的，cxf-rt-transports-http-jetty是服务器，与spring整合时不需要
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http-jetty</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+
+2、server端：
+	创建接口interface_server(需要加上@WebService)和实现类interface_server_impl，用如下代码发布
+	public static void main(String[] args) {
+		JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
+		f.setAddress("http://localhost:12345/abcdefg");
+		f.setServiceBean(new interface_server_impl());
+		f.create();
+	}
+	
+3、客户端：
+	在src/main/java路径cmd，wsimport -s . http://localhost:12345/abcdefg?wsdl后回车(-s表示生成文件，.表示在当前路径生成)，可以发现在客户端生成了一些类。客户端测试代码如下
+		@Test
+		public void t1() {
+			JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
+			f.setAddress("http://localhost:12345/abcdefg");
+			
+			// interface_client是客户端接口
+			f.setServiceClass(interface_client.class);
+			interface_client c = (interface_client) f.create();
+			
+			// func是server端interface_server的某方法
+			String s = c.func("1");
+			System.out.println(s);
+
+		}

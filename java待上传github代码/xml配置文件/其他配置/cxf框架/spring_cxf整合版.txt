@@ -1,0 +1,6 @@
+1、服务端为war项目，接口需要加上@WebService，需要配置pom，web.xml和applicationContext-ws-server.xml，实例见文件夹。这样配置的地址是http://localhost:8000/xiangmuming/ws/user?wsdl
+
+2、客户端可以是jar项目，先在src/main/webapp cmd，ws import -s . 回车，再配置applicationContext-ws-client.xml和pom，见实例
+
+
+	

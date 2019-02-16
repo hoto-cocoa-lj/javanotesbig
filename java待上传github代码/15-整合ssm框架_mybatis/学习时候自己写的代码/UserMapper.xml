@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- #{id}表示等待传入的参数，parameterType表示参数类型，
+resultType表示输出类型。 -->
+<mapper namespace="cn.me.mapper.UserMapper">
+
+	<select id="findUserById" parameterType="int" resultType="user">
+		select * from user where id=#{id}
+	</select>
+	
+	<!-- 直接用Map接收数据，key是user的属性名，value是属性值，这样没有User类也能查询  -->
+	<select id="findUserById1" parameterType="int" resultType="map">
+		select * from user where id=#{id}
+	</select>
+	
+	<!-- List<User> l = s.selectList("findUserByName1", "%小%"); -->
+	<select id="findUserByName1" parameterType="string" resultType="user">
+		select * from user where username like #{aaa}
+	</select>
+	
+	<!-- List<User> l = s.selectList("findUserByName2", "小"); -->
+	<select id="findUserByName2" parameterType="string" resultType="user">
+		select * from user where username like '%${value}%'
+	</select>
+	
+
+	<insert id="insertUser" parameterType="user">
+		<!-- last_insert_id()返回当前事务最后产生的id,这里id是自增所以resultType是int,
+		keyProperty表示该值放到pojo的哪个属性上,order只有BEFORE和AFTER两个值,
+		分别表示insert语句完成前/后获取值,这样设置新建user并保存后打印可以看见id而不用去数据库查 -->
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			select last_insert_id()
+		</selectKey>
+		insert user(username,birthday,sex,address) 
+			value(#{username},#{birthday},#{sex},#{address})			
+	</insert>
+	
+	<!-- 如果是个包装类，比如role里有user，要获取user的id可以写#{role.user.id} -->
+	<update id="updateUser" parameterType="user">
+		update user set username=#{username},
+			birthday=#{birthday},sex=#{sex},address=#{address} where id=#{id}			
+	</update>
+	
+	<delete id="deleteUser" parameterType="int">
+		delete from user where id=#{id}
+	</delete>
+	
+
+	<!-- user有username,sex等5个属性，和数据库的表的字段一样，现在修改是挂号信成username1,sex1，
+	直接使用上面的 findUserById方法不会报错，但是获取不到这两个属性的值。解决方法如下，
+	设置resultMap，type是user的别名或全名，下面的column表示表里的名字，property是类的属性名，
+	column和property一样的可以不写，然后方法不用resultType用resultMap。这个东西很常用 -->
+	<resultMap id="user1" type="user">
+		<id column="id" property="id"/>
+		<result column="username" property="username1"/>
+		<result column="sex" property="sex1"/>
+		<result column="birthday" property="birthday"/>
+		<result column="address" property="address"/>
+	</resultMap>
+	<select id="findUserById2" parameterType="int" 	resultMap="user1">
+		select * from user where id=#{id}
+	</select>
+
+</mapper>

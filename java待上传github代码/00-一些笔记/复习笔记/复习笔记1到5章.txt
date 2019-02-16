@@ -831,7 +831,7 @@ servlet上下文ServletContext的一些方法：
 
 ================================================================================
 
-下载实现，解决中文文件名乱码问题(包括火狐浏览器)：	
+下载并解决中文文件名乱码问题(包括火狐浏览器)：	
 	public class S2 extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest r, HttpServletResponse s) throws ServletException, IOException {
@@ -855,6 +855,9 @@ servlet上下文ServletContext的一些方法：
 			//这里根据文件类型得到mimetype，根路径无关，jpg的mimetype是image/jpeg
 
 		s.setHeader("content-type", mimeType);				//必须设置1
+		//s.setContentType("application/octet-stream");
+		//设置成application/octet-stream更好，适用于任意类型文件
+			
 			
 		//String cd = "attachment;filename=" + filename1;		//头1
 		String cd = "attachment;filename*=utf-8'zh_cn'" + f3;	//头2

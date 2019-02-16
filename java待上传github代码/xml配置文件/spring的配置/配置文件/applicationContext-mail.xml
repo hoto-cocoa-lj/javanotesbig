@@ -18,12 +18,16 @@
 
 	<context:property-placeholder location="classpath:mail.properties"/>
 	
+	
+	<!-- SimpleMailMessage只能发送文本内容等，这个最好自己创建不由spring管理，
+		因为可能发很多个，不应该使用singtone的对象 --> 
 	<bean id="mailMessage" class="org.springframework.mail.SimpleMailMessage">  
         <property name="from">  
+			<!--${mail.from}和${mail.username}都是发送者的邮箱地址 -->
             <value>${mail.from}</value>  
-        </property>  
-        <!-- 查看SimpleMailMessage源码还可以注入标题,内容等 -->  
+        </property>         
     </bean>  
+	
     <!-- 申明JavaMailSenderImpl对象 -->  
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">  
         <property name="defaultEncoding" value="UTF-8" />  
@@ -41,5 +45,54 @@
             </props>  
         </property>  
     </bean>  	
-	
 </beans>
+
+
+  <!-- 
+发送邮件的代码：
+	@ContextConfiguration(value = "classpath:applicationContext-mail.xml")
+	@RunWith(value = SpringJUnit4ClassRunner.class)
+	public class SpringJunit {
+		@Autowired
+		private SimpleMailMessage mm;
+		@Autowired
+		private JavaMailSender sender;
+
+		@Test
+		public void test1() {
+			mm.setTo("yukitosairi5@163.com");
+			mm.setSubject("subject");
+			mm.setText("test text");
+			sender.send(mm);
+		}
+		
+		
+	//发送了  带html标签文本和 本地图片(直接显示)和 本地文件
+	@Test
+	public void test1() throws MessagingException {
+		MimeMessage message = sender.createMimeMessage();
+		
+		// 带图片带附件必须设置true，类似post表格要设置multipart
+		MimeMessageHelper helper = new MimeMessageHelper(message, true); 
+		helper.setFrom("17727462455@163.com");
+		helper.setTo("yukitosairi5@163.com");
+		helper.setSubject("200张图片的附件");
+
+		// true代表前面的文本可以当成html标签进行解析
+		//cid:image11的image11和下面图片附件的第一个参数必须一样
+		helper.setText(
+				"<html><head></head><body><h1>hello!!spring image html mail</h1><a href=http://www.baidu.com>baidu</a><img src='cid:image11' /></body></html>",
+				true);
+
+		// 添加了一个图片的附件
+		helper.addInline("image11", new FileSystemResource(new File("E:/1.jpg")));
+
+		// 添加附件，可以看到收到的邮件附件名字就叫11.jpg和22.jpg
+		helper.addAttachment("11.jpg", new FileSystemResource(new File("E:/1.js")));
+		helper.addAttachment("22.jpg", new FileSystemResource(new File("E:/1.jpg")));
+
+
+		sender.send(message);
+	}
+	}
+-->

@@ -41,10 +41,23 @@ day07笔记：
 如果有特殊情况，当然要特殊对待，数据库设计最重要的是看需求跟性能，需求>性能>表结构。
 所以不能一味的去追求范式建立数据库。
 
+
+根据外键的id获取list的写法，教程用第二种，自己测试第一种也没问题，推荐第二种
+	Specification<ContractProduct> spec = new Specification<ContractProduct>() {
+		@Override
+		public Predicate toPredicate(Root<ContractProduct> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+			return cb.equal(root.get("contract").as(Contract.class),d.getContract());
+			//return  cb.equal(root.get("contract").get("id").as(String.class),d.getContract().getId());
+		}
+	};
+		
+		
+		
+
 day09笔记：
 报运单a和购销合同(contract简称c)是一对多的关系，因为一个a有多个c，且a里的合同一定在c里，
 但是不能设置在数据库设置一对多的关系。因为如果设置一对多，删除a时会删除a的c，
-但显然c不应该被a删除(c只应该在c自己的模块被删除)。
+但显然c不应该被a删除(c只应该在c自己的模块被删除，这里类似洋酒品类有多个品牌，现在需要删除洋酒品类统一归入酒品类，应该只删除品类而不应该删除下属的所有品牌)。
 可以使用打断设计，即a里有一个字段保存c的id的集合，例如c1,c2.....
 
 外面有 数据搬家 和 多方维护外键 的代码。

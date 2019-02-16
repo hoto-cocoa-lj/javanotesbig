@@ -258,9 +258,8 @@ spring发邮件：1个
 		  <artifactId>spring-context-support</artifactId>
 		  <version>4.2.4.RELEASE</version>
 		</dependency>
-
-		
-		
+需要配置xml，配置和详细代码见 spring的配置\配置文件\applicationContext-mail.xml
+	
 ================================================================
 	
 ================================================================	

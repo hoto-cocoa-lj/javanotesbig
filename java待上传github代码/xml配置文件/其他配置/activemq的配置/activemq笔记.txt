@@ -1,0 +1,54 @@
+运行H:\黑马java淘宝68元\14-国际物流云商项目\day14\day14\资料\activeMQ\soefware\apache-activemq-5.14.5\bin\win64的activemq.bat打开服务器，
+访问http://localhost:8161可以管理和查看详细队列，账号密码都是admin。
+没有该文件的话解压apache-activemq-5.14.5-bin.zip得到。
+
+
+两种消息模式：
+	1、queue，类似qq聊天，一方发了消息后会一直保存在queue里，直到对方接收或者消息过期；生产者发送10条信息，两个消费者消费，会发现Messages Enqueued +10，Messages Dequeued+10，两个消费者消费总条数是10
+	2、topic，类似qq群，一方发了消息后群里所有人都会接收到，新入群的收不到入群前的信息；生产者发送10条信息，两个消费者消费，会发现Messages Enqueued +10，Messages Dequeued+20，每个消费者消费条数是10
+	
+
+消费者有两种方式消费，一种是用receive手动消费，receive一次消费一次，
+一种是用监听，有新信息就会调用监听的onMessage方法处理信息。
+
+
+
+基本版要导的包：
+   	<dependency>
+   		<groupId>org.apache.activemq</groupId>
+   		<artifactId>activemq-all</artifactId>
+   		<version>5.2.0</version>
+   	</dependency>
+	<dependency>
+   		<groupId>org.springframework</groupId>
+   		<artifactId>spring-beans</artifactId>
+   		<version>4.2.4.RELEASE</version>
+   	</dependency>
+	
+spring整合要导的包：
+   <!-- activemq的 -->
+   	<dependency>
+   		<groupId>org.apache.activemq</groupId>
+   		<artifactId>activemq-all</artifactId>
+   		<version>5.2.0</version>
+   	</dependency>
+   	
+   	  <!-- spring整合activemq -->
+   	<dependency>
+   		<groupId>org.springframework</groupId>
+   		<artifactId>spring-jms</artifactId>
+   		<version>4.2.4.RELEASE</version>
+   	</dependency>
+   	<dependency>
+   		<groupId>org.apache.xbean</groupId>
+   		<artifactId>xbean-spring</artifactId>
+   		<version>3.7</version>
+   	</dependency> 
+   	<dependency>
+   		<groupId>org.springframework</groupId>
+   		<artifactId>spring-beans</artifactId>
+   		<version>4.2.4.RELEASE</version>
+   	</dependency>
+	
+
+

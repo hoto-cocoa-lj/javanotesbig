@@ -1,4 +1,4 @@
-运行apache-activemq-5.14.5\bin\win64的activemq.bat打开服务器，
+运行H:\黑马java淘宝68元\14-国际物流云商项目\day14\day14\资料\activeMQ\soefware\apache-activemq-5.14.5\bin\win64的activemq.bat打开服务器，
 访问http://localhost:8161可以管理和查看详细队列，账号密码都是admin。
 
 学习了ActiveMq的基本写法，spring整合写法。

@@ -1,0 +1,13 @@
+1、服务端为war项目，导包：
+  		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxrs</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+	domain的类要加@XmlRootElement(name = "Car")注解，Car是在xml文件/json里的对象名，接口写法比较复杂见代码，applicationContext-rs-server.xml配置同ws；
+
+
+2、客户端可以是jar项目，要导的包见客户端的pom，domain层对应的对象加上@XmlRootElement(name = "Car")注解，测试代码可以不用WebClient用httpclient，但是要自己处理xml文件。
+
+
+	

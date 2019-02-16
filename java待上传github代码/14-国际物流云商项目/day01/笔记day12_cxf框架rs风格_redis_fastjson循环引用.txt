@@ -74,8 +74,8 @@ export和exportproduct是自带的，但是会无限引用，根本不能转json
 ========================================================================
 
 https://blog.csdn.net/zl18310999566/article/details/52712465
-用fastjson转换一个list[对象a，对象b，对象a]时，同一个对象会出现"$ref"，
-SerializerFeature.DisableCircularReferenceDetect可以禁止循环引用。
+用fastjson转换一个list[对象a，对象b，对象a]时，同一个对象会出现"$ref"，转换函数里设置第二个参数为
+SerializerFeature.DisableCircularReferenceDetect可以禁止循环引用解决问题。
 当出现无限引用时也可以用这个禁止循环引用，但是会出现stackoverflow，
 这时候删除一方对另一方的引用即可。也可以用simplepropertyprefilter。
 

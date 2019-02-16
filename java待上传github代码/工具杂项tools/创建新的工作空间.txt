@@ -5,3 +5,5 @@ preferences-->workspace-->text file encoding选择utf-8；
 设置右键-->new的初始项目：
 	window-->perspective-->customize perspective-->shortcuts
 
+svn不上传自己编译的东西：
+window-->preferences-->team-->ignored resources,add pattern里分别加上.settings，.project，.classpath，.class，target

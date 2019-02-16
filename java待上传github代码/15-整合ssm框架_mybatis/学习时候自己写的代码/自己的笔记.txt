@@ -1,5 +1,5 @@
-mybatis生成的sql语句，parameterType="string"和#{}搭配会自动生成引号包裹，
-模糊查询一般用select * from user where username like '%${value}%'。
+mybatis生成的sql语句，parameterType="string"和#{}搭配会自动生成引号包裹，如果写'%#{value}%'传参数a会变成'%'a'%'报错，必须使用'%${value}%'，这里value不能改，
+模糊查询一般用select * from user where username like '%${value}%'。用#{}的方法见UserMapper.xml的findUserByName1方法。
 
 ==================================================================
 
@@ -20,6 +20,7 @@ mybatis生成的sql语句，parameterType="string"和#{}搭配会自动生成引
  		<package name="cn.itcast.mybatis.pojo"/>
 		<!-- <typeAlias type="cn.itcast.mybatis.po.User" alias="user"/> -->
 	</typeAliases> 
+	
 下面代码可以实现不用手动到各个pojo类xml文件，mapper类似service。
 	<mappers>
 		<package name="cn.itcast.mybatis.mapper"/>		
@@ -79,11 +80,3 @@ column是这次查找的表(user_copy)的字段，property是user的对应的属
 </configuration>	
 	
 ==================================================================
-==================================================================
-==================================================================
-==================================================================
-==================================================================
-==================================================================
-==================================================================
-==================================================================
-	

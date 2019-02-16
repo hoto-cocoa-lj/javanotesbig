@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:amq="http://activemq.apache.org/schema/core"
+	xmlns:jms="http://www.springframework.org/schema/jms"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jms
+        http://www.springframework.org/schema/jms/spring-jms.xsd
+		http://activemq.apache.org/schema/core
+        http://activemq.apache.org/schema/core/activemq-core.xsd">
+	
+
+	
+	<!-- ActiveMQ 连接工厂 -->
+    <amq:connectionFactory id="amqConnectionFactory"
+        brokerURL="tcp://localhost:61616" userName="admin" password="admin"  />
+
+    <!-- Spring Caching连接工厂 -->
+    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory" ref="amqConnectionFactory"></property>
+        <property name="sessionCacheSize" value="100" />
+    </bean>
+    
+    <!-- 扫描包 -->
+	<context:component-scan base-package="cn.me.jms.consumer" />
+	
+     <!-- Spring JmsTemplate 的消息生产者 start-->
+    <jms:listener-container  destination-type="queue" container-type="default" connection-factory="connectionFactory">
+       <jms:listener destination="myQueue" ref="queueConsumer"/>
+    </jms:listener-container>
+    
+     <jms:listener-container  destination-type="topic" container-type="default" connection-factory="connectionFactory">
+       <jms:listener destination="myTopic" ref="topicConsumer"/>
+       <jms:listener destination="myTopic" ref="topicConsumer2" />
+    </jms:listener-container> 
+    
+    
+</beans>

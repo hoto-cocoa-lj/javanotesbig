@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	
+
+   <properties resource="jdbc.properties"></properties>
+	<!-- jdbc.properties的内容
+	jdbc.driver=com.mysql.jdbc.Driver
+	jdbc.url=jdbc:mysql:///hibernate1?characterEncoding=utf-8
+	jdbc.username=root
+	jdbc.password= -->
+
+   
+
+	<!-- 使用了mybatis自己的连接池，和spring整合后 environments配置将废除-->
+	<environments default="development">
+		<environment id="development">
+		<!-- 使用jdbc事务管理-->
+			<transactionManager type="JDBC" />
+		<!-- 数据库连接池-->
+			<dataSource type="POOLED">
+				<property name="driver" value="${jdbc.driver}" />
+				<property name="url" value="${jdbc.url}" />
+				<property name="username" value="${jdbc.username}" />
+				<property name="password" value="${jdbc.password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<!-- 一开始使用user.xml，满足4,5规范后直接扫描接口所在的包就可以了 -->
+	<mappers>
+		<package name="cn.me.mapper"/>	
+		<!-- <mapper resource="user.xml"></mapper> -->
+	</mappers>
+	
+</configuration>

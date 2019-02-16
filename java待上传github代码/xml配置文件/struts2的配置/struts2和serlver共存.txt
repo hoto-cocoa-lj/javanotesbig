@@ -1,0 +1,13 @@
+struts2和servlet的共存问题：默认配置的话struts2和servlet是不能共存的，因为servlet的访问被struts拦截并处理，找不到处理的类就报错了。但是实际开发中很多情况需要两者共存。
+常见的两种处理方法：
+1、struts2不拦截/*，比如加前缀(/struts/*)或者后缀(/*.action)
+2、用自己的类继承StrutsPrepareAndExecuteFilter,配置web.xml里。
+	public void doFilter(ServletRequest request, ServletResponse response,   FilterChain chain) throws IOException, ServletException {
+			  if(url.contain("servlet")){
+				  ((HttpServletResponse) response).sendRedirect(redirectUrl);
+			  }
+			  super.doFilter(request, response, chain);
+	}
+做法是遇到不想拦截的访问直接在过滤器请求转发或者重定向。
+
+

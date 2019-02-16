@@ -80,6 +80,8 @@ struts2注解包：1个
 			<version>2.3.24</version>
 		</dependency>
 
+===============	===============	===============	===============		
+		
 修改web.xml，加上：
 	  <filter>
 		<filter-name>strust2_3</filter-name>	
@@ -90,7 +92,9 @@ struts2注解包：1个
 		<filter-name>strust2_3</filter-name>
 		<url-pattern>/*</url-pattern>
 	  </filter-mapping>
-	使用spring整合struts2，必须加上：  
+	  
+	  
+	使用spring整合struts2，必须加上！！！！！！！！！！！：  
 	<filter>
 	  	<filter-name>struts2</filter-name>
 	  	<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
@@ -108,7 +112,7 @@ struts2注解包：1个
   		<url-pattern>/*</url-pattern>
   </filter-mapping>
 	  
-	
+===============	===============	===============	===============	
 	
 	
 创建/复制粘贴修改struts.xml，放在src/main/resources下配置完毕。
