@@ -4,8 +4,10 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 
-	
 
+	
+	<!--properties里面可以设置property，效果和在properties文件里写一样，如果同时配置在文件
+	和property里配置，先加载内再加载外，后者覆盖前者，所以以文件为准 -->
    <properties resource="jdbc.properties"></properties>
 	<!-- jdbc.properties的内容
 	jdbc.driver=com.mysql.jdbc.Driver
@@ -13,9 +15,22 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	jdbc.username=root
 	jdbc.password= -->
 
-   
 
-	<!-- 使用了mybatis自己的连接池，和spring整合后 environments配置将废除-->
+	<!--在mybatis的配置文件sqlMapConfig.xml里加上下面代码可以打印sql语句，非常方便。-->
+ 	<settings>
+		<setting name="logImpl" value="STDOUT_LOGGING"/>
+	</settings> 
+
+	<!-- 别名，配置后可以用user代替cn.me.po.User，mybatis认识int,string是因为它内置了很多别名，
+	可以使用package开启扫描，扫描对象是实体类所在的包 -->
+   <typeAliases>
+   		<!-- <typeAlias type="cn.me.po.User" alias="user"></typeAlias> -->
+   		<package name="cn.me.po"/>	
+   </typeAliases>
+
+
+
+	<!-- 和spring整合后 environments配置将废除-->
 	<environments default="development">
 		<environment id="development">
 		<!-- 使用jdbc事务管理-->
@@ -30,10 +45,13 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 		</environment>
 	</environments>
 	
-	<!-- 一开始使用user.xml，满足4,5规范后直接扫描接口所在的包就可以了 -->
+	
+	<!-- user.xml没有遵守规范4和5，所以用<mapper resource="user.xml"></mapper>导入，
+	遵守后可以用package扫描接口所在的包导入-->
 	<mappers>
 		<package name="cn.me.mapper"/>	
 		<!-- <mapper resource="user.xml"></mapper> -->
+		<!-- <mapper class="cn.itcast.mybatis.mapper.userMapper"></mapper> -->
 	</mappers>
 	
 </configuration>

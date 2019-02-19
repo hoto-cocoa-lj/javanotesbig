@@ -19,11 +19,13 @@
 			<value>5242880</value>
 		</property>
 	</bean>
+	
+	
 	<!--  配置视图解析器的前缀和后缀 -->
-	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-	 <property name="prefix" value="/WEB-INF/jsp/"></property>
-	 <property name="suffix" value=".jsp"></property>
-</bean>
+		<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		 <property name="prefix" value="/WEB-INF/jsp/"></property>
+		 <property name="suffix" value=".jsp"></property>
+	</bean>
 
 <!-- 异常处理器 -->
 	<bean id="handlerExceptionResolver" class="cn.itcast.ssm.exception.MyHandlerExceptionResolver"/>

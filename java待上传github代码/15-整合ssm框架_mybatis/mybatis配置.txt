@@ -1,4 +1,4 @@
-1、导包：	cglib的包可以不要
+1、不整合spring版本要导的包：	cglib的包可以不要
    	<dependency>
    		<groupId>org.mybatis</groupId>
    		<artifactId>mybatis</artifactId>
@@ -56,7 +56,7 @@
    	</dependency>
 	
 
-2、创建核心配置文件sqlMapConfog.xml(可以用其他文件名)和映射文件，在核心配置文件import映射文件，映射文件见 E:\GitHub\javanotesbig\java待上传github代码\15-整合ssm框架_mybatis\学习时候自己写的代码\user笔记.xml
+2、创建核心配置文件sqlMapConfig.xml(可以用其他文件名)和映射文件，在核心配置文件import映射文件，映射文件见 E:\GitHub\javanotesbig\java待上传github代码\15-整合ssm框架_mybatis\学习时候自己写的代码\user笔记.xml
 
 	开发规范(前3必须遵守，后2遵守的话少写一些配置)：
 	1、接口全路径名和映射文件的namespace一致
@@ -64,3 +64,9 @@
 	3、接口方法的参数类型、返回类型和映射文件的parameterType和resultType一致
 	4、接口和映射文件名最好一致，如UserMapper.java对应UserMapper.xml
 	5、接口和映射文件最好放同一个目录
+	
+3、
+1对1和1对多配置见 \15-整合ssm框架_mybatis\学习时候自己写的代码\自己的笔记；
+详细配置见 \15-整合ssm框架_mybatis\学习时候自己写的代码下的xml和java文件；
+
+spring整合mybatis配置见 \15-整合ssm框架_mybatis\学习时候自己写的代码\A(maven配置)

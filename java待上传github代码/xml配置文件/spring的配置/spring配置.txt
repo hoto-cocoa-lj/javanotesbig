@@ -92,7 +92,7 @@ spring-aop实现了aop的规范，效果不好，aspects实现效果好，纳入
 		</dependency>
 
 		
-aop的xml配置：更多的例子和全注解配置见  xml配置文件/spring的配置/aop代码
+aop的xml配置：更多的例子和全注解配置见  xml配置文件/spring的配置\spring一些案例代码/aop代码
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -112,6 +112,7 @@ aop的xml配置：更多的例子和全注解配置见  xml配置文件/spring�
 	<bean id="ss" class="com.interception.SS"></bean>
 	<bean id="z" class="com.interception.Z"></bean>		
 
+	<!--下面的配置作用是用z的一些方法增强ss的一些方法 -->
 	<aop:config>
 		<aop:aspect ref="z">
 			<!--给需要增强的方法设置引用ref，减少代码量，也可以不设置-->	
@@ -119,6 +120,8 @@ aop的xml配置：更多的例子和全注解配置见  xml配置文件/spring�
 			
 			<!--最常用这个，void表示此方法没有返回值，用*表示可以更好，
 			包括所有返回值和没有返回值。g(..)里的..表示任意参数-->
+			
+			<!--下面method的af和md都是com.interception.Z里的方法名 -->
 			<aop:after-returning method="af" pointcut="
 			execution(void com.interception.SS.g())" /> 
 			

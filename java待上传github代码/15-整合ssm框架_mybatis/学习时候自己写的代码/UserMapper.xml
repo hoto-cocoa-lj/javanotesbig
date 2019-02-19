@@ -26,6 +26,13 @@ resultType表示输出类型。 -->
 		select * from user where username like '%${value}%'
 	</select>
 	
+	
+	<!-- QueryVo封装了user，设置get/set方法，使用queryVo.user.username进行查询。 -->	
+	<select id="findUserByQueryVo" parameterType="queryVo" 	resultType="user">
+		select * from user where username like '%${user.username}%' 
+			and sex=#{user.sex} and address like '%${user.address}%'
+	</select>
+	
 
 	<insert id="insertUser" parameterType="user">
 		<!-- last_insert_id()返回当前事务最后产生的id,这里id是自增所以resultType是int,
@@ -63,5 +70,53 @@ resultType表示输出类型。 -->
 	<select id="findUserById2" parameterType="int" 	resultMap="user1">
 		select * from user where id=#{id}
 	</select>
+
+
+	<!-- where,if和foreach的用法，where可以自动处理第一个and，foreach可以拼接in查询 -->
+	<select id="findUserList" parameterType="user" resultType="user">
+		select * from user 
+		<where>
+			<if test="id!=null and id!=''">
+				and id=#{id}
+			</if>
+			<if test="username!=null and username!=''">
+				and username like '%${username}%'
+			</if>
+			<if test="ids!=null and ids.size>0">
+	    		<foreach collection="ids" open=" and id in(" close=")" item="id" separator="," >
+	    			#{id}
+	    		</foreach>
+			</if>
+		</where>
+	</select>
+	
+	<!-- Sql片段:将重复的sql提取出来，使用时用include引用，达到sql重用的目的 -->
+	<sql id="query_user_where">
+		<if test="id!=null and id!=''">
+			and id=#{id}
+		</if>
+		<if test="username!=null and username!=''">
+			and username like '%${username}%'
+		</if>
+	</sql>
+	<select id="findUserList1" parameterType="user" resultType="user">
+		select * from user 
+		<where>
+		<include refid="query_user_where"/>
+		</where>
+	</select>
+	<!--  注意：如果引用其它mapper.xml的sql片段，则在引用时需要加上namespace，如下：
+	<include refid="namespace.sql片段”/>-->
+	
+	
+	<!-- set标签会去掉最后的逗号,实现部分更新 -->
+	<update id="updateUser_if_set" parameterType="user">
+		update user
+		<set>
+			<if test="name != null and name.length()>0">name = #{name},</if>
+			<if test="gender != null and gender.length()>0">gender = #{gender},</if>
+　　　　</set>
+　　　　where id = #{id}
+　　</update>
 
 </mapper>

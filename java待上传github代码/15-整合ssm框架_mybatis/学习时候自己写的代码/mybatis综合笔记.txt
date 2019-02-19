@@ -1,0 +1,96 @@
+mybatis生成的sql语句，parameterType="string"和#{}搭配会自动生成引号包裹，如果写'%#{value}%'传参数a会变成'%'a'%'报错，必须使用'%${value}%'，这里value不能改，
+模糊查询一般用select * from user where username like '%${value}%'。用#{}的方法见UserMapper.xml的findUserByName1方法。
+
+==================================================================
+
+不同的mapper.xml可能方法id冲突，每个文件上面有个namespace，使用这个可以避免。
+如下代码，指定selectOne使用test1的findUserById。
+	@Override
+	public User findById(int id) {
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+		 User user = sqlSession.selectOne("test1.findUserById", id);
+		 sqlSession.close();
+		 return user;
+	}
+
+==================================================================	
+
+满足条件4，5命名的情况下，下面代码可以实现包里的类名自动产生别名，pojo类似domain。
+	 <typeAliases>
+ 		<package name="cn.itcast.mybatis.pojo"/>
+		<!-- <typeAlias type="cn.itcast.mybatis.po.User" alias="user"/> -->
+	</typeAliases> 
+	
+下面代码可以实现不用手动到各个pojo类xml文件，mapper类似service。
+	<mappers>
+		<package name="cn.itcast.mybatis.mapper"/>		
+		<!-- <mapper resource="user.xml"></mapper> -->
+		<!-- <mapper resource="mapper/userMapper.xml"></mapper> -->
+		<!-- <mapper class="cn.itcast.mybatis.mapper.userMapper"></mapper> -->
+	</mappers>
+扫描mapper包用来建立 mapper接口和xml的一一对应关系并用xml的对应语句实现该接口方法，
+扫描pojo包用获取各个 pojo类的别名。
+
+==================================================================
+
+count方法：
+	<select id="findCount"  resultType="_int">
+		select count(*) from user
+	</select>
+	
+==================================================================
+
+在mybatis的配置文件sqlMapConfig.xml里加上下面代码可以打印sql语句，非常方便。
+<configuration>
+	<settings>
+		<setting name="logImpl" value="STDOUT_LOGGING"/>
+	</settings>
+</configuration>	
+	
+==================================================================
+
+1对多和1对1	(详情见mybatis教案-day02的10到17页)：
+这里1对1和1对多是从一个表来看的，比如1个user对应多个order，处理user时是1对多，处理order时是1对1(1个order只有1个user)，所以前面学的多对多在这里就是对双方的1对多。
+1对1有两种方法：
+方法1是用order1继承order，再加上user的一些属性，作为resultType，跨表查询的数据会自动填充进order1,；
+方法2是resultMap，order里user的引用myuser，返回类型用自定义的resultMap，配置如下
+	<resultMap type="Orders" id="orderUserResultMap">
+		<!-- 一对一关联映射 -->
+		<!-- 		property:Orders对象的user属性
+		javaType：user属性对应 的类型		 -->
+		<association property="user" javaType="cn.itcast.po.User">
+			<!-- column:user表的主键对应的列  property：user对象中id属性-->
+			<id column="user_id" property="id"/>
+			<result column="username" property="username"/>
+			<result column="address" property="address"/>
+		</association>
+	</resultMap>
+	
+多对多配置如下：
+	<resultMap type="user" id="userOrderResultMap">
+		<!-- 一对多关联映射 -->
+		<collection property="orders" ofType="orders">
+			<id property="id" column="oid"/>	
+		      <!--用户id已经在user对象中存在，此处可以不设置-->
+			<result property="userId" column="id"/> 
+			<result property="number" column="number"/>
+			<result property="createtime" column="createtime"/>
+			<result property="note" column="note"/>
+		</collection>
+	</resultMap>
+	
+==================================================================
+
+逆序工程，作用是生成mapper接口,对应的xml文件,POJO类和example类：
+mapper接口里selective(选择性)表示非空才注入，即使用了if标签判断是否为空，空就不注入。
+不会处理外键,1对1和1对多的关系。
+example类的用法类似hibernate的criteria：
+	UserExample example=new UserExample();
+	example.createCriteria().addSexEqualTo(0).addNameLike("小");
+	List<User> list=userMapper.selectByExample(example);
+
+==================================================================
+
+==================================================================
+
+==================================================================

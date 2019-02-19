@@ -28,9 +28,12 @@
 		<!-- 加载mybatis的全局配置文件 -->
 		<!-- <property name="configLocation" value="classpath:sqlMapConfig.xml" /> -->
 		
+		<!-- 扫描所有pojo类所在的包，目的是使用类名当别名 -->
 		<property name="typeAliasesPackage" value="cn.itcast.mybatis.po"></property>	
 	</bean>
 	
+	<!-- 扫描所有接口mapper所在的包，目的是代替	原来sqlMapConfig.xml的
+	<mappers><package name="cn.itcast.mybatis.mapper"/></mappers> -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="basePackage" value="cn.itcast.mybatis.mapper"></property>	
 	</bean>
