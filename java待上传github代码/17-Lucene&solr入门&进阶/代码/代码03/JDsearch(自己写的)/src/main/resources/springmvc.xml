@@ -9,6 +9,8 @@
         
 <!-- 	<bean name="/list.action" class="cn.itcast.ssm.controller.ItemsController"></bean> -->        	
 	<context:component-scan base-package="cn.itcvast.web"></context:component-scan>
+	
+	
 	<mvc:annotation-driven />
  
 	<!--  配置视图解析器的前缀和后缀 -->

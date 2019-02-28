@@ -1,0 +1,19 @@
+详情见	/1.品优购电商系统开发讲义/品优购_day01_课程讲义_V1.3.docx
+
+需要启动3个(4个)服务器：
+提供者，消费者，注册中心Zookeeper，(管理中心)
+
+提供者(war)：
+提供接口和实现类，注册到注册中心
+实现类需要 com.alibaba.dubbo.config.annotation.Service注解
+在applicationContext-service.xml里配置 端口、名字、Zookeeper地址、dubbo的注解扫描
+在web.xml里配置spring，这样服务器启动时会注册服务
+
+
+消费者(war)：
+属性注入不用@Autowired，使用com.alibaba.dubbo.config.annotation.Reference注解
+在applicationContext-service.xml里配置 名字、Zookeeper地址、dubbo的注解扫描
+在web.xml里配置springMVC(和spring)，通过访问链接来调用提供者的服务
+
+
+运行 提供者、消费者、Zookeeper的服务器即可，运行管理中心的服务器可以查看提供者、消费者和服务，登录用户名和密码均为root，地址是http://192.168.153.130:8080/dubbo，其中ip是管理中心的ip，端口是tomcat的，dubbo是tomcat里管理中心的项目名称

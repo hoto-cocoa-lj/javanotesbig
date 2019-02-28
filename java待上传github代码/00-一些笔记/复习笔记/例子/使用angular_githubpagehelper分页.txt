@@ -1,0 +1,75 @@
+后端代码：
+	
+	controller模块单纯调用serviceimpl并返回pageResult，就不写了
+	
+	serviceimpl模块：
+	//PageHelper和PageInfo<T>在com.github.pagehelper
+	public PageResult<TbBrand> findPage(int pageNum, int pageSize) {
+		Map map = new HashMap();
+	//调用startPage后会自动分页
+		PageHelper.startPage(pageNum, pageSize);
+		List list = brandMapper.selectByExample(null);
+		PageInfo pageInfo = new PageInfo(list);
+		PageResult pageResult = new PageResult(pageInfo.getTotal(), list);
+		return pageResult;
+	}
+	
+	pojo模块：
+	public class PageResult<T> implements Serializable {
+		private long total;// 总记录数
+		private List<T> rows;// 当前页结果
+		//get/set方法省略
+	}
+	
+前端代码：
+	分页需要pagination.css和pagination.js，[ 'pagination' ]表示需要第三方插件
+	
+	<script src="../plugins/angularjs/angular.min.js"></script>
+	<link rel="stylesheet" href="../plugins/angularjs/pagination.css">
+	<script src="../plugins/angularjs/pagination.js"></script>
+	
+	<script>
+		
+		var app = angular.module('pyg', [ 'pagination' ]);
+		app.controller('brandController', function($scope, $http) {
+			$scope.findAll = function() {
+				$http.get('/brand/list.do').success(
+					function(response) {
+						$scope.list = response;
+					})
+			}
+
+
+			//重新加载列表 数据
+			$scope.reloadList = function() {
+				//切换页码  
+				$scope.findPage($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+			}
+			
+			//分页控件配置，为了防止第一次打开此页面访问两次，注释了totalItems
+			$scope.paginationConf = {
+				currentPage : 1,
+				/* totalItems : 10, */
+				itemsPerPage : 10,
+				perPageOptions : [ 10, 20, 30, 40, 50 ],
+				onChange : function() {
+					$scope.reloadList(); //重新加载
+				}
+			};
+
+			//分页
+			$scope.findPage = function(page, rows) {
+				url = '/brand/page.do?pageNum=' + page + '&pageSize=' + rows;
+				$http.get(url).success(
+					function(response) {
+						$scope.list = response.rows;
+						$scope.paginationConf.totalItems = response.total; //更新总记录数
+					}
+				);
+			}
+		})
+	</script>
+	
+	在页面下方加上分页组件			
+	<!-- 分页 -->
+	<tm-pagination conf="paginationConf"></tm-pagination>

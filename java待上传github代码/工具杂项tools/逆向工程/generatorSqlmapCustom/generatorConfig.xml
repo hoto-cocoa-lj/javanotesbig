@@ -11,7 +11,7 @@
 		</commentGenerator>
 		<!--数据库连接的信息：驱动类、连接地址、用户名、密码 -->
 		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
-			connectionURL="jdbc:mysql://localhost:3306/newschema" userId="root"
+			connectionURL="jdbc:mysql:///pinyougoudb" userId="root"
 			password="">
 		</jdbcConnection>
 		<!-- <jdbcConnection driverClass="oracle.jdbc.OracleDriver"
@@ -27,7 +27,7 @@
 		</javaTypeResolver>
 
 		<!-- targetProject:生成PO类的位置 -->
-		<javaModelGenerator targetPackage="cn.itcast.ssm.pojo"
+		<javaModelGenerator targetPackage="cn.me.pojo"
 			targetProject=".\src">
 			<!-- enableSubPackages:是否让schema作为包的后缀 -->
 			<property name="enableSubPackages" value="false" />
@@ -35,14 +35,14 @@
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
         <!-- targetProject:mapper映射文件生成的位置 -->
-		<sqlMapGenerator targetPackage="cn.itcast.ssm.mapper" 
+		<sqlMapGenerator targetPackage="cn.me.mapper" 
 			targetProject=".\src">
 			<!-- enableSubPackages:是否让schema作为包的后缀 -->
 			<property name="enableSubPackages" value="false" />
 		</sqlMapGenerator>
 		<!-- targetPackage：mapper接口生成的位置 -->
 		<javaClientGenerator type="XMLMAPPER"
-			targetPackage="cn.itcast.ssm.mapper" 
+			targetPackage="cn.me.mapper" 
 			targetProject=".\src">
 			<!-- enableSubPackages:是否让schema作为包的后缀 -->
 			<property name="enableSubPackages" value="false" />
@@ -50,7 +50,10 @@
 		<!-- 指定数据库表 -->
 <!-- 		<table schema="" tableName="user"></table>
 		<table schema="" tableName="orders"></table> -->
-		<table schema="" tableName="items"></table>
+		<table schema="" tableName="tb_item"></table>
+		<table schema="" tableName="tb_item_cat"></table>
+		<table schema="" tableName="tb_type_template"></table>
+
 	<!-- 	<table schema="" tableName="orderdetail"></table> -->
 		
 		<!-- 有些表的字段需要指定java类型

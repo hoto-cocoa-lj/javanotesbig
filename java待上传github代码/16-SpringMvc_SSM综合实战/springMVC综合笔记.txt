@@ -195,7 +195,7 @@ Web工程中一般都是三层结构，如果系统中无论那一层发送异�
 
 ==========================================================================================
 
-这里的url-pattern表示前端控制器会处理*.action，/*会处理所以，/会处理jsp以外的。
+这里的url-pattern表示前端控制器会处理*.action，/*会处理所有的，/会处理jsp以外的。
 
   	<!-- springmvc配置开始 -->
      <servlet>
@@ -239,7 +239,6 @@ location="/js/**" mapping="/js/**"都找得到；
 location="/js/*" mapping="/js/*"都找不到；
 location="/js/" mapping="/js/**"都找得到；
 
-
 	@RequestMapping("/itemEdit/{thisid}")
 	public String editItemRestful(@PathVariable("thisid") int iid,Model model) throws Exception{
 		System.out.println(iid);
@@ -251,22 +250,6 @@ location="/js/" mapping="/js/**"都找得到；
 		return "editItem";
 	}
 	
-	
-==========================================================================================
-
-@RequestParam(value="id")  int iid表示页面的id属性赋值给iid，
-形参名字如果和页面的id属性一样，不用加这个注解。
-
-	@RequestMapping("/itemEdit")
-	public String editItem(@RequestParam(value="id") int iid,Model model) throws Exception{
-		System.out.println(iid);
-		Items i = itemService.findByID(iid);
-		model.addAttribute("item", i);
-		return "editItem";
-	}
-	
-@RequestParam(value="id",required=false,defaultValue="1")表示不是必须传id过来，不传的话id默认是1(required默认值是true)
-
 ==========================================================================================
 
 创建拦截器处理类，代码如下：(preHandle返回true表示放行，false不放行)
@@ -322,6 +305,11 @@ public class MyIterceptor1 implements HandlerInterceptor{
 
 ==========================================================================================
 
+注意不要出现路径重复的现象。比如某页面是/search.html，自动调用angularjs的方法访问/search，
+这样会报错请求参数错误。原因应该是/search.html的.html被当成参数了。
+
+==========================================================================================
+
 使用拦截器拦截未登录用户，一般不用这个而是用框架判断，例如shiro：
 先判断当前方法的名字，如果是某特定方法(如登陆方法，这里是showList2方法)，
 直接放行，这个方法里有设置session的 user，相当于登陆成功。
@@ -359,14 +347,62 @@ public class MyIterceptor1 implements HandlerInterceptor{
 
 ==========================================================================================
 
-@RequestBody把json字符串转成java对象，要求属性名字一样。
+json交互：
+	前端代码：
+    <script type="text/javascript">
+    	data={'user':'user11','pw':'pw11'};
+    	data=JSON.stringify(data);
+    /* 	data=$("#form1").serialize();  */
+    	alert(data);
+    	$.ajax({
+    		'type':'post',
+    		'url':'ajax1.action',
+    		/* data:JSON.stringify(data), */
+    		data:data,
+    		dataType:'json',
+    		contentType: "application/json",
+    		'success':function(d){alert(JSON.stringify(d))},
+    		'error':function(){alert(1)},
+    	})
+    </script>
+	
+	后端代码：
+	@RequestMapping("ajax1")
+	@ResponseBody
+	public Map ajax1(@RequestBody User u) throws IOException {
+		System.out.println("ajax1 u=" + u);
+		Map m = new HashMap();		m.put("a", 1);		m.put("b", "c");
+		return m;
+	}
+	
+@ResponseBody注解：
+服务端传json给客户端本来需要将java对象转成json字符串再返回字符串，使用这个注解可以直接返回java对象，转换操作由spring处理
+	
+@RequestBody注解：
+用在形参上，把浏览器传来json字符串对应值赋值给形参对象。比如@RequestBody User u的User有user,pw,phone属性，json字符串是"{'user':'a','pw':'b'}"，则u的user=a,pw=b,phone=null，这个参数对传来的json字符串要求非常严格，必须是刚刚的格式。
 https://jingyan.baidu.com/article/624e7459069f4034e8ba5a87.html
-@ResponseBody把返回的对象转成json，不用手动gson.tojson(对象)。
 
 ==========================================================================================
 
-注意不要出现路径重复的现象。比如某页面是/search.html，自动调用angularjs的方法访问/search，
-这样会报错请求参数错误。原因应该是/search.html的.html被当成参数了。
+注解@RequestParam(value="id")  int iid表示页面的id属性赋值给iid，
+形参名字如果和页面的id属性一样，不用加这个注解。
+
+	@RequestMapping("/itemEdit")
+	public String editItem(@RequestParam(value="id") int iid,Model model) throws Exception{
+		System.out.println(iid);
+		Items i = itemService.findByID(iid);
+		model.addAttribute("item", i);
+		return "editItem";
+	}
+	
+@RequestParam(value="id",required=false,defaultValue="1")表示不是必须传id过来，不传的话id默认是1(required默认值是true)
 
 ==========================================================================================
+
+
+	
+==========================================================================================
+
+	
+
 

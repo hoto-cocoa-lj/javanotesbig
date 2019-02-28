@@ -10,7 +10,7 @@
 
 	
 	 <bean id="httpSolrServe" class="org.apache.solr.client.solrj.impl.HttpSolrServer">
-	 	<constructor-arg index="0" value="http://localhost:10080/solr/collection1"> </constructor-arg>
+	 	<constructor-arg index="0" value="http://localhost:11111/solr/collection2"> </constructor-arg>
 	 </bean>  
 
 </beans>

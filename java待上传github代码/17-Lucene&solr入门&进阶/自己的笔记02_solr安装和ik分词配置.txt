@@ -22,8 +22,17 @@
 
 ====================================================================================
 
+Solr Core的管理界面(类似mysql的database)。
+Solr core是Solr的一个独立运行实例单位，它可以对外提供索引和搜索服务，
+一个Solr工程可以运行多个SolrCore（Solr实例），一个Core对应一个索引目录。
+添加/创建solrcore：(添加完后没有数据)
+第一步：复制collection1改名为collection2
+第二步：修改core.properties。name=collection2
+第三步：重启tomcat
 
-安装ik分词器：
+====================================================================================
+
+安装ik分词器，添加自定义域：
 1、导入ik分词器的jar包(IKAnalyzer2012FF_u1.jar)到tomcat的webapps/solr/web-inf/lib/里；
 
 2、导入ik分词器配置文件(3个文件)到tomcat的webapps/solr/web-inf/classes/里，需要手动创建；
@@ -32,15 +41,15 @@
 	3、mydict.dic：扩展词汇，比如需要分词的特殊词某朋友的名字，即需要分词不是常用词的；
 	这3个文件必须是无BOM的utf-8格式，另存为时可以看到encoding是utf-8而不是utf-8+BOM；
 	
-3、创建索引域的类型。索引库里的/仓库名/conf/schema.xml，加上如下配置：
+3、创建索引域的类型，供自定义域使用。打开solrhome\collection1/conf/schema.xml，加上如下配置：
 	<fieldType name="text_ik" class="solr.TextField">
 		<analyzer class="org.wltea.analyzer.lucene.IKAnalyzer"/>
 	</fieldType>
 	
 4、配置域字段。如<field name="username_ik" type="text_ik" indexed="true" stored="true"/>。
-	这表示username_ik字段使用ik分词器分词，这里的type和索引域的类型的name必须一样。
+	这表示username_ik字段使用ik分词器分词，这里的type和索引域的name必须一样。
 	至此可以进行测试。打开ip:port/solr，选择core selector的合适的仓库，
-	选择analysis，输入一句话进行分析，看分词是否成功。
+	选择analysis，Analyse Fieldname/FieldType选择text_ik或者username_ik，输入一句中文进行分析，看分词是否成功。
 	
 5、配置复制域。如<field  name="item_keywords"  type="text_ik"  indexed="true"  stored="false"
 			multiValued="true"/>
@@ -116,12 +125,5 @@ ClassNotfoundException：org.apache.commons.lang3.StringUtils，
 
 
 
-Solr Core的管理界面(类似mysql的database)。
-Solr core是Solr的一个独立运行实例单位，它可以对外提供索引和搜索服务，
-一个Solr工程可以运行多个SolrCore（Solr实例），一个Core对应一个索引目录。
-添加solrcore：
-第一步：复制collection1改名为collection2
-第二步：修改core.properties。name=collection2
-第三步：重启tomcat
 
 		

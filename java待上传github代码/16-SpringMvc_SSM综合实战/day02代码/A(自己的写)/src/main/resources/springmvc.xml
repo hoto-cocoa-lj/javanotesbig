@@ -9,6 +9,9 @@
         
 <!-- 	<bean name="/list.action" class="cn.itcast.ssm.controller.ItemsController"></bean> -->        	
 	<context:component-scan base-package="cn.itcast.ssm.controller"></context:component-scan>
+	
+	
+	<!-- 配置处理器映射器  适配器，不配置的话使用@ResponseBody注解会出现Could not find acceptable representation -->
 	<mvc:annotation-driven />
  
  <!-- 文件上传 -->

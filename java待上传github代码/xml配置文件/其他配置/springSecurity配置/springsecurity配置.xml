@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bean:beans xmlns="http://www.springframework.org/schema/security"
+xmlns:bean="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/security
+http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<!-- 在权限拦截时放行，security="none" 设置此资源不被拦截。add.do是注册页面 -->
+	<http pattern="/*.html" security="none"></http>
+	<http pattern="/css/**" security="none"></http>
+	<http pattern="/js/**" security="none"></http>
+	<http pattern="/seller/add.do" security="none"></http> 	
+
+	<!-- http安全控制规则 -->
+	<http>
+		<!-- /* 表示的是该目录下的资源，只包括本级目录不包括下级目录 
+			/** 表示的是该目录以及该目录下所有级别子目录的资源  ，
+			如果http加上标签use-expressions变成<http use-expressions="false">，
+			则hasRole可以省略，变成<intercept-url pattern="/**" access="ROLE_USER1"/>-->
+		<intercept-url pattern="/**" access="hasRole('ROLE_USER1')"/>
+		<!-- 表单认证 ,login-page：指定登录页面。 (login-processing-url=)/login-test就是登陆页面表单的action的值。 authentication-failure-url：指定了身份验证失败时跳转到的页面。 default-target-url：指定了成功进行身份验证和授权后默认呈现给用户的页面。 	always-use-default-target：指定了是否在身份验证通过后总是跳转到default-target-url属性指定的URL。 
+		如果你在系统中使用了框架页，需要设置框架页的策略为SAMEORIGIN -->
+		<form-login login-page="/login.html" default-target-url="/admin/index.html" 
+		always-use-default-target="true" authentication-failure-forward-url="/error.html"
+		login-processing-url="/login-test"/>
+		<!-- 屏蔽跨域，关闭csrf ,如果不加会出现错误 403 -->
+		<csrf disabled="true"/>
+		<!-- 配置在iframe里的页面可以访问 -->
+		<headers>
+			<frame-options policy="SAMEORIGIN"/>
+		</headers>
+		<!-- 注销，logout-url是注销地址默认是/logout，logout-success-url是注销后跳转的页面，
+		下面的配置表示注销地址/logout-test，注销后跳转/1.html	-->
+		<logout logout-url="/logout-test" logout-success-url="/1.html"/>
+	</http>
+
+	<!-- 配置认证管理器，有2种常见方法 -->
+	<authentication-manager>
+				
+		<!--方法1：死数据，例如下面表示账号密码都是a或者admin时可以登陆 -->
+		<!--
+		<authentication-provider>
+			<user-service>
+				<user name="admin" password="admin" authorities="ROLE_USER1"/>
+				<user name="a" password="a" authorities="ROLE_USER1"/>	
+			</user-service>
+		</authentication-provider> -->
+		
+		<!--方法2：使用自定义类判断，这里bcryptEncoder是springsecurity某类
+		的引用，用来对密码加密，如果没加密的话password-encoder和bcryptEncoder
+		的bean都不用设置，userDetailService是自定义类的引用，使用component-scan
+		+@Component("userDetailService")进行获取，具体代码见外面的文件。做法是
+		bcryptEncoder需要的注入由dubbo完成，authentication-provider需要的注入
+		由spring完成，需要注意的是springMVC容器和spring容器并不共用，即各自容器
+		通过context:component-scan和dubbo:annotation扫描到的类其他容器都获取不到，
+		所以applicationContext-security.xml和springmvc.xml都配置了扫描 -->
+		<authentication-provider user-service-ref="userDetailService">
+			<password-encoder ref="bcryptEncoder"></password-encoder>	
+		</authentication-provider>
+	</authentication-manager>
+	
+	<bean:bean id="bcryptEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+	<context:component-scan base-package="com.pyg.manager.controller"></context:component-scan>
+	
+</bean:beans>
+
+
+上面是applicationContext-security.xml的配置。
+用法：
+web.xml配置如下：
+  	<!-- 加载spring容器，加载上面的springsecurity配置 -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext-security.xml</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+ 
+      <filter>  
+		<filter-name>springSecurityFilterChain</filter-name>  		 
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>  
+	 </filter>  
+	 <filter-mapping>  
+		<filter-name>springSecurityFilterChain</filter-name>  
+		<url-pattern>/*</url-pattern>  
+	 </filter-mapping>	 
+	 
+验证表单的action是spring-security.xml的login-processing-url，一般是/login，
+这里写成/login-test用来测试，这时前台页面是
+<form id="loginform" action="/login-test" method="post" >
+	<input name='username' type='text'/>
+	<input name='password' type='text'/>
+	<input type='submit'/>
+</form>
+后台可以用SecurityContextHolder.getContext().getAuthentication().getName()得到username
