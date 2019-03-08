@@ -1,0 +1,65 @@
+模板必须是utf-8，在preferences里设置成utf-8后还需要用notepad++编码成utf-8
+	<html>
+		<head>
+			<meta charset="utf-8">
+			<title>Freemarker入门小DEMO </title>
+		</head>
+		<body>
+			<#--我只是一个注释，我不会有任何输出  -->
+			${name},你好。${message}
+		</body>
+	</html>
+
+
+具体笔记 见外面4个文件
+
+
+spring整合freemarker配置：
+1、导包
+	<dependency>
+		<groupId>org.freemarker</groupId>
+		<artifactId>freemarker</artifactId>
+	</dependency>  
+	
+2、spring配置文件：这里我配置了xmlns:beans="http://www.springframework.org/schema/beans",
+不然可以把beans全部去掉，而且templateLoaderPath使用/WEB-INF/flt始终找不到，原因不明
+	<beans:bean id="freemarkerConfig"	
+	class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<beans:property name="templateLoaderPath"
+		 value="classpath:/flt" />		
+		<beans:property name="defaultEncoding" value="UTF-8" />	
+	</beans:bean>
+	
+3、后台代码如下：
+	public class ItemPageServiceImpl implements ItemPageService {
+		@Value("${pagedir}")
+		private String pagedir;	
+		@Autowired
+		private FreeMarkerConfig freeMarkerConfig;	
+		@Autowired
+		private TbGoodsMapper goodsMapper;	
+		@Autowired
+		private TbGoodsDescMapper goodsDescMapper;		
+		@Override
+		public boolean genItemHtml(Long goodsId){				
+			try {
+				Configuration configuration = freeMarkerConfig.getConfiguration();
+				Template template = configuration.getTemplate("item.ftl");
+				Map dataModel=new HashMap<>();			
+				//1.加载商品表数据
+				TbGoods goods = goodsMapper.selectByPrimaryKey(goodsId);
+				dataModel.put("goods", goods);			
+				//2.加载商品扩展表数据			
+				TbGoodsDesc goodsDesc = goodsDescMapper.selectByPrimaryKey(goodsId);
+				dataModel.put("goodsDesc", goodsDesc);						
+				Writer out=new FileWriter(pagedir+goodsId+".html");
+				template.process(dataModel, out);
+				out.close();
+				return true;			
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+	}
+

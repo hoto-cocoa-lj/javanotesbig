@@ -37,5 +37,18 @@
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="basePackage" value="cn.itcast.mybatis.mapper"></property>	
 	</bean>
+	
+	
+	
+	<!-- 下面的是事务配置，放在service层，@Transactional和@Service的顺序没影响，
+	千万注意想要事务生效数据库的表的engine必须是innodb-->
+	<context:component-scan base-package="cn.me.sellergoods.*"></context:component-scan>
+	
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
 
 </beans>

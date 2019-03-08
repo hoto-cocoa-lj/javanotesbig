@@ -52,6 +52,9 @@
 	<!-- 可以覆盖前面加载的配置文件内容，下面这句表示只过滤.action页面-->
 	<!-- <constant name="struts.action.extension" value="action"></constant> -->
 	
+	<!-- 上传时文件稍大会报错，需要配置大小限制
+	<constant name ="struts.multipart.maxSize" value ="100000000"/> -->
+	
 	<!-- 使用动态方法
 	<constant name="struts.enable.DynamicMethodInvocation" value="true"></constant> -->
 	

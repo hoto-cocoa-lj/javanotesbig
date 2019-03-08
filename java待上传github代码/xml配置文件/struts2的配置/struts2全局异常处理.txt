@@ -91,7 +91,6 @@
 4、cn.me.exception.SysException代码如下：自定义异常要自己抛，代码见5
 
 	package cn.me.exception;
-
 	public class SysException extends Exception {
 		public SysException(String message) {
 			super(message);

@@ -131,7 +131,7 @@ contoroller里面可以写如下代码，但是比较麻烦一般不用，因为
 
 ==========================================================================================
 
-上传文件配置：
+springMVC上传文件配置：
 
 1、导包：<dependency>
 			<groupId>commons-io</groupId>
@@ -154,7 +154,7 @@ contoroller里面可以写如下代码，但是比较麻烦一般不用，因为
 		</property>
 	</bean>
 	
-3、上传代码如下，pictureFile必须和表单的<input type="file"  name="pictureFile"/> 一一对应，可能报错MultipartFile Specified class is an interface，MultipartFile前加上@RequestParam可以解决。
+3、上传代码如下，pictureFile必须和表单的<input type="file"  name="pictureFile"/> 一一对应。可能报错MultipartFile Specified class is an interface，MultipartFile前加上@RequestParam可以解决。
 	@RequestMapping("/updateitem")
 	public String updateitem(MultipartFile pictureFile) throws Exception{
 		String ss=pictureFile.getOriginalFilename();

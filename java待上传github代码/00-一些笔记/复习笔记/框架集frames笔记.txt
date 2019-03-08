@@ -1,4 +1,4 @@
-
+用法1：
 
 使用框架集frameset时页面不显示，原因是html文件中只能同时包含body标签或者frameset标签其中之一，去掉frame外面的body即可
 
@@ -47,3 +47,71 @@ top.frames[0].docuemnt，例如$(top.frames['cc'].document).find("#did").prop('c
 			<a href='http://www.hupu.com' target='cc'>切换账户并重新登录</a>
 			<a href="logout.action">退出系统</a>
 		</body></html>
+		
+
+用法2(不需要全页面都是框架的话，这个更好)：
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <base href="/" />
+    <title>My JSP 'index.jsp' starting page</title>
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<meta http-equiv="description" content="This is my page">
+	<script src="../plugins/angularjs/angular.min.js"></script>
+	<script src="/js/base.js"></script>
+	<script src="../js/controller/baseController.js"></script>
+  </head>
+  
+  <body ng-app='pyg' ng-controller='x' ng-init='w2="c";w1=2;'>
+    This is my JSP page.
+    <form action="/seller/updateitem.do" method='post' enctype="multipart/form-data">
+    <input type="file" name='pictureFile'/>
+    <input type="submit"/>
+    </form> <hr>
+    
+    <script type="text/javascript" ng-init="init()">
+    	app.controller('x',function($scope,$controller,$location){
+    		$controller('baseController',{$scope:$scope});
+    		$scope.e={};
+    		$scope.init=function(){
+				$scope.e.key=$location.search()['key'];
+    		};
+    		$scope.$watch($scope.e,function(){
+    			fff.src='a';
+    		},true)
+    	})
+  	
+    </script>
+    <input ng-model='e.x'/>--{{e}}--
+
+	<iframe id='fff' width=40%></iframe>
+</body>
+</html>
+
+简化如下：
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Insert title here</title>
+		<style>
+			.a{
+				float:left;box-sizing:border-box;padding:5px;
+				border:1px solid #555;border-radius: 2px;
+			}
+			.a1{width:20%;}
+			.a2{width:80%;}
+</style>
+	</head>
+	<body >
+		<div>
+			<iframe class='a a1'></iframe>
+			<iframe class='a a2'></iframe>
+		</div>
+	</body>
+</html>

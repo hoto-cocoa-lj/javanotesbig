@@ -183,8 +183,8 @@ Java反射机制主要提供了以下功能：在运行时判定任意一个对�
 
 ======================================================================
 
+servlet处理文件上传：
 
-文件上传：
 前端：	
 	<form enctype="multipart/form-data" method="post" 	action='/d2/product?method=pic'>
 		<input type='file' name='fn'/>upload

@@ -90,6 +90,17 @@ example类的用法类似hibernate的criteria：
 	List<User> list=userMapper.selectByExample(example);
 
 ==================================================================
+排序：
+	UserExample example = new UserExample();
+	Criteria criteria = example.createCriteria();
+	criteria.andNameEqualTo("joe");
+	criteria.andIdIsNull();
+	example.setOrderByClause("name asc,email desc");
+	List<?>list = Mapper.selectByExample(example);
+相当于：
+select * from user where name = 'joe' and id is null order by name asc,email desc
+
+ 
 
 ==================================================================
 

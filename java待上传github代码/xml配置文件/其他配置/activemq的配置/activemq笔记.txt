@@ -50,5 +50,42 @@ spring整合要导的包：
    		<version>4.2.4.RELEASE</version>
    	</dependency>
 	
+发送消息全部用textmessage即可，发送对象时转json，接收时转对象。
 
+=====================================================================
 
+用如下方法可以传文件：读文件时不能用循环读，否则s.writeBytes(b)只会报错最后一次数据
+
+	@Override
+	public Message createMessage(Session session) throws JMSException {
+		StreamMessage s = session.createStreamMessage();
+		String x = "E:/..../img/024.jpg";
+		byte[] b = new byte[1024 * 1024];
+		try {
+			InputStream in=new FileInputStream(x)
+			in.read(b);in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		s.writeBytes(b);
+		return s;
+	}			
+	
+	@Override
+	public void onMessage(javax.jms.Message message) {
+		try {
+			StreamMessage s = (StreamMessage) message;
+			byte[] b = new byte[1024 * 1024];
+			s.readBytes(b);
+			FileOutputStream f = new FileOutputStream("1.jpg");
+			f.write(b);
+			f.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+=====================================================================
+
+可以实现a发送信息给b，b处理后在把结果反馈给a。需要使用两套发送和监听系统，
+a发给b一套，b发给a一套。如果只用一套系统，会出现a发送的信息被a自己接收，b同样。

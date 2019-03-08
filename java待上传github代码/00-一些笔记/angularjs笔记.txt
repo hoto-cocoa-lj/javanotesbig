@@ -1,35 +1,76 @@
 ng-model：双向绑定
 
+
 ng-repeat：遍历List(这个笔记里list=[{a:1,b:2},{a:2,b:4},{a:3,b:6}])
 	<tr ng-repeat='x in list'>
 		<td>{{x.a}}</td><td>{{x.b}}</td>
 	<tr>
 	
+===========================================================================
+	
 ng-repeat遍历Map要这么写，注意遍历List和Map的方法不一样，不能通用：
 <li ng-repeat="(key,value) in searchMap.spec"  ng-if="value!=null&&value!=''"
 	ng-click="removeSearchItem(key)">{{key}}:{{value}}</li>
-						
-						
-						
+	
+例如：$scope.l2={'a':1,'b':4,'c':'e'};						
+<span ng-repeat='(x,y) in l2'><span>{{x}}:{{y+1}}:{{y}}+1</span>---</span>
+的输出是：				a:2:1+1---b:5:4+1---c:e1:e+1---			
+		
+
+===========================================================================
+		
 ng-if：满足条件才会显示标签和标签内的东西，下例a！=1时整个div会消失。
     <div class="row data-type" ng-if='a==1'>
 		<table>.....</table>
 	</div>
 
+===========================================================================
+	
 ng-true-value/ng-false-value：
-用在单选复选框，和ng-model配合使用，上例表示选中则a=1未选中则a=0
+	<input type=checkbox ng-model='a' ng-true-value='good' ng-false-value='bad'/>{{a}}
+用在单选复选框，和ng-model配合使用，上例表示选中则a=good未选中则a=bad
 
-ng-options：
-	<select ng-options="x.a as x.b for x in list" ng-model='w'>
-	上例表示生成一个下拉列表，每个option显示的值是遍历list的每个对象x的b属性，
-	即[2,4,6]，而对应的w的值分别是[1,2,3]。类似于x.a是value，x.b是option的text。
+===========================================================================
 
+ng-options：			 list=[{a:1,b:2},{a:2,b:4},{a:3,b:6}]
+	<select ng-options='x.b for x in list'  ng-model='w1'></option>{{w1}}
+	<select ng-options="x.a as x.b for x in list" ng-model='w2'/></option>{{w2}}
+	<select ng-options="x.b as x.b for x in list" ng-model='w3'/></option>{{w3}}
+	上面3个例子都会生成一个下拉列表，每个option显示的文本是遍历list的每个对象x的b属性，
+	即2,4,6，不同的是ng-model的值分别是(x,x.a,x.b)，例如每个都选择第3个，w1={"a":3,"b":6}，
+	w2=3,w3=6，如果一开始设置w2=3或者w3=6，后两个会初始选择第3个，第一个不知道怎么设置
+
+===========================================================================
+	
+对上面ng-options第3个下拉框$scope.w3进行监控：
+    	$scope.$watch('w3', function(newValue,oldValue) {
+			alert(newValue+":"+oldValue);
+		})
+测试发现如果$scope.list=[{a:1,b:2},{a:3,b:6},{a:5,b:6}]，第2个和第3个之间的变化不会触发监控
+
+===========================================================================
+
+$watch监控:
+    <script type="text/javascript" ng-init="init()">
+    	app.controller('x',function($scope){
+    		$scope.e={};
+    		$scope.$watch("e",function(){alert(9);fff.src='a';},true)
+    	})	
+    </script>
+    <input ng-model='e.x'/>--{{e}}--<input ng-model='e.y'/>
+	<iframe id='fff' width=40%></iframe>
+可以监控一个值,多个值,和对象。监控一个值，比如e.x，$watch的参数写'e.x',function即可；
+监控多个值，可以写'e.x_e.y',f；如果监控对象必须设置第3个参数true，即'e',f,true，
+因为监控对象时监控的是地址
+
+===========================================================================
+	
 ng-checked：
 	   <input  ng-checked='a==1' type="checkbox" >
 	   <input  ng-checked='willcheck()' type="checkbox" >
 上面第一行代码表示a==1则选中，第二行表示'willcheck()返回true则选中false则不选中。
-更重要的用法：
-<body ng-app="">
+更重要的用法，原理是checkbox被选中ng-model默认为true，默认值用ng-true/false-value修改：
+<body ng-app="??" ng-controller="??">
     <p>My cars:</p>
     <input type="checkbox" ng-model="all"> Check all<br><br>
     <input type="checkbox" ng-checked="all">Volvo<br>
@@ -38,7 +79,32 @@ ng-checked：
     <p>点击 "Check all" 选择所有的车。</p>
 </body>			
 	
+===========================================================================
+
+delete：
+
+	$scope.l3=[['a','b'],['c','d']];$scope.l4={"x":2,"z":4};
+	delete $scope.l3[1];$scope.l3[0]=null;delete $scope.l4["x"];$scope.l4["z"]=null;		
+{{l3}}-{{l4}}	：	[null,null]-{"z":null}
+			
+===========================================================================
 	
+$event和$event.target：用来监测鼠标点击后键盘输入事件
+
+	<input type='checkbox' ng-model='xx' ng-click='ev1($event)' />
+	
+	$scope.ev1=function($event){
+		console.log($event.target);
+		console.log($event.target.type+"--"+$event.target.className);
+		console.log($event.target.checked);
+	}
+输出如下：			
+	<input type="checkbox" ng-model="xx" ng-click="ev1($event)" class="ng-valid ng-dirty">		
+	checkbox--ng-valid ng-dirty
+	false
+			
+===========================================================================
+
 {{$index==0?'active':''}}三目运算符：
 class="{{$index==0?'active':''}} item"表示$index==0则class='active item'否则class='item'，
 这是一个非常有意思且有用的写法。
@@ -68,18 +134,57 @@ class="{{$index==0?'active':''}} item"表示$index==0则class='active item'否�
 					</div>
 				</div>
 				
+===========================================================================
 
+$location：		
+访问http://localhost:9102/index.jsp#?s=3&z=6或者http://localhost:9102/#?s=3&z=6，
+两个页面是同一个地方，页面里有如下代码：
 
+	s={{s}}******z={{z}}
+    <script type="text/javascript">
+    	app.controller('x',function($scope,$location){
+			$scope.s=$location.search().s;
+			$scope.z=$location.search().z;
+    	})   	
+    </script>
+	
+可以看到页面显示s=3******z=6，即$location.search().'name'可以获取url里的参数，
+不过要加上#
+
+===========================================================================
+
+联动下拉菜单回显：
+两个下拉菜单，第一个被选择后第二个才有下拉选项，下面代码可以正常回显：
+
+	<body ng-app='pyg' ng-controller='x' ng-init='w1=2;w2="d"'>		
+		<script type="text/javascript">
+			app.controller('x',function($scope){
+				$scope.l1=[1,2];
+				$scope.l3=[['a','b'],['c','d']];
+				$scope.l2=[];
+				$scope.$watch("w1",function(){
+					$scope.l2=$scope.l3[$scope.w1-1];
+				})
+			})			
+		</script>
+		<select ng-options='x for x in l1' ng-model='w1'></select>{{w1}}<br>
+		<select ng-options="x for x in l2" ng-model='w2'></select>{{w2}}<br>
+	</body>
+
+select也可以写成<select ng-model='w1'><option ng-repeat='x in l1'/>{{x}}</select>，
+但是和<select ng-options='x for x in l1' ng-model='w1'></select>在一起用有小bug
+	
+===========================================================================
 				
 ng-bind-html：
 在为html标签绑定数据的时，如果绑定的内容是纯文本，你可以使用{{}}或者ng-bind。
 但在为html标签绑定带html标签的内容的时候，angularjs为了安全考虑，不会将其渲染成html，
 而是将其当做文本直接在页面上展示。有两种方法：
-1、过滤器
+
+1、过滤器(推荐用第二种)
 html部分：
 <body ng-app="myApp" ng-controller="myCtl">
-<div ng-bind-html="htmlContent | to_trusted">
-</div>
+<div ng-bind-html="htmlContent | to_trusted"></div>
 </body>
 
 js部分：
@@ -95,7 +200,6 @@ js部分：
 }]);
 </script>
 
-
 2.$sce.trustAsHtml
 html部分：
 <body ng-app="myApp" ng-controller="myCtl">
@@ -110,16 +214,6 @@ js部分：
         $scope.content = $sce.trustAsHtml( $scope.content );
     });
 </script>
-	
-
-===========================================================================
-
-angularjs页面间传递数据：
-url地址需要加一个#，如goods_edit.html#?id={{x.id}}，
-然后在goods_edit.html的controller.js里用
-app.controller('goodsController' ,function($scope,$controller,$location){
-	 $scope.uid=$location.search().id;
-}即可将该id值({{x.id}})传递给uid。
 
 ===========================================================================
 
@@ -131,20 +225,7 @@ get和post方法：
 get方法接收参数可以用基本类型/数组/map/对象，只要属性名一样就行；
 post方法必须用@RequestBody
 
-	app.controller('brandController', function($scope, $http) {
-		$scope.findAll = function() {
-			$http.get('/brand/list.do').success(
-				function(response) {
-					$scope.list = response;
-				})
-		}
-
 		$scope.addOrUpdate = function() {
-			url = '/brand/addOrUpdate.do?name=' + $scope.entity.name
-			+ '&firstChar=' + $scope.entity.firstChar;
-			if ($scope.entity.id) {
-				url += '&id=' + $scope.entity.id;
-			}
 			url1 = '/brand/addOrUpdate.do';
 			$http.post(url1,$scope.entity).success(
 				function(response) {
@@ -154,7 +235,7 @@ post方法必须用@RequestBody
 				}
 			);
 		}
-	})
+
 
 ===========================================================================
 
@@ -162,7 +243,7 @@ updateGoodsStatus里$scope.reloadList()和location.href='goods.html'都可以回
 但是location.href='goods.html'会刷新整个页面，页面被重新渲染，scope域会被重新生成；
 而$scope.reloadList不会，因为它调用了findPage，重新去数据库拿更新后的数据，
 只刷新数据不渲染页面。类似于ajax。原理是(pinyougou的$scope绑定的)这些方法在后台
-都是@RestController，即不返回页面只返回数据。
+都是@RestController，不返回页面只返回数据。
 还有$scope.selectIds=[]写在$scope.reloadList()前后都一样，因为$scope没有被重新生成。
 
     $scope.updateGoodsStatus=function(i){
@@ -211,7 +292,7 @@ ng-model值包含id	比如刚刚的两个都选择的话，select2-model的值�
 config的值必须是json对象，要回显的话select2-model也必须是对象，不能是字符串。如果是字符串，要用JSON.parse(字符串)转成对象。
 	
 ===========================================================================
-===========================================================================
+
 ===========================================================================
 ===========================================================================
 ===========================================================================

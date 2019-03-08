@@ -179,15 +179,68 @@ day04
 
 1、springSecurity配制见 xml配置文件\其他配置\springSecurity配置
 
-================================================================================
-
-
-================================================================================
-
-
+2、fastdfs配制见  xml配置文件\其他配置\fastdfs配置
 
 ================================================================================
+day06:
 
+1、js深拷贝	JSON.parse(JSON.stringify(Object))
+newRow由oldRow深拷贝获得，所以修改newRow不会对list造成影响
+	addColumn=function(list,columnName,conlumnValues){
+		var newList=[];//新的集合
+		for(var i=0;i<list.length;i++){
+			var oldRow= list[i];
+			for(var j=0;j<conlumnValues.length;j++){
+				var newRow= JSON.parse( JSON.stringify( oldRow )  );//深克隆
+				newRow.spec[columnName]=conlumnValues[j];
+				newList.push(newRow);
+			}    		 
+		} 		
+		return newList;
+	}
+
+================================================================================
+day07：
+
+1、千万注意想要事务生效数据库的表的engine必须是innodb，@Transactional和@Service的顺序没影响
+
+================================================================================
+day12：
+
+1、freemarker笔记 见 00-一些笔记\复习笔记
+
+2、js遍历对象：
+	
+<script>
+	   var skuList=[    	    
+		    		{
+		    		"id":"id1",
+		    		"name":"name1",	
+		    		} ,     		
+		    		{
+		    		"id":"id2",
+		    		"name":"null_name",	
+		    		} ,     		
+		    		{
+		    		"id":"null_id",
+		    		"name":"name3",	
+		    		} ,     		
+		    		{
+		    		"id":"id4",
+		    		"name":"name4",	
+		    		} ,     		
+	   ];  
+	   console.log(skuList);
+	   	for(var k in skuList){
+			console.log(skuList[k]);
+		}					
+</script>
+
+输出如下：
+{id: "id1", name: "name1"}
+{id: "id2", name: "null_name"}
+{id: "null_id", name: "name3"}
+{id: "id4", name: "name4"}
 
 ================================================================================
 ================================================================================

@@ -197,4 +197,9 @@ SerializerFeature.DisableCircularReferenceDetect可以禁止循环引用解决�
 短信：点击发送短信会访问jms模块，jsm对应的方法会往redis存 手机号：验证码，client从redis获取数据并验证。也可以访问client，client对应的方法往activemq发信息，jsm监听器监听到信息再往redis存数据。
 验证码：由client生成，因为没有手机号也有验证码
 
+5、md5加盐：
+		import org.apache.shiro.crypto.hash.Md5Hash;
+		Md5Hash p = new Md5Hash(SysConstant.DEFAULT_PASS, entity.getUserName(),2);
+		entity.setPassword(p.toString());
+		
 ================================================================================

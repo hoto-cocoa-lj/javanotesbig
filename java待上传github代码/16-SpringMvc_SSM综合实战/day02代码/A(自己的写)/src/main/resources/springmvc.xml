@@ -11,7 +11,40 @@
 	<context:component-scan base-package="cn.itcast.ssm.controller"></context:component-scan>
 	
 	
-	<!-- 配置处理器映射器  适配器，不配置的话使用@ResponseBody注解会出现Could not find acceptable representation -->
+	<!--配置json转换器，在注解适配器中加入messageConverters
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+		<list>
+		<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"></bean>
+		</list>
+		</property>
+	</bean>
+	注意：如果使用<mvc:annotation-driven /> 则不用定义上边的内容，必须导两个包
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.4.4</version>
+		</dependency>，springmvc默认是没有对象转换成json的转换器的，需要手动添加jackson依赖。	项目2使用fastjson进行转换，所以不用这两个包，配置文件是这样的：
+			<mvc:annotation-driven>
+			  <mvc:message-converters register-defaults="true">
+				<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">  
+				  <property name="supportedMediaTypes" value="application/json"/>
+				  <property name="features">
+					<array>
+					  <value>WriteMapNullValue</value>
+					  <value>WriteDateUseDateFormat</value>
+					</array>
+				  </property>
+				</bean>
+			  </mvc:message-converters>   
+			</mvc:annotation-driven>，
+		如果不配置这些在需要转换时候后端报错No converter found for return value of type，
+		前端报错415 Unsupported media type等错误		-->
 	<mvc:annotation-driven />
  
  <!-- 文件上传 -->

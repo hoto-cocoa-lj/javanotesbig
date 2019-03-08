@@ -831,7 +831,7 @@ servlet上下文ServletContext的一些方法：
 
 ================================================================================
 
-下载并解决中文文件名乱码问题(包括火狐浏览器)：	
+serlvet下载并解决中文文件名乱码问题(包括火狐浏览器)：	
 	public class S2 extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest r, HttpServletResponse s) throws ServletException, IOException {

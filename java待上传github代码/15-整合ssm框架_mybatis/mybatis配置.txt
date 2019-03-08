@@ -70,3 +70,6 @@
 详细配置见 \15-整合ssm框架_mybatis\学习时候自己写的代码下的xml和java文件；
 
 spring整合mybatis配置见 \15-整合ssm框架_mybatis\学习时候自己写的代码\A(maven配置)
+
+
+4、事务配置也在3的文件
