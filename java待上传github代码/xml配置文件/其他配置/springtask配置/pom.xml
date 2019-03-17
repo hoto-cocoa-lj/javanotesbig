@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cn.me</groupId>
+    <artifactId>pyg-parent</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
+  </parent>
+  <artifactId>pyg-task-service</artifactId>
+  <packaging>war</packaging>
+
+
+  <properties>
+  	<webVersion>2.5</webVersion>
+  </properties>
+  <build>
+	 <plugins>
+		<!-- 配置Tomcat插件 -->
+		<plugin>
+			<groupId>org.apache.tomcat.maven</groupId>
+			<artifactId>tomcat7-maven-plugin</artifactId>
+			<configuration>
+				<path>/</path>
+				<port>9108</port>
+			</configuration>
+		</plugin>
+	 </plugins>
+  </build>
+  
+  <dependencies>
+	<dependency>
+		<groupId>javax.servlet</groupId>
+		<artifactId>servlet-api</artifactId>	
+		<scope>provided</scope>
+	</dependency>
+
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-web</artifactId>
+		<version>4.2.4.RELEASE</version>
+	</dependency>
+  </dependencies>
+
+</project>

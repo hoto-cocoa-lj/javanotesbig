@@ -17,3 +17,42 @@
 
 
 运行 提供者、消费者、Zookeeper的服务器即可，运行管理中心的服务器可以查看提供者、消费者和服务，登录用户名和密码均为root，地址是http://192.168.153.130:8080/dubbo，其中ip是管理中心的ip，端口是tomcat的，dubbo是tomcat里管理中心的项目名称
+
+注意dubbo和springmvc整合时容易出现空指针，原因是springmvc扫描的时候无法识别@Reference，
+同一方面，dubbo的扫描也无法识别Spring的@Controller ,所以两个扫描的顺序要排列好， 
+如果先扫了controller，这时候把控制器都实例化好了，再扫dubbo的服务，就会出现空指针。
+解决办法是把dubbo的配置放到springmvc的配置文件springmvc.xml里，且先dubbo扫描再spring扫描，
+因为分开配置的话，@Reference扫描到的类在spring容器，springmvc容器的类依旧是空指针，
+而访问时肯定是调用springmvc容器的类。实例如下：
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+    http://code.alibabatech.com/schema/dubbo 
+    http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<dubbo:application name="pyg-cart-web"></dubbo:application>
+	<dubbo:registry address="zookeeper://192.168.153.130:2181" />
+	<dubbo:annotation package="cn.pyg.cart.controller" />
+
+	<mvc:annotation-driven />
+	<!-- 配置静态资源 -->
+	<mvc:resources location="/js/" mapping="/js/**">
+	</mvc:resources>
+	<context:component-scan base-package="cn.pyg.cart.controller"></context:component-scan>
+</beans>
+
+
+com.alibaba.dubbo.remoting.TimeoutException: Waiting server-side response...
+原因是调用该服务超时，解决办法是在@Reference添加timeout，如下
+	@Reference(timeout = 6000)
+	private BrandService brandService;
+

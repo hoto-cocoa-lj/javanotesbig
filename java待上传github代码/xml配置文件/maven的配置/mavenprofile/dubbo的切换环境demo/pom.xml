@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cn.me</groupId>
+    <artifactId>pyg-parent</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
+  </parent>
+  <artifactId>pyg-common</artifactId>
+
+
+	<properties>
+		<myenv>dev</myenv>
+	</properties>
+	
+	<!-- 这里默认用myenv=dev,然后id=dev对应myenv=dev,id=pro对应myenv=pro,
+	外面的两个文件放在src/main/resources/filters文件夹里,
+	用package/install或者package/install -P dev打包/安装则使用db_dev的数据,
+	用package/install -P prov打包/安装则使用db_pro的数据,
+	传进来的参数和profiles的profile的id对应,使用该id下的properties 
+	测试发现:用dev安装正常使用(端口2181),用pro安装使用报错(端口2182未开放)-->
+	<profiles>
+		<profile>
+			<id>dev</id>
+				<properties>
+					<myenv>dev</myenv>
+				</properties>
+		</profile>
+		<profile>
+			<id>pro</id>
+				<properties>
+					<myenv>pro</myenv>
+				</properties>
+		</profile>
+	</profiles>
+	<build>
+		<filters>
+			<filter>src/main/resources/filters/dubbo_${myenv}.properties</filter>
+		</filters>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+	
+
+<dependencies>
+			...省略...
+</dependencies>
+</project>

@@ -1,0 +1,43 @@
+详情见 java待上传github代码\18-大型分布式电商项目\1.品优购电商系统开发讲义/day15
+
+用户的操作需要多个服务器处理，session属于单个服务器，
+cas可以解决用户在访问其他服务器要重新登陆的问题
+
+访问被cas管理的页面a，如果没有登陆会被带到登陆页面，登陆后自动跳转页面a
+
+CAS服务端配置：
+1、修改cas的端口，需要修改tomcat的conf\server.xml和cas的WEB-INF/cas.properties 
+2、去除https认证，需要修改cas的WEB-INF/deployerConfigContext.xml和
+cas的/WEB-INF/spring-configuration/ticketGrantingTicketCookieGenerator.xml
+3、修改参数cookieSecure改为false ,  cookieMaxAge 改为3600
+p:cookieMaxAge="-1"，是COOKIE的最大生命周期，-1为无生命周期，即只在当前打开的窗口有效，关闭或重新打开其它窗口，仍会要求验证。可以根据需要修改为大于0的数字，比如3600等，意思是在3600秒内，打开任意窗口，都不需要验证。
+
+
+单点退出登录：
+地址栏输入  http://localhost:9100/cas/logout 即可看到退出后的提示页面；
+修改cas系统的配置文件cas-servlet.xml
+  <bean id="logoutAction" class="org.jasig.cas.web.flow.LogoutAction"
+        p:servicesManager-ref="servicesManager"
+        p:followServiceRedirects="${cas.logout.followServiceRedirects:true}"/>
+改为true后，可以在退出时跳转页面到目标页面，修改index.jsp的退出链接
+<a href="http://localhost:9100/cas/logout?service=http://www.baidu.com">退出登录</a>，
+点击后可以实现退出登录后自动跳转到某个页面
+
+
+CAS服务端数据源设置：
+目前使用的账号密码是默认写死的，需要更换成数据库的
+修改cas服务端中web-inf下deployerConfigContext.xml，加上dataSource，passwordEncoder，
+dbAuthHandler，修改<entry key-ref="dbAuthHandler" value-ref="primaryPrincipalResolver"/>，
+将(c3p0,cas整合jdbc,数据库驱动)三个jar包放入webapps\cas\WEB-INF\lib下。
+如果密码不需要加密，则不需要配置passwordEncoder和dbAuthHandler的passwordEncoder-ref
+
+
+CAS服务端界面改造：
+1、将登陆页login.html拷贝到cas系统下WEB-INF\view\jsp\default\ui 目录下
+2、将css  js等文件夹拷贝到  cas目录下
+3、将原来的casLoginView.jsp改名（为修改做参照），将login.html改名为casLoginView.jsp
+4、为casLoginView.jsp添加指令(导入各种标签)，修改form标签,用户名框,密码框,登陆按钮和错误提示，这些东西都参考原登陆页面，可以复制原登陆页面的组件，加上本页面相应的样式
+5、修改cas-servlet.xml和messages_zh_CN.properties，使错误提示显示中文
+
+
+springsecurity整合cas版本见 cas_demo2

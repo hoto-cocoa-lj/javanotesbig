@@ -8,7 +8,7 @@ ng-repeat：遍历List(这个笔记里list=[{a:1,b:2},{a:2,b:4},{a:3,b:6}])
 	
 ===========================================================================
 	
-ng-repeat遍历Map要这么写，注意遍历List和Map的方法不一样，不能通用：
+ng-repeat遍历对象Map要这么写，注意遍历List和Map的方法不一样，不能通用：
 <li ng-repeat="(key,value) in searchMap.spec"  ng-if="value!=null&&value!=''"
 	ng-click="removeSearchItem(key)">{{key}}:{{value}}</li>
 	
@@ -292,6 +292,31 @@ ng-model值包含id	比如刚刚的两个都选择的话，select2-model的值�
 config的值必须是json对象，要回显的话select2-model也必须是对象，不能是字符串。如果是字符串，要用JSON.parse(字符串)转成对象。
 	
 ===========================================================================
+
+$interval和$filter用法：
+
+先引入$interval和$filter服务
+	app.controller('sc',function($scope,$filter,$interval){	
+	
+		$scope.coo=0;$scope.coo1=0;
+		var timer=$interval(function(){
+			$scope.coo=$scope.coo+1;
+			if($scope.coo>5){$interval.cancel(timer);}
+		},1000);
+		
+		var timer1=$interval(function(){$scope.coo1=$scope.coo1+1;},1000,4);
+		
+		var timer2=$interval(function(){
+			$scope.time=$filter('date')(new Date(), "yyyy-MM-dd hh:mm:ss"); 
+			console.log(new Date().getTime());
+			console.log(Math.floor((new Date()-new Date('2019-3-13 14:00:00'))/1000));
+		},1000);
+	}
+	
+$interval用来执行重复任务，timer表示每隔1000ms $scope.coo++，大于5时取消任务；
+timer1表示每隔1000ms $scope.coo1++，执行4次后取消任务；
+timer2表示每隔1000ms更新时间并格式化后赋值给time，
+打印当前时间戳和当前时间距离某时间的秒数；
 
 ===========================================================================
 ===========================================================================

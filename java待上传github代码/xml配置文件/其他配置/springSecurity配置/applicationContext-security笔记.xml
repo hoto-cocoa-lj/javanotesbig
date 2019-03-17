@@ -20,7 +20,10 @@ http://www.springframework.org/schema/security/spring-security.xsd">
 			如果http加上标签use-expressions变成<http use-expressions="false">，
 			则hasRole可以省略，变成<intercept-url pattern="/**" access="ROLE_USER1"/>-->			
 		<!-- 设置多个intercept-url可以实现权限细粒度控制，千万注意范围小的在上面，
-		否则下面的被包含的页面都会报错403。而且只有ROLE_USER1权限无法访问admin/seller.html		-->
+		否则下面的被包含的页面都会报错403。而且只有ROLE_USER1权限无法访问admin/seller.html，多个权限写法有3种，http设置use-expressions="true"时
+		<security:intercept-url pattern="/secure/*" access="r1,r2"/>，测试没问题；	
+		<security:intercept-url pattern="/secure/*"access="hasAnyRole('r1','r2')"/>
+		<security:intercept-url pattern="/secure/*" access="hasRole('r1') or hasRole('r2')"/>，这两种是不设置use-expressions="true"的写法，没测试。-->
 		<intercept-url pattern="/admin/seller.html" access="hasRole('ROLE_USER1')" />
 		<intercept-url pattern="/**" access="hasRole('ROLE_USER')"/>
 		

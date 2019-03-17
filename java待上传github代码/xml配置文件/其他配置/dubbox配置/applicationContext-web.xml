@@ -14,8 +14,10 @@
 	<!-- 引用dubbo 服务 -->
 	<dubbo:application name="pinyougou-manager-web" />
 	
-	<!-- zookeeper注册中心的地址 -->
-	<dubbo:registry address="zookeeper://192.168.66.66:2181"/>
+	<!-- 指定服务注册中心地址,两种写法，第一种更好 -->
+	<dubbo:registry protocol="zookeeper" address="192.168.153.130:2181"/>
+    <!--<dubbo:registry address="zookeeper://192.168.66.66:2181"/>-->
+	
      <dubbo:annotation package="cn.itcast.dubbodemo.controller" />
 	 
 

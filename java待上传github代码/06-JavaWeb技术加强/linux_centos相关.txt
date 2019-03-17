@@ -37,9 +37,13 @@ xftp右键可修改。如果报错/lib/ld-linux.so.2: bad ELF interpreter: 没�
 
 =========================================================================
 
+安装zookeeper：
+将zookeeper-3.4.5.tar.gz解压后上传到linux服务器，
+将 conf下zoo_sample.cfg 文件改名为 zoo.cfg
+
 开启zookeeper：
 cd /usr/local/rjb/registry-zookeeper/bin-->./zkServer.sh start。
-查看zookeeper开启状态./zkServer.sh status。
+查看zookeeper开启状态./zkServer.sh status。(报错无权限则修改成777)
 
 =========================================================================
 

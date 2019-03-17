@@ -1,0 +1,28 @@
+详情见 18-大型分布式电商项目\1.品优购电商系统开发讲义\day14 或者百度
+
+创建maven项目时，即使是web工程也选择jar，
+springboot不需要配置web.xml和applicationContext*.xml，配置application.properties，
+运行Application.java启动项目
+
+版本最好用1.8,其次1.7，设置方式是：
+		<properties>
+			<java.version>1.7</java.version>
+		</properties>
+	或者
+		<plugin>
+			用来指定使用maven-compiler-plugin插件可以指定项目源码的jdk版本， 编译后的jdk版本，以及编码。
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<configuration>
+				<source>1.7</source>
+				<target>1.7</target>
+				<encoding>UTF-8</encoding>
+			</configuration>
+		</plugin>，
+	在<plugin>设置tomcat无效，因为不用maven的tomcat启动
+	
+	
+怎么进行测试始终不会，报错tests not found matching
+	
+	
+	

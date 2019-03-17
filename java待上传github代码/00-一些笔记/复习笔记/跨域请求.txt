@@ -1,0 +1,112 @@
+当前发起请求的域与该请求指向的资源所在的域不一样。这里的域指的是这样的一个概念：我们认为若协议 + 域名 + 端口号均相同，那么就是同域。
+
+CSRF攻击，中文名称：跨站请求伪造，缩写为：CSRF/XSRF。CSRF攻击者在用户已经登录目标网站之后，诱使用户访问一个攻击页面，利用目标网站对用户的信任，以用户身份在攻击页面对目标网站发起伪造用户操作的请求，达到攻击目的。
+
+攻击的原理大致描述如下：有两个网站，其中A网站是真实受信任的网站，而B网站是危险网站。在用户登陆了受信任的A网站是，本地会存储A网站相关的Cookie，并且浏览器也维护这一个Session会话。这时，如果用户在没有登出A网站的情况下访问危险网站B，那么危险网站B就可以模拟发出一个对A网站的请求（跨域请求）对A网站进行操作，而在A网站的角度来看是并不知道请求是由B网站发出来的（Session和Cookie均为A网站的），这时便成功发动一次CSRF 攻击。
+
+
+如果不需要cookie，浏览器请求不能加withCredentials:true，因为如果后台不设置发送Access-Control-Allow-Credentials会报错，设置了就变成正常发送cookie；此时后台不管怎么配置，
+cookie都不能给浏览器
+
+如果需要cookie，浏览器请求必须设置withCredentials:true，后台必须配置Access-Control-Allow-Credentials为true，且Access-Control-Allow-Origin不为*，否则报错
+
+
+
+浏览器设置withCredentials:true的方法有多种，下面有jquery和angularjs的方法，
+要注意post方法需要额外修改tomcat的配置文件，见最下面：
+jquery：
+	get方法：
+		$.ajax({
+			url:'http://localhost:9101/brand/page.do?pageNum=1&pageSize=5',
+			type:'get',
+			error:function(){alert("error:function")},  
+			xhrFields:{
+				withCredentials:true 
+			}
+		})
+
+	post方法：(dataType和contentType必须有，不然报乱七八糟的错，调试了一下午)
+		$.ajax({
+			url:u,
+			type:'post',
+			data:JSON.stringify({'pageNum':1,'pageSize':5}),
+			dataType:'json',
+			contentType: "application/json",
+			error:function(){alert("error:function")},  
+			xhrFields:{
+				 withCredentials:true 
+			  }
+		})}
+		
+angularjs：
+	$scope.u='http://localhost:9101/brand/page.do?pageNum=1&pageSize=5';
+	get方法：		
+		$http.get($scope.u,{withCredentials: true}).success(function(data){
+			...
+		})
+		
+	post方法：	
+		data=JSON.stringify({'pageNum':1,'pageSize':5});
+		$http.post(u,data,{withCredentials: true}).success(function(data){
+			...
+		})
+		
+
+		
+后端非注解写法：
+	@RequestMapping("/page")
+	public PageResult<TbBrand> findPage(int pageNum, int pageSize) {
+	
+		//注意这里要写"http://localhost:9102"，不能写"http://localhost:9102/"
+		s.setHeader("Access-Control-Allow-Origin", "http://localhost:9102");
+		
+		// s.setHeader("Access-Control-Allow-Origin", "*");
+		
+		// 表示可以操作cookie,这时Access-Control-Allow-Origin不能为*，
+		//如果设置成*，cookie会发给浏览器但是该请求会报错
+		s.setHeader("Access-Control-Allow-Credentials", "true");
+		
+		s.addCookie(new Cookie("a1", "b1"));
+		return brandService.findPage(pageNum, pageSize);
+	}
+
+springmvc的注解写法：@CrossOrigin默认设置了	allowCredentials = "true"
+	@CrossOrigin(origins = "http://localhost:9102")
+	public PageResult<TbBrand> findPage(int pageNum, int pageSize) {
+		s.addCookie(new Cookie("a1", "b1"));
+		return brandService.findPage(pageNum, pageSize);
+	}
+	
+	
+	
+在tomcat的web.xml(tomcat\conf\web.xml)加上下面的配置：
+	
+	<filter>
+	  <filter-name>CorsFilter</filter-name>
+	  <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+	  <init-param>
+	    <param-name>cors.allowed.origins</param-name>
+	    <param-value>*</param-value>
+	  </init-param>
+	  <init-param>
+	    <param-name>cors.allowed.methods</param-name>
+	    <param-value>GET,POST,HEAD,OPTIONS,PUT</param-value>
+	  </init-param>
+	  <init-param>
+	    <param-name>cors.exposed.headers</param-name>
+	    <param-value>*</param-value>
+	  </init-param>
+	  <init-param>
+	    <param-name>cors.support.credentials</param-name>
+	    <param-value>true</param-value>
+	  </init-param>
+	  <init-param>
+	    <param-name>cors.preflight.maxage</param-name>
+	    <param-value>10</param-value>
+	  </init-param>
+	</filter>
+	<filter-mapping>
+	  <filter-name>CorsFilter</filter-name>
+	  <url-pattern>/*</url-pattern>
+	</filter-mapping> 
+如果是maven的tomcat,这个文件的路径是 target/tomcat/conf/web/xml

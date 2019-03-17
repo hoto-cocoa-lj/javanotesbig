@@ -179,7 +179,7 @@ spring使用jdbc：事务spring-tx,spring-jdbc,加上ioc的包(这4个包spring�
 	1、所有1对多或者多对多都配置lazy=false，这样查询效率很低；	2、在web.xml里配置如下过滤器，作用是在过滤器中关闭session。配置的时候需要把这个过滤器的配置放在struts2等前端框架的过滤器之前，因为web.xml中的执行顺序是从上到下，回来的时候是从下往上关闭的。如果反过来，就会出现过滤器中关闭session了才在action里查询。
 
   <!-- 下面两个filter用来解决延迟加载问题的过滤器，放在web.xml里 -->
-  <!-- LocalContainerEntityManagerFactoryBean使用这个-->
+  <!-- LocalContainerEntityManagerFactoryBean(即jpa)使用这个-->
   <filter>
   	<filter-name>OpenSessionInViewFilter</filter-name>	<filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
   </filter> 
@@ -189,7 +189,7 @@ spring使用jdbc：事务spring-tx,spring-jdbc,加上ioc的包(这4个包spring�
   	<url-pattern>*.action</url-pattern>
   </filter-mapping>
   
-    <!-- LocalSessionFactoryBean 使用这个 -->
+    <!-- LocalSessionFactoryBean(hibernate原生，不用jpa) 使用这个 -->
 	<filter>
 		<filter-name>SpringOpenEntityManagerInViewFilter</filter-name>
 		<filter-class>

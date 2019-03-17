@@ -45,7 +45,8 @@
 			</mvc:annotation-driven>，
 		如果不配置这些在需要转换时候后端报错No converter found for return value of type，
 		前端报错415 Unsupported media type等错误		-->
-	<mvc:annotation-driven />
+
+		<mvc:annotation-driven/>
  
  <!-- 文件上传 -->
 	<bean id="multipartResolver"

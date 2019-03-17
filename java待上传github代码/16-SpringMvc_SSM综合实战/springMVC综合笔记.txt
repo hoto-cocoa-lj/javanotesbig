@@ -88,8 +88,29 @@ HttpServletRequest，HttpServletResponse，HttpSession，Model/ModelMap
 		return "editItem";
 	}
 
+接收map：
+前台用post传JSON.stringify({'pageNum':'1','pageSize':'5'})，
+后台用@RequestBody Map m可以接收到
+
 接收数组和List：
 数组直接用参数，List需要用包装的POJO，即POJO里有List的属性。页面传的属性的name写成list[索引].属性，一般不直接传List。	
+	
+HttpServletRequest，HttpServletResponse还可以用属性注入绑定，不用再在每个方法单独写，
+代码如下：(HttpSession没测试)
+
+	@RestController
+	public class C1 {
+		@Autowired
+		private HttpServletRequest r;
+		@Autowired
+		private HttpServletResponse s;
+
+		@RequestMapping("i")
+		public void ii() {
+			System.out.println(r + "\t" + s);
+			System.out.println(r.getSession());
+		}
+	}
 	
 ==========================================================================================
 
@@ -348,6 +369,7 @@ public class MyIterceptor1 implements HandlerInterceptor{
 ==========================================================================================
 
 json交互：
+	下面的dataType和contentType必须，省略后找个半个小时bug。
 	前端代码：
     <script type="text/javascript">
     	data={'user':'user11','pw':'pw11'};
@@ -399,7 +421,25 @@ https://jingyan.baidu.com/article/624e7459069f4034e8ba5a87.html
 
 ==========================================================================================
 
-
+跨域请求：
+设置Access-Control-Allow-Orign即可，如果要发送cookie，需要设置Access-Control-Allow-Credentials且前端ajax请求如下：(使用@CrossOrigin则不需要设置请求头)
+			$.ajax({
+				url:u,	type:'get',
+				xhrFields:{
+				     withCredentials:true 
+				  }
+			})
+			
+	@RequestMapping(value = "/page")
+	// @CrossOrigin(origins = "http://localhost:9102")
+	public PageResult<TbBrand> findPage(int pageNum, int pageSize) {
+		s.setHeader("Access-Control-Allow-Origin", "http://localhost:9102");
+		s.setHeader("Access-Control-Allow-Credentials", "true");
+		Cookie c = new Cookie("a1", "b1");
+		c.setMaxAge(3600);
+		s.addCookie(c);
+		return brandService.findPage(pageNum, pageSize);
+	}
 	
 ==========================================================================================
 
