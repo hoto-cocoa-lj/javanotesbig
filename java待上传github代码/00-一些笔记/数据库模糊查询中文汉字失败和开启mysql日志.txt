@@ -34,3 +34,8 @@ character-set-server = utf8
 collation-server = utf8_general_ci
 后重启，character_set_server是变成utf8，查询成功。
 
+
+SET GLOBAL general_log = 'On';		#设置日志开启
+show variables like '%general%';	#查看日志是否开启和日志文件位置
+删除日志文件后不会自动生成文件，关闭日志再开启即可。
+
