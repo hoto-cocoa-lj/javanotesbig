@@ -1,0 +1,7 @@
+#@SwitchHosts! {"url": null, "icon_idx": 0, "title": "itcast"}
+# itcast
+192.168.153.130 www.a.com
+192.168.153.130 cart.a.com
+192.168.153.130 www.ss3.com
+192.168.153.130 www.ss5.com
+192.168.153.130 www.ss1.com

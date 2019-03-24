@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE mycat:schema SYSTEM "schema.dtd">
+<mycat:schema xmlns:mycat="http://org.opencloudb/">
+	
+	<!-- 定义MyCat的逻辑库 -->
+	<!-- schema name="rc_schema1" checkSQLschema="false" sqlMaxLimit="100" dataNode="rc_dn1"></schema -->
+	<!-- schema name="pay_schema1" checkSQLschema="false" sqlMaxLimit="100" dataNode="pay_dn1"></schema -->
+	<schema name="rc_schema2" checkSQLschema="false" sqlMaxLimit="100" dataNode="rc_dn2"></schema>
+	<schema name="pay_schema2" checkSQLschema="false" sqlMaxLimit="100" dataNode="pay_dn2"></schema>
+
+	<!-- 定义MyCat的数据节点 -->
+	<!-- dataNode name="rc_dn1" dataHost="dtHost1" database="roncoo" / -->
+	<!-- dataNode name="pay_dn1" dataHost="dtHost1" database="edu_simple_pay" / -->
+	<dataNode name="rc_dn2" dataHost="dtHost2" database="roncoo" />
+	<dataNode name="pay_dn2" dataHost="dtHost2" database="edu_simple_pay" />
+
+	<!-- 注意：schema中的每一个dataHost中的host属性值必须唯一，否则会出现主从在所有dataHost中全部切换的现象。 -->
+	<!-- 定义数据主机dtHost1，只连接到MySQL读写分离集群中的Master节点,不使用MyCat托管MySQL主从切换 -->
+	<!--
+	<dataHost name="dtHost1" maxCon="500" minCon="20" balance="0"
+		writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100">
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="hostM1" url="192.168.1.205:3306" user="root" password="www.roncoo.com" />
+	</dataHost>
+	-->
+
+	<!-- 使用MyCat托管MySQL主从切换 -->
+	<!-- 定义数据主机dtHost2，连接到MySQL读写分离集群，并配置了读写分离和主从切换 -->
+	<dataHost name="dtHost2" maxCon="500" minCon="20" balance="1"
+		writeType="0" dbType="mysql" dbDriver="native" switchType="2" slaveThreshold="100">
+		<!-- 通过show slave status检测主从状态，当主宕机以后，发生切换，从变为主，原来的主变为从，这时候show slave 
+			status就会发生错误，因为原来的主没有开启slave，不建议直接使用switch操作，而是在DB中做主从对调。 -->
+		<heartbeat>show slave status</heartbeat>
+		<!-- can have multi write hosts -->
+		<writeHost host="hostM2" url="192.168.1.205:3306" user="root" password="www.roncoo.com" />
+		<writeHost host="hostS2" url="192.168.1.206:3306" user="root" password="www.roncoo.com" />
+	</dataHost>
+	<!-- 参数balance决定了哪些MySQL服务器参与到读SQL的负载均衡中 -->
+	<!-- balance="0"，为不开启读写分离，所有读操作都发送到当前可用的writeHost上-->
+	<!-- balance="1"，全部的readHost与stand by writeHost参与select语句的负载均衡-->
+	<!-- balance="2"，所有读操作都随机的在writeHost、readHost上分发-->
+	<!-- MyCat1.4版本中，若想支持MySQL一主一从的标准配置，并且在主节点宕机的情况下，从节点还能读取数据，
+	     则需要在MyCat里配置为两个writeHost并设置balance="1" -->
+	<!-- writeType="0"，所有写操作发送到配置的第一个writeHost，第一个挂了切到还生存的第二个writeHost-->
+	<!-- writeType="1"，仅仅对于galera for mysql集群这种多主多节点都能写入的集群起效，此时Mycat会随机选择一个writeHost并写入数据，
+	     对于非galera for mysql集群，请不要配置writeType=1，会导致数据库不一致的严重问题 -->
+
+</mycat:schema>
+

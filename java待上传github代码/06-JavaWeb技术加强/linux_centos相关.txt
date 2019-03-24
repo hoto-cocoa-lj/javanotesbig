@@ -66,7 +66,10 @@ com.alibaba.citrus.service.uribroker.impl.URIBrokerServiceImpl$URIBrokerInfo
 原帖名字：Centos7安装并配置mysql5.6完美教程，
 安装时完全按照作者说的，不要修改任何路径，不要思考(解压和写文件部分可以自己搞)。
 mysql我安装的是mysql-5.6.30-linux-glibc2.5-x86_64.tar.gz，已经保存在百度云。
-开启远程访问我是在mysql -uroot进入mysql后运行grant all privileges on *.* to 'root'。
+开启远程访问我是在mysql -uroot进入mysql后运行
+grant all privileges on *.* to 'root';
+或者
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;
 
 
 数据库mysql：
@@ -84,7 +87,9 @@ less /var/log/mysqld.log|grep error				#查看日志
 
 rm -rf /var/log/mysqld.log						#删除日志
 
+service mysqld start
 service mysqld restart							#重启
+service mysqld stop
 
 
 ========================================================================
@@ -121,7 +126,7 @@ firewall-cmd --add-service=ftp                 ##临时开放ftp服务
 firewall-cmd --add-service=ftp --permanent     ##永久开放ftp服务
 firewall-cmd --remove-service=ftp --permanent  ##永久移除ftp服务
 
-firewall-cmd --zone=public --add-port=80/tcp --permanent     ##永久添加80端口 
+firewall-cmd --zone=public --add-port=80/tcp --permanent     ##永久添加80端口,移除端口把add改成remove即可
 firewall-cmd --reload							#开放端口reload才生效
 firewall-cmd --zone=public --list-ports		   #查看所有打开的端口
 
@@ -158,7 +163,9 @@ tail -f logs/catalina.out 查看tomcat日志(当前路径tomcat根目录)
 yum安装gcc依赖：yum install gcc
 进入到解压目录：cd redis-3.0.0
 执行make编译Redis：make MALLOC=libc，报错的话可能是权限不够，改相应文件成777；
+删除redis后重新上传依旧报错，可以关闭ftp的xshell窗口重开再装
 继续完成安装：sudo make install
+
 
 
 修改redis.conf里daemonize no为yes				#设置后台启动

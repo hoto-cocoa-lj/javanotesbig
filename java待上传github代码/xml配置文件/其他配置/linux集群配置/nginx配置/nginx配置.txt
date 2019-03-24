@@ -1,0 +1,26 @@
+1、环境准备
+（1）需要安装 gcc 的环境
+yum install gcc-c++
+（2）第三方的开发包。
+yum install -y pcre pcre-devel
+yum install -y zlib zlib-devel
+yum install -y openssl openssl-devel
+
+2、将nginx-1.8.0.tar.gz解压后上传,cd /usr/local/rjb/nginx-1.8.0,
+复制粘贴如下代码后回车(prefix表示nginx将被安装到的路径)
+=================================
+./configure \
+--prefix=/usr/local/nginx \
+--pid-path=/var/run/nginx/nginx.pid \
+--lock-path=/var/lock/nginx.lock \
+--error-log-path=/var/log/nginx/error.log \
+--http-log-path=/var/log/nginx/access.log \
+--with-http_gzip_static_module \
+--http-client-body-temp-path=/var/temp/nginx/client \
+--http-proxy-temp-path=/var/temp/nginx/proxy \
+--http-fastcgi-temp-path=/var/temp/nginx/fastcgi \
+--http-uwsgi-temp-path=/var/temp/nginx/uwsgi \
+--http-scgi-temp-path=/var/temp/nginx/scgi
+=================================
+
+3、编译和安装 make后回车,然后make install再回车

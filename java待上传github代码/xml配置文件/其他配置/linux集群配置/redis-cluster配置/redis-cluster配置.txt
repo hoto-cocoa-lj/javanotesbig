@@ -1,0 +1,43 @@
+流程：
+
+0、准备工作
+（1）安装gcc yum install gcc-c++
+(以前的版本安装gcc,这次我安装gcc-c++,结果编译的时候报错,再安装gcc就好了)
+（2）使用yum命令安装 ruby  
+yum install ruby
+yum install rubygems
+
+
+1、复制6个redis到服务器,把redis.conf放到bin里,(同一台服务器运行两个以上redis的话修改端口),将cluster-enabled yes 前的注释去掉(632行)
+
+2、运行6个redis,./redis-server redis.conf(这两文件都在bin里)
+
+3、上传redis-3.0.0.gem并安装,install redis-3.0.0.gem
+
+4、使用 ruby 脚本搭建集群。进入redis源码目录中的src目录,执行下面的命令
+./redis-trib.rb create --replicas 1 192.168.25.140:7001 192.168.25.140:7002 192.168.25.140:7003
+192.168.25.140:7004 192.168.25.140:7005 192.168.25.140:7006
+(这里1表示每个主节点创建1个从节点)
+
+=====================================================================
+
+每台master服务器有对应的slave服务器
+
+redis-cli -h 127.0.0.1 -p 6380 -c连接某redis后(-c代表连接的是redis集群),info Replication可以查看主从信息。
+
+容错机制-投票
+（1）选举过程是集群中所有master参与,如果半数以上master节点与故障节点通信超过(cluster-node-timeout),认为该节点故障，自动触发故障转移操作.  故障节点对应的从节点自动升级为主节点
+（2）什么时候整个集群不可用(cluster_state:fail)? 
+如果集群任意master挂掉,且当前master没有slave.集群进入fail状态,也可以理解成集群的slot映射[0-16383]不完成时进入fail状态. 
+
+=====================================================================
+
+要注意的坑：
+
+1、配置成功安装或者打包，需要取maven仓库查看，直接查看工作空间的源码无效
+
+2、redisTemplate用org.springframework.data.redis.core.StringRedisTemplate,
+别用org.springframework.data.redis.core.RedisTemplate,
+不然key上出现\xac\xed\x00\x05t\x00\x01c,
+在eclipse自己创建的键值直连redis会查不到(好像有延迟),
+直连redis创建的键值在eclipse查不到,一开始我还以为连接有问题,查了1小时bug

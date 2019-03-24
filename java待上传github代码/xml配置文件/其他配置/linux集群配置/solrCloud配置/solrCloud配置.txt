@@ -1,0 +1,68 @@
+ip和端口可能有误，自行修改
+
+1、把配置好的solrHome(包含仓库core信息等)和包含solr项目的tomcat复制粘贴到linux，
+修改tomcat里solr的web.xml第43行的位置成solrHome的地址(collection1等core所在的目录).
+
+
+2、修改每个tomcat/bin/catalina.sh,把此配置替换第234行(java_opts所在的行)：
+JAVA_OPTS="-DzkHost=192.168.25.140:2181,192.168.25.140:2182,192.168.25.140:2183"
+这3个地址就是zookeeper的3个注册地址,是用来设置JVM相关运行参数的变量.  
+此配置作用是在tomcat启动时找到zookeeper集群。
+注意原来234行的内容是：
+#JAVA_OPTS="$JAVA_OPTS -Dorg.apache.catalina.security.SecurityListener.UMASK=`umask`"
+要把这一整行替换掉，且不能带上中文符号(空格等)，不然报错未预期的符号 `(' 附近有语法错误
+
+
+3、配置solrCloud相关的配置。每个 solrhome 下都有一个 solr.xml，把其中的 ip 及端口号配置好（是对应的tomcat的IP和端口）。
+即修改  <solrcloud>里的<str name="host">和<int name="hostPort">的值。
+
+========================================================
+
+4、让 zookeeper 统一管理配置文件。需要把 solrhome下collection1/conf 目录上传到
+zookeeper。上传任意 solrhome 中的配置文件即可。我们需要使用solr给我们提供的工具上传配置文件：
+solr-4.10.3/example/scripts/cloud-scripts/zkcli.sh
+将solr-4.10.3压缩包上传到linux，解压，然后进入solr-4.10.3/example/scripts/cloud-scripts目录 ，执行下列命令(不要有换行符)
+./zkcli.sh -zkhost 192.168.25.140:2181,192.168.25.140:2182,192.168.25.140:2183 -cmd upconfig -confdir /usr/local/solrhomes/solrhome-1/collection1/conf -confname myconf
+参数解释
+-zkhost  ：指定zookeeper地址列表
+-cmd    ：指定命令。upconfig 为上传配置的命令
+-confdir  : 配置文件所在目录
+-confname : 配置名称
+
+
+执行命令时可能报错找不到或无法加载主类 org.apache.solr.cloud.ZkCLI，
+解决方法见https://blog.csdn.net/justweb/article/details/78310739，
+我在solr-4.10.3/example目录下执行完 java -jar start.jar 命令ctrl+c退出后也解决了问题
+
+bugs:
+	1、完成后上述步骤后在zookeeper不重启的情况下开启solr的tomcat，报错503，查看tomcat日志，提示collection1(core)有两个，一个是solrhome原有，一个是solr-4.10.3的(我把这个包解压在solrhome)，删除此包后bug解决。
+	2、用SolrTemplate添加数据报错字段不对。原因是使用了collection1的配置文件,真实数据在collection3.删除配置文件重新上传即可。具体操作是用ZooInspector连接任意一个zookeeper，删除configs/myconf。只删除myconf不要删除configs，因为上面的上传命令是把collection1/conf里的所有文件上传到configs/myconf下，configs可能有其他程序的配置文件。
+	
+	3、再用上面的上传命令，上传不停止:路径写错了
+	
+	4、在core里query显示503:可能solr服务器挂了
+	
+	5、创建collection1失败,提示scheme.xml里1 字节的 UTF-8 序列的字节 1 无效。把该文件的<?xml version="1.0" encoding="UTF-8" ?>改成<?xml version="1.0" encoding="UTF8" ?>
+	
+	6、同5，提示scheme.xml里某行无法识别的字符。可能是中文空格什么的，删除即可
+	
+ZooInspector在安装包里，解压后双击build里的jar文件运行，填写ip和端口后可以直接管理zookeeper的文件。可以发现修改任意zookeeper其他zookeeper都会被修改
+
+========================================================
+
+5、访问如下地址可以分片和删除collection
+分片：http://192.168.153.131:11112/solr/admin/collections?action=CREATE&name=collection2&numShards=1&replicationFactor=3
+删除：http://192.168.153.131:11112/solr/admin/collections?action=delete&name=collection2
+分片后没有数据，需要重新加入数据。
+这里Solr服务器可能报错ClassNotFoundException - DataImportHandler,需要在每个solr服务器的webapps\solr\WEB-INF\lib里放入solr-dataimporthandler这个jar包;
+numShards=a表示collections被分成a份,replicationFactor=b表示分片后的数据有几个服务器分
+比如numShards=1&replicationFactor=3表示整个数据分成1片,由3个服务器一起处理,每个服务器都有全部数据,这种情况挂了两台也能继续运行;
+numShards=3&replicationFactor=1表示整个数据分成3个片，3个服务器各处理1片,这种情况挂了挂了任意一台服务器都不能继续运行,此时访问solr会报错503;
+这两个参数的乘积要大于等于solr服务器台数才能分片,否则报错.
+solr能继续运行的要求是没有挂的服务器加在一起能够处理所有分片。
+
+========================================================
+
+使用spring整合solrCloud的配置和用法，参考 SpringJunit.java和 applicationContext-solr.xml
+
+能切换生产环境和开发环境的配置需要修改pom，见applicationContext-solr_changable.xml和pom.xml,打包时加上参数发现能正常切换

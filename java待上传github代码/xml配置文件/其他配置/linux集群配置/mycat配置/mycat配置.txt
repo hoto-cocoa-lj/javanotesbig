@@ -1,0 +1,69 @@
+流程：
+
+1、安装数据库(直接上传的不能用,还是要安装),启动MySQL服务service mysql start,
+登录数据库mysql -u root,设置远程登录权限GRANT ALL PRIVILEGES ON *.* TO 'root'@'%'IDENTIFIED BY '密码'  WITH GRANT OPTION;
+在本地远程连接MySQL进行测试  
+
+2、将Mycat-server-1.4-release-20151019230038-linux.tar.gz解压后上传至服务器,
+放到/usr/local/rjb/mycat目录下。
+启动./mycat start
+停止./mycat stop
+重启./mycat restart
+Mycat的默认端口号为：8066
+
+3、配置schema.xml 、server.xml 和 rule.xml，如实例
+
+=============================================================
+
+其他笔记：
+
+mycat的日志在/usr/local/rjb/mycat/conf/log4j.xml里配置,默认是/usr/local/rjb/mycat/logs/mycat.log
+mysql(linux)的日志默认是/usr/local/mysql/data/localhost.log
+
+=============================================================
+
+balance属性负载均衡类型，目前的取值有3种：
+1. balance=“0”, 所有读操作都发送到当前可用的writeHost上。
+2. balance=“1”，所有读操作都随机的发送到readHost。
+3. balance=“2”所有读操作都随机的发给writeHost、readhost
+
+writeType属性负载均衡类型，目前的取值有3种：
+1. writeType=“0”, 所有写操作都发送到可用的writeHost上。
+2. writeType=“1”，所有写操作都随机的发送到readHost。
+3. writeType=“2”，所有写操作都随机的发给writeHost、readhost
+
+switchType 目前有三种选择：
+-1 表示不自动切换
+1 默认值，自动切换 
+2 基于MSQL主从同步的状态决定是否切换
+
+=============================================================
+
+
+如下配置全部失败,第二张表不获取不到新写入的数据,原有的数据mycat也读不到，
+失败原因应该是有些配置没做,不如数据配置文件的server-id没有等等。。
+需要时看其他教程的配置，未测试
+
+	<dataHost name="localhost1" maxCon="1000" minCon="10" balance="1"
+		writeType="0" dbType="mysql" dbDriver="native" >
+		
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="hostM1" url="192.168.153.131:3306" user="root"
+			password="">
+			<readHost host="hostS1" url="192.168.43.247:3306" user="root"
+			password=""/>
+		</writeHost>
+
+	</dataHost>
+
+	
+	<dataHost name="localhost1" maxCon="1000" minCon="10" balance="1"
+		writeType="0" dbType="mysql" dbDriver="native" switchType="2"  slaveThreshold="100">
+		
+		<heartbeat>show slave status</heartbeat>
+			<writeHost host="hostS1" url="192.168.43.247:3306" user="root"
+			password=""/>
+		<writeHost host="hostM1" url="192.168.153.131:3306" user="root"
+			password=""/>
+
+	</dataHost>

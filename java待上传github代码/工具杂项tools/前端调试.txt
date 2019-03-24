@@ -21,4 +21,7 @@
 
 ======================================================================
 	
-	
+使用fiddler的autoresponder可以把服务器的js替换成本地js,
+方法是选择想要替换的js,add rule,下面的rule editor就是替换规则,
+在第二个输入框输入自己的js的路径,点save保存.然后勾选enable rules和
+unmatched requests passthrough(否则不符合规则的请求全部被拦截而失效)即可

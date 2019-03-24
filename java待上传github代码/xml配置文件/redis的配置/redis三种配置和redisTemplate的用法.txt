@@ -1,0 +1,189 @@
+String url="192.168.153.129";
+使用jedis需要导入redis.clients.jedis和org.apache.commons.commons-pool2。
+
+redis.conf的logfile "mylog.log"可以看到日志,loglevel可以设置日志输出级别
+
+1_：使用jedis：
+		Jedis j = new Jedis(url,6379);
+		String s=j.get("modules");
+		System.out.println(s);
+
+========================================================================
+2_使用spring整合的带连接池的redis：
+
+	在applicationContext.xml里导入applicationContext-redis.xml(a)，a的配置：
+    <!-- 创建Jedis的连接池配置对象    JedisPoolConfig config = new JedisPoolConfig(); -->
+    <bean id="config" class="redis.clients.jedis.JedisPoolConfig">
+    	 <property name="maxTotal" value="50"></property>
+    	 <property name="maxIdle" value="10"></property>
+    </bean>
+    
+    <!-- 创建连接池对象  JedisPool pool = new JedisPool(config, "192.168.153.129", 6379); -->
+    <bean id="pool" class="redis.clients.jedis.JedisPool">
+    	<constructor-arg index="0" ref="config"></constructor-arg>
+    	<constructor-arg index="1" value="192.168.153.129" type="java.lang.String"></constructor-arg>
+    	<!-- <constructor-arg index="2" value="6379"></constructor-arg> -->
+    </bean>
+	
+	maven导包，详情见方法3；
+	
+		JedisPoolConfig c = new JedisPoolConfig();
+		c.setMaxIdle(10);
+		c.setMaxTotal(30);
+		JedisPool jp = new JedisPool(c,url);
+		Jedis j = jp.getResource();
+		String s=j.get("modules");
+
+========================================================================
+
+3_使用spring整合的带org.springframework.data.redis.core.RedisTemplate的redis
+
+在主项目的pom里设置：
+        <!-- redis  start  -->
+        <dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>2.6.2</version>
+		</dependency>
+		
+		<!-- 这个好像不用
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+			<version>2.2</version>
+		</dependency>   -->
+		
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-redis</artifactId>
+			<version>${springdataredis.version}</version>
+		</dependency>
+		<!-- redis end  -->
+		
+		
+在applicationContext.xml里导入applicationContext-redis.xml(外面有)：
+
+
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">  
+        <property name="maxIdle" value="300" />        
+        <property name="maxWaitMillis" value="3000" />  
+        <property name="testOnBorrow" value="true" />  
+    </bean>  
+	
+    <bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+            <property name="hostName" value="192.168.153.129"></property>
+            <property name="port" value="6379"></property>
+			<property name="password" value="asd123"></property>
+            <property name="poolConfig" ref="poolConfig"></property>
+            <!-- redis有16个数据库，这个可以用来切换数据库 -->
+            <property name="database" value="0"></property>
+     </bean>
+        
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">  
+        <property name="connectionFactory" ref="redisConnectionFactory" /> 
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+        </property>
+        <property name="valueSerializer">
+        	<bean class="org.springframework.data.redis.serializer.StringRedisSerializer"> 
+        	</bean>
+        </property> 
+    </bean>  
+
+	
+	
+		
+	r.boundHashOps(key)/r.boundListOps(key)/r.boundSetOps(key)/r.boundValueOps(key)/
+	r.boundZSetOps(key)有各自增删改查方法，r.delete(key)也可以删除，
+	用来直接删除整个list/hash/set/zset，demo如下：
+	
+	
+4.5.2值类型操作
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations="classpath:spring/applicationContext-redis.xml")
+public class TestValue {
+	@Autowired
+	private RedisTemplate redisTemplate;		
+	public void setValue(){
+		redisTemplate.boundValueOps("name").set("itcast");		
+	}		
+	public void getValue(){
+		String str = (String) redisTemplate.boundValueOps("name").get();
+		System.out.println(str);
+	}		
+	public void deleteValue(){
+		redisTemplate.delete("name");;
+	}	
+}
+4.5.3 Set类型操作
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations="classpath:spring/applicationContext-redis.xml")
+public class TestSet {
+	@Autowired
+	private RedisTemplate redisTemplate;	
+	public void setValue(){
+		redisTemplate.boundSetOps("nameset").add("曹操");		
+		redisTemplate.boundSetOps("nameset").add("刘备");	
+		redisTemplate.boundSetOps("nameset").add("孙权");
+	}	
+	public void getValue(){
+		Set members = redisTemplate.boundSetOps("nameset").members();
+		System.out.println(members);
+	}	
+	public void deleteValue(){
+		redisTemplate.boundSetOps("nameset").remove("孙权");
+	}	
+	public void deleteAllValue(){
+		redisTemplate.delete("nameset");
+	}
+}
+
+4.5.4 List类型操作
+创建测试类TestList 
+	public void testSetValue1(){		
+		redisTemplate.boundListOps("namelist1").rightPush("刘备");
+		redisTemplate.boundListOps("namelist1").rightPush("关羽");
+		redisTemplate.boundListOps("namelist1").rightPush("张飞");		
+	}	
+	public void testGetValue1(){
+		List list = redisTemplate.boundListOps("namelist1").range(0, 10);
+		System.out.println(list);
+	}
+	public void testSetValue2(){		
+		redisTemplate.boundListOps("namelist2").leftPush("刘备");
+		redisTemplate.boundListOps("namelist2").leftPush("关羽");
+		redisTemplate.boundListOps("namelist2").leftPush("张飞");		
+	}	
+	public void testGetValue2(){
+		List list = redisTemplate.boundListOps("namelist2").range(0, 10);
+		System.out.println(list);
+	}
+	public void testSearchByIndex(){
+		String s = (String) redisTemplate.boundListOps("namelist1").index(1);
+		System.out.println(s);
+	}	
+	public void testRemoveByIndex(){
+		redisTemplate.boundListOps("namelist1").remove(1, "关羽");
+	}
+4.5.5 Hash类型操作
+创建测试类TestHash
+	public void testSetValue(){
+		redisTemplate.boundHashOps("namehash").put("a", "唐僧");
+		redisTemplate.boundHashOps("namehash").put("b", "悟空");
+		redisTemplate.boundHashOps("namehash").put("c", "八戒");
+		redisTemplate.boundHashOps("namehash").put("d", "沙僧");
+	}
+	public void testGetKeys(){
+		Set s = redisTemplate.boundHashOps("namehash").keys();		
+		System.out.println(s);		
+	}
+	public void testGetValues(){
+		List values = redisTemplate.boundHashOps("namehash").values();
+		System.out.println(values);		
+	}
+	public void testGetValueByKey(){
+		Object object = redisTemplate.boundHashOps("namehash").get("b");
+		System.out.println(object);
+	}
+	public void testRemoveValueByKey(){
+		redisTemplate.boundHashOps("namehash").delete("c");

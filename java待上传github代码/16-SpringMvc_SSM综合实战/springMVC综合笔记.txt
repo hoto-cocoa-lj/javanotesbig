@@ -324,6 +324,11 @@ public class MyIterceptor1 implements HandlerInterceptor{
 可以发现访问一个页面拦截器触发了多次，
 测试发现是载入静态资源(上面列子的a.js和b.js)也触发了拦截器。
 
+HandlerInterceptor接口有3个方法，preHandler是处理器controller处理前调用，
+postHandler是处理器controller处理后渲染视图前调用，
+afterCompletion是视图渲染完毕后调用，且只调用preHandler返回true的拦截器
+的afterCompletion
+
 ==========================================================================================
 
 注意不要出现路径重复的现象。比如某页面是/search.html，自动调用angularjs的方法访问/search，
@@ -364,7 +369,6 @@ public class MyIterceptor1 implements HandlerInterceptor{
 	}
 	......
 }
-
 
 ==========================================================================================
 
@@ -441,6 +445,10 @@ https://jingyan.baidu.com/article/624e7459069f4034e8ba5a87.html
 		return brandService.findPage(pageNum, pageSize);
 	}
 	
+==========================================================================================
+
+@RequestMapping的路径可以模糊匹配和正则匹配	，详情百度
+
 ==========================================================================================
 
 	
