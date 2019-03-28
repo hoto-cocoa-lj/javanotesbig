@@ -358,10 +358,14 @@ InputStreamReader可以把字节流转成字符流，查源码发现FileReader�
 		D d1 = (D) i.readObject();
 		System.out.println(d1);
 	}
-	
+
 ================================================================================
 
-多线程的两种写法：
+new Random().nextInt(n)方法生成一个介于[0,n)的随机的int
+
+================================================================================
+
+多线程的3种写法：
 1、继承方法：
 	@Test
 	public void t7() {
@@ -415,6 +419,40 @@ InputStreamReader可以把字节流转成字符流，查源码发现FileReader�
 			}
 		}
 	}
+	
+3、继承callable写法：
+	public class C implements Callable {
+		public Object call() throws Exception {
+			int i = 0;
+			for (; i < 10; i++) {
+				Thread.sleep(22);
+				System.out.println(Thread.currentThread().getName() + ":" + i);
+			}
+			return i;
+		}
+	}
+	@Test
+	public void ttttt1() throws Exception {
+		int i;
+		// FutureTask[] l = new FutureTask[10];
+		List<FutureTask> li = new ArrayList();
+
+		for (i = 0; i < 10; i++) {
+			FutureTask ft = new FutureTask(new C());
+			// l[i] = ft;
+			li.add(ft);
+			Thread t = new Thread(ft);
+			t.setDaemon(true);
+			t.start();
+		}
+		for (i = 0; i < 10; i++) {
+			// System.out.println(l[i].get());
+			System.out.println(li.get(i).get());
+		}
+		while (true)
+			;
+	}
+
 ================================================================================
 
 测试线程不安全：
@@ -493,6 +531,37 @@ InputStreamReader可以把字节流转成字符流，查源码发现FileReader�
 		}
 	}
 	
+================================================================================
+线程池：
+线程池的execute没有返回值,submit有返回值.submit里的参数可以是Callable,也可以是Runnable,前者重写的call有返回值,后者重写的run方法没有返回值,
+
+	public static void main(String[] args) throws Exception{
+		ExecutorService pool = Executors.newFixedThreadPool(3);
+		List<Future<?>> taskResults = new ArrayList();
+		for (int i = 0; i < 11; i++) {
+			final int j = i;
+			Future<?> taskResult = pool.submit(new Callable<Integer>() {
+				public Integer call() throws Exception {
+					String name = Thread.currentThread().getName();
+					System.out.println(j + ":start\t" + name);
+					try {
+						Thread.sleep(1111);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					System.out.println(j + ":end\t" + name);
+					return j;
+				}
+			});
+			taskResults.add(taskResult);
+		}
+		for (Future<?> taskResult : taskResults) {
+			System.out.println(taskResult.get());
+		}
+		System.out.println("over");
+		pool.shutdown();
+	}
+
 ================================================================================
 
 第二章无，第三章：

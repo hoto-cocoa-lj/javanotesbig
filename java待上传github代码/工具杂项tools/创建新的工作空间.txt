@@ -7,3 +7,8 @@ preferences-->workspace-->text file encoding选择utf-8；
 
 svn不上传自己编译的东西：
 window-->preferences-->team-->ignored resources,add pattern里分别加上.settings，.project，.classpath，.class，target
+
+
+
+
+window-->perspective-->customize perspective-->shortcuts可以修改右键展示的项

@@ -19,9 +19,8 @@ c3p0连接池地址是
 
 
 
-想查看mysql的日志，百度了一对方法都无效，修改my.ini都不会无法启动mysql。
-终于在
-找到了开启日志的方法：在my.ini设置general_log=on，
+想查看mysql的日志，百度了一对方法都无效，修改my.ini后无法启动mysql。
+终于在**找到了开启日志的方法：在my.ini设置general_log=on，
 此时在workbench执行show variables like 'general_log%'可以看到设置成功
 和日志所在文件。打开文件，发现查询语句是
 select * from base_dict where dict_type_name like binary '%?%'，

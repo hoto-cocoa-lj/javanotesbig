@@ -1,3 +1,0 @@
-eclipse代码左边虚线对齐设置
-点击window–>preferences打开设置，勾选“show whitespace characters” ，
-点击configure visibility。然后把carriage return和line feed勾选去掉。

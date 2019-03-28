@@ -1,5 +1,0 @@
-netstat -aon|findstr "8080"找到占用端口的pid（比如1552）；
-如果任务管理器找不到pid，可以用taskkill /pid 1552 /f   关闭该程序。
-
-
-https://blog.csdn.net/u010486124/article/details/38845163

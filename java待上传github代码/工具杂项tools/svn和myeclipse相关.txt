@@ -16,3 +16,9 @@
 不然出问题了很麻烦。提交的时候选择提交哪些就行了，一次一次提交。提交前一定要更新。
 
 将svn文件里的.svn删除，就能消除svn标签变成普通文件。
+
+====================================================================
+
+eclipse代码左边虚线对齐设置
+点击window–>preferences打开设置，勾选“show whitespace characters” ，
+点击configure visibility。然后把carriage return和line feed勾选去掉。
