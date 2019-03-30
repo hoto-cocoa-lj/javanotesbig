@@ -1,6 +1,24 @@
+端口占用：
+
+windows:
 netstat -aon|findstr "8080"找到占用端口的pid（比如1552）；
 如果任务管理器找不到pid，可以用taskkill /pid 1552 /f   关闭该程序。
+
 https://blog.csdn.net/u010486124/article/details/38845163
+
+
+centos:
+
+1、检查端口被哪个进程占用
+netstat -lnp|grep 88   #88请换为你的apache需要的端口，如：80
+
+2、查看进程的详细信息:			ps 1777
+
+3、杀掉进程，重新启动apache
+kill -9 1777        #杀掉编号为1777的进程（请根据实际情况输入）
+service httpd start #启动apache
+
+http://www.cnblogs.com/mracale/p/5786831.html
 
 ===============================================================
 get请求：

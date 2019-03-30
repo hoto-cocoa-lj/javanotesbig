@@ -1,0 +1,348 @@
+安装java：
+
+1_将jdk复制粘贴到centos的rjb，jdk的根目录就是JAVA_HOME。
+
+2_到centos最上层。打开vim /etc/profile，在最下面加上下面3行：
+export JAVA_HOME=	JAVA_HOME（这里是jdk的根目录）
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+然后source /etc/profile更新配置。
+
+3_下面的步骤直接在虚拟机上操作，别在xftp的控制台操作，否则各自找不到命令：
+输入java version回车(下面全都不会写回车了)。
+如果报错找不到命令，可能是第二部修改有问题。
+如果报错权限不够，修改lib里所有文件的权限。
+xftp右键可修改。如果报错/lib/ld-linux.so.2: bad ELF interpreter: 没有那个文件或目录，
+说明在64位系统安装了32位java，输入sudo yum install glibc.i686回车即可。
+输入java version 成功的话显示java版本。
+
+=========================================================================
+
+
+=========================================================================
+
+网络相关：虚拟机ifconfig不显示127.0.0.0以外的ip：
+一般重启就行了，有一次重启了也无效。重启网络服务service network start，
+报错with error code.see 'systemctl status network.service'，
+输入systemctl status network.service回车，
+报错 Failed to start LSB: Bring up/down networking，解决方式：禁用NetworkManager，
+1. systemctl stop NetworkManager
+2. systemctl disable NetworkManager 
+然后重启网络服务，能正常联网了！
+
+=========================================================================
+
+
+=========================================================================
+
+=========================================================================
+
+安装zookeeper：
+将zookeeper-3.4.5.tar.gz解压后上传到linux服务器，conf下zoo_sample.cfg改名为zoo.cfg，
+这个文件里clientPort=2181表示端口，加上下面两行：
+dataDir=/usr/local/rjb/zookeeper-3.4.5/data
+dataLogDir=/usr/local/rjb/zookeeper-3.4.5/log，
+用来指定两个路径的位置，在zookeeper内部
+
+
+开启zookeeper：
+cd /usr/local/rjb/registry-zookeeper/bin-->./zkServer.sh start。
+查看zookeeper开启状态./zkServer.sh status。(报错无权限则修改成777)
+
+=========================================================================
+
+启动dubbo：
+把dubbo-damin解压后的文件复制到tomcat的webapps下，如果报错
+com.alibaba.citrus.service.uribroker.impl.URIBrokerServiceImpl$URIBrokerInfo
+说明jdk版本是1.8不能运行这个，需要改成1.7的。改完后，重启。
+如果报错 Starting ZkClient event thread说明 zookeeper没有启动，启动即可。
+如果报错端口占用，查询端口的pid关闭即可，经常是java占用了。
+
+=========================================================================
+
+安装数据库：
+详情见E:\GitHub\reboot_and_tools\Centos7安装并配置mysql5.6完美教程 - CSDN博客.html,，
+原帖地址：https://blog.csdn.net/qq_17776287/article/details/53536761，
+原帖名字：Centos7安装并配置mysql5.6完美教程，
+安装时完全按照作者说的，不要修改任何路径，不要思考(解压和写文件部分可以自己搞)。
+mysql我安装的是mysql-5.6.30-linux-glibc2.5-x86_64.tar.gz，已经保存在百度云。
+开启远程访问我是在mysql -uroot进入mysql后运行
+grant all privileges on *.* to 'root';
+或者
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;
+
+
+数据库mysql：
+
+似乎默认账号root没有密码。
+
+查看ip：ip add或者ifconfig
+centos账号密码：root/shuang
+
+rpm -qa | grep mysql							查看CentOS自带的mysql
+
+rpm -e --nodeps ???								mysql卸载
+
+less /var/log/mysqld.log|grep error				#查看日志
+
+rm -rf /var/log/mysqld.log						#删除日志
+
+service mysqld start
+service mysqld restart							#重启
+service mysqld stop
+
+
+========================================================================
+https://www.cnblogs.com/moxiaoan/p/5683743.html
+
+centos7防火墙操作：
+常用命令介绍
+几条关于防火墙的命令：
+
+
+2.关闭防火墙：systemctl stop firewalld.service 
+3.开机不启动防火墙：systemctl disable firewalld.service
+
+版权声明：本文为博主原创文章，转载请附上博文链接！
+firewall-cmd --state                           ##查看防火墙状态，是否是running
+									##开启状态：running 	关闭状态：not running 
+systemctl start firewalld						开启防火墙
+注意：防火墙关闭的情况下，netstat -lntp | grep 6379显示6379被占用，
+打开了redis且配置没问题，但是远程始终连不上。无法telnet ip 6379，能telnet ip 22，
+发现开启防火墙，并开放6379后解决。
+
+
+永久关闭后，开启防火墙（开机自动启用）
+systemctl enable firewalld
+chkconfig iptables on
+
+该端口开启的话，在主机上tenlet ip port(如telnet 10.20.66.37 8090)可以进入。
+
+firewall-cmd --reload                          ##重新载入配置，比如添加规则之后，需要执行此命令
+firewall-cmd --get-zones                       ##列出支持的zone
+firewall-cmd --get-services                    ##列出支持的服务，在列表中的服务是放行的
+firewall-cmd --query-service ftp               ##查看ftp服务是否支持，返回yes或者no
+firewall-cmd --add-service=ftp                 ##临时开放ftp服务
+firewall-cmd --add-service=ftp --permanent     ##永久开放ftp服务
+firewall-cmd --remove-service=ftp --permanent  ##永久移除ftp服务
+
+firewall-cmd --zone=public --add-port=80/tcp --permanent     ##永久添加80端口,移除端口把add改成remove即可
+firewall-cmd --reload							#开放端口reload才生效
+firewall-cmd --zone=public --list-ports		   #查看所有打开的端口
+
+
+iptables -L -n                                 ##查看规则，这个命令是和iptables的相同的
+man firewall-cmd                               ##查看帮助
+
+mysql -uroot  -h192.168.88.130					#远程登陆mysql，-uroot表示用户名root
+
+========================================================================
+
+
+安装tomcat：
+复制粘贴到centos的rjb，在bin路径sh startup.sh。
+如果报错Cannot find bin/catalina.sh说明权限不够，把bin下文件权限全部放开。
+成功的话显示tomcat started。
+tail -f logs/catalina.out 查看tomcat日志(当前路径tomcat根目录)
+
+开启tomcat：
+cd /usr/local/rjb/apache-tomcat-7.0.57/bin
+sh startup.sh
+将war文件放在/usr/local/rjb/apache-tomcat-7.0.57/webapps即可，
+war文件会不封装java文件保证源码安全
+配置tomcat后，用workbench导出导入数据库即可，导入时需要先建数据库，选定后再导入
+tail -f logs/catalina.out 查看tomcat日志(当前路径tomcat根目录)
+
+
+将war放在tomcat的webapps下，tomcat会自动解压并运行，但是删除war包项目也会被删除。
+可以先解压war包再放进去。
+
+=========================================================================
+
+安装redis：https://www.cnblogs.com/zuidongfeng/p/8032505.html
+yum安装gcc依赖：yum install gcc
+进入到解压目录：cd redis-3.0.0
+执行make编译Redis：make MALLOC=libc，报错的话可能是权限不够，改相应文件成777；
+删除redis后重新上传依旧报错，可以关闭ftp的xshell窗口重开再装
+继续完成安装：sudo make install
+
+
+
+修改redis.conf里daemonize no为yes				#设置后台启动
+
+开启redis：（2步）
+1、src/redis-server /usr/local/rjb/redis-3.0.0/redis.conf --port 6379
+		#设置后台启动并开放端口，可以远程连接。（先到redis目录）
+2、src/redis-cli 								#开启redis，先启动服务
+src/redis-cli shutdown						#关闭redis
+
+直接在虚拟机上开启使用redis：
+cd /usr/local/rjb/redis-3.0.0/src
+./redis-cli
+
+
+./redis-server /usr/local/redis-4.0.6/redis.conf			#后台启动			
+#启动redis（redis账号密码都是root？？，先到redis目录，我装在rjb同级目录，redis.conf放在根目录）
+
+./redis-server 									#普通启动
+127.0.0.1:6379> keys *							#打开客户端，并查看所有keys
+
+netstat -lntp | grep 6379						#检测6379端口是否被占用
+kill -9 进程id									#发现某进程占用端口后，关闭该进程
+
+./bin/redis-cli -h 192.168.88.130 -p 6379	
+							#打开redis后（./bin/redis-cli）才可以（远程）连接，需要防火墙开放6379
+192.168.88.130:6379>							#输入ping返回pong表示连接正常
+
+ps -ef | grep redis								#使用命令查看6379端口是否启动
+
+
+
+
+
+redis持久化
+两种方法：rdb持久化和aof持久化
+rdb生成rdb二进制文件，保存数据；
+aof生产文本文件，保存操作过程。
+AOF包含一个格式清晰、易于理解的日志文件用于记录所有的修改操作，可以通过该文件完成数据的重建。
+例如使用flushall清空数据后，可以马上关闭redis服务器，把aof里的flushall删除，即可重建；
+
+AOF的劣势有哪些呢？
+1). 对于相同数量的数据集而言，AOF文件通常要大于RDB文件。RDB 在恢复大数据集时的速度比 AOF 的恢复速度要快。
+2). 根据同步策略的不同，AOF在运行效率上往往会慢于RDB。总之，每秒同步策略的效率是比较高的，同步禁用策略的效率和RDB一样高效。
+
+https://www.cnblogs.com/AndyAo/p/8135980.html
+
+========================================================================
+
+查看java版本：	java -version
+
+========================================================================
+
+关于“该虚拟机似乎正在使用中”的解决方法
+https://blog.csdn.net/Ethan706/article/details/41451467
+今天，在没有关闭虚拟机的情况下关闭了电脑，造成的影响就是，重新开机并启动虚拟机后，ubuntu不能正常打开了，提示“该虚拟机似乎正在使用中”。
+
+解决方法是删除掉虚拟机ubuntu安装目录中的.lck文件，然后重启虚拟机就可以了。
+
+这个.lck文件是虚拟机的磁盘锁文件。虚拟机的磁盘和主机的磁盘是共存的，只是由于采用了特定的虚拟机制，使得两者互不影响。在使用虚拟机时，vmware就会生成若干磁盘锁文件，用于保护当前虚拟机占用的磁盘不会被主机或者其他虚拟机占用修改。在正常关闭虚拟机后，vmware会自动删除这个锁。可是在少数情况下，例如主机突然崩溃、非正常关机等，vmware就不能删除.lck磁盘锁文件了。所以下次再启动虚拟机时，vmware还会误以为需要启动的虚拟系统已经正在运行中了，就会出现提示。因此删除磁盘锁文件之后就恢复正常了。
+
+========================================================================
+docker：
+docker的镜像可以理解为软件,pull了哪些镜像就装了哪些软件,比如tomcat,
+启动(run)镜像就启动了tomcat,tomcat需要发布自己的站点的文件,有两种方法,
+一种是目录挂载,创建目录到目录的映射,docker会自己取指定的地点找文件,不需要上传;另一种是进入镜像,通过cp把宿主机的文件上传到镜像里。
+
+启动与停止Docker：
+systemctl命令是系统服务管理器指令，它是 service 和 chkconfig 两个命令组合。
+启动docker：systemctl start docker
+停止docker：systemctl stop docker
+重启docker：systemctl restart docker
+查看docker状态：systemctl status docker
+开机启动：systemctl enable docker
+
+查看docker概要信息：docker info
+查看docker帮助文档：docker --help
+
+列出docker下的所有镜像：docker images
+docker search 镜像名称(redis)
+
+从Docker Hub拉取镜像(速度慢)：docker pull centos:7
+使用ustc的镜像(速度快)：
+	（1）编辑该文件：vi /etc/docker/daemon.json  // 如果该文件不存在就手动创建；说明：在centos7.x下，通过vi。
+	（2）在该文件中输入如下内容：
+	{
+	"registry-mirrors": ["https://docker.mirrors.ustc.edu.cn"]
+	}
+	（3）注意：一定要重启docker服务，如果重启docker后无法加速，可以重新启动OS
+	
+删除镜像
+	1、docker rmi $IMAGE_ID：删除指定镜像(iamge_id可以通过docker images查看)
+	2、docker rmi `docker images -q`：删除所有镜像
+
+容器操作：
+创建容器命令：docker run
+	-i：表示运行容器
+	-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。
+	--name :为创建的容器命名。
+	-v：表示目录映射关系（前者是宿主机目录，后者是映射到宿主机上的目录），可以使用多个－v做多个目录或文件映射。注意：最好做目录映射，在宿主机上做修改，然后共享到容器上。
+	-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。
+	-p：表示端口映射，前者是宿主机端口，后者是容器内的映射端口。可以使用多个－p做多个端口映射
+
+docker run -it --name=mycentos centos:7 /bin/bash 表示前台打开centos,tag=7,
+names是mycentos(在docker ps里可以看到),使用exit命令退出当前容器
+
+docker run -di --name=mycentos2 centos:7 表示守护式容器方式，即后台打开
+登录守护式容器方式是
+docker exec -it container_name(或者container_id)  /bin/bash（exit退出时，容器不会停止）
+
+停止与启动容器
+停止正在运行的容器：docker stop $CONTAINER_NAME/ID
+启动已运行过的容器：docker start $CONTAINER_NAME/ID
+
+
+目录挂载
+	我们可以在创建容器的时候，将宿主机的目录与容器内的目录进行映射，这样我们就可以通过修改宿主机某个目录的文件从而去影响容器。
+	创建容器 添加-v参数 后边为   宿主机目录:容器目录
+	docker run -di -v /usr/local/myhtml:/usr/local/myhtml --name=mycentos2 centos:7
+	如果你共享的是多级的目录，可能会出现权限不足的提示,新建文件也会提示。
+
+	这是因为CentOS7中的安全模块selinux把权限禁掉了，我们需要添加参数  --privileged=true  来解决挂载的目录没有权限的问题，如
+	docker run -id --name=mycentos3 -v /usr/local/myhtml1:/usr/local/mh1 --privileged=true  centos:7  (7依旧是tag )
+
+查看容器IP地址
+	我们可以通过以下命令查看容器运行的各种数据
+	docker inspect mycentos2(names和容器id都可以)
+	
+删除容器
+删除指定的容器：docker rm $CONTAINER_ID/NAME
+	注意，只能删除停止的容器
+删除所有容器：docker rm `docker ps -a -q`
+删除镜像：
+	docker rmi nginx2
+	
+
+创建tomcat容器
+docker run -id --name=mytomcat -v /usr/local/myhtml:/usr/local/tomcat/webapps --privileged=true -p 9000:8080 tomcat:7-jre7 
+9000:8080表示项目的端口是9000(即项目地址是主机ip:9000),8080是该tomcat的端口.
+
+创建Nginx容器
+docker run -di --name=pinyougou_nginx -p 80:80  nginx/bin/bash
+	配置反向代理
+	官方的nginx镜像,nginx配置文件nginx.conf 在/etc/nginx/目录下。
+	在容器内编辑配置文件不方便，我们可以先将配置文件从容器内拷贝到宿主机，编辑修改后再拷贝回去。
+	（1）从容器拷贝配置文件到宿主机
+	docker cp pinyougou_nginx:/etc/nginx/nginx.conf nginx.conf 
+	（2）编辑nginx.conf，添加反向代理配置
+	upstream tomcat-cas {
+		server 172.17.0.7:8080;
+	}
+	server {
+		listen 80;
+		server_name passport.pinyougou.com;
+		location / {
+			proxy_pass http://tomcat-cas;
+			index index.html index.htm;
+		}
+	}
+
+	（3）将修改后的配置文件拷贝到容器
+	docker cp nginx.conf  pinyougou_nginx:/etc/nginx/nginx.conf
+	（4）重新启动容器
+	docker restart pinyougou_nginx
+	（5）设置域名指向
+	192.168.247.135 passport.pinyougou.com 
+	浏览器测试：http://passport.pinyougou.com/cas/login
+
+创建Redis容器
+	docker run -di --name=pinyougou_redis -p 6379:6379 redis
+	找到redis-cli的目录,redis-cli -h 192.168.247.135即可远程连接redis
+	
+	
+镜像生成容器后可能要修改配置文件,可以用修改后的容器生成镜像,
+方法是docker commit mynginx nginx2(用mynginx2生成REPOSITORY=nginx2的镜像),
+生成镜像文件到宿主机: docker save -o /nnn.tar nginx2(o表示output),
+用镜像文件生成镜像:docker load -i nnn.tar(i表示input),
+再用此镜像生成容器,可以发现配置文件都有保存
+
+========================================================================

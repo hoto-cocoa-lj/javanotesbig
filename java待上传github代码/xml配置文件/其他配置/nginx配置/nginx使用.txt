@@ -1,0 +1,97 @@
+配置ip访问：打开/nginx/conf的nginx.conf修改配置,
+server的access_log可以开启日志,默认是logs/host.access.log,需要自己创建logs;
+server的root表示根路径,默认html,即 http://ip:端口 请求 html文件夹的资源;
+配置多个server可以运行多个项目,比如把cart文件夹上传到/usr/local/nginx,
+(不是/usr/local/nginx/html),复制粘贴一个新的server修改root为cart和端口即可。
+
+2、
+运行./nginx
+重启./nginx -s reload
+关闭./nginx -s stop
+
+================================================
+
+配置域名访问：
+本地测试可以修改hosts文件C:\Windows\System32\drivers\etc,也可以用SwitchHosts软件,如下修改:
+192.168.153.130 www.a.com
+192.168.153.130 cart.a.com
+
+然后如下修改nginx.conf:
+	 server {
+        listen       80;
+        server_name  www.a.com;
+		location / {
+            root   html;
+            ...
+        }
+		...
+	}
+	 server {
+        listen       80;
+        server_name  cart.a.com;		
+		location / {
+            root   cart;
+            ...
+        }
+		...
+	}
+这样即可输入域名访问
+
+================================================
+
+反向代理配置:
+============================千万注意:============================
+1、host配置www.ss3.com和www.ss3.com都是nginx服务器的ip
+2、访问地址是www.ss3.com/1.html,访问www.ss3.com会返回404,不知道index干什么的,tmd找了两个小时bug。。。。。。。。
+方法1，access_log可以删除
+	upstream ss2 {							
+	   server 192.168.153.131:8080;
+    }
+    server {
+		access_log  logs/access.log;
+        listen       80;
+        server_name  www.ss3.com;   
+        location / {
+            proxy_pass   http://ss2;
+            index  1.html;
+        }
+    }
+	
+方法2	
+	#upstream ss4 {
+	#   server 192.168.153.130:11111;
+    #}
+    server {
+		access_log  logs/access.log;
+        listen       80;
+        server_name  www.ss5.com;   
+        location / {
+            proxy_pass   http://192.168.43.247:11111;
+            index  1.html;
+        }
+    }
+
+
+================================================
+
+负载均衡:
+	upstream ss2 {
+	   server 192.168.153.131:8080;
+	   server 192.168.153.130:11111;
+	   server 192.168.43.247:11111;
+	   #server 192.168.43.247:11111 weight=3;
+    }
+    server {
+	access_log  logs/access.log;
+        listen       80;
+        server_name  www.ss3.com;   
+        location / {
+            proxy_pass   http://ss2;
+            index  1.html;
+        }
+    }
+
+这样请求会被均分到3个服务器，随便哪两个挂掉也没关系;
+设置weight(默认1)可以控制分配倾向,比如weight=3,则权重是其他的3倍
+
+================================================
