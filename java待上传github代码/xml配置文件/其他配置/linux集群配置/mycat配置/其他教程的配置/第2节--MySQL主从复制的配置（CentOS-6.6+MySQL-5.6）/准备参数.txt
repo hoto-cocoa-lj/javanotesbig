@@ -1,6 +1,6 @@
 Master /etc/my.cnf
 
-[mysqld]ÖĞÔö¼Ó
+[mysqld]ä¸­å¢åŠ 
 
 ## replication
 server_id=205
@@ -15,7 +15,7 @@ slave_skip_errors=1062
 
 Slave /etc/my.cnf
 
-[mysqld]ÖĞÔö¼Ó
+[mysqld]ä¸­å¢åŠ 
 
 ## replication
 server_id=206
