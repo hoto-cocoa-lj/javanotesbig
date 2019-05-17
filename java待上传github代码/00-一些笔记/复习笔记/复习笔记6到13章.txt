@@ -17,7 +17,7 @@ append a fuck：给a后面加上字符串fuck
 hash：(相当于dict/map)
 hset h1 a 1/hmset h1 b 2 c 3：给map h1 put(a,1)/put(b,2)和put(c,3)
 hget h1 a/hmget h1 b c：h1.get(a)/h1.get(b) h1.get(c)
-hdel h1 a b/del h1：h1.delete(a) h1.delete(b)/删除整个h1
+hdel h1 a b/del h1：	即h1.delete(a) h1.delete(b)/删除整个h1
 hincrby h1 a 3：给h1的a增加3，报错和初始化情况同incrby
 hexists h1 a/hlen h1：h1里有没有a这个key/h1的长度
 hkeys h1/hvals h1：h1的所有key/value
@@ -473,6 +473,7 @@ select的id是由name生成的，deptList是put在值栈的，listKey是option�
 ======================================================================
 
 struts2处理ajax：不需要其他任何配置
+这里有private DeptService ds，private Dept d = new Dept()，private Page<Dept> page = new Page<Dept>();
 	@Action(value = "roleAction_ajax")
 	public String ajax() throws IOException {
 		Set<Module> mm = ds.get(d.getId()).getModules();

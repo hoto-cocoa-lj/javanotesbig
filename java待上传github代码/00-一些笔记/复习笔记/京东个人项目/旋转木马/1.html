@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="11.css" type="text/css" rel="stylesheet"></link>
+    <script type="text/javascript" src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+     <script type="text/javascript" src="11.js"></script>
+	 <style>
+	 ul, div {
+    margin: 0;
+    padding: 0
+}
+.wrap1 {
+    width: 90%;
+    height: 400px;
+    margin: 50px auto;
+    border: 1px solid #f0f;
+}
+
+.wrap {
+    width: 800px;
+    height: 400px;
+    margin: 0 auto;
+    /*border: 1px solid #f00;*/
+    line-height: 400px;
+    position: relative
+}
+
+.wrap li {
+    list-style-type: none;position: absolute; width: 800px;
+    height: 400px;
+}
+
+/*.wrap li a{display: block;position: absolute}*/
+.wrap li img {
+    width: 100%;
+    height: 100%;
+    /*position: absolute;*/
+}
+
+.wrap .span {
+    position: absolute;
+    font-size: 4em;
+    z-index: 10;
+    font-weight: 900;
+    cursor: pointer;
+    height:400px;
+    background: #000;
+    line-height: 400px;
+    opacity: 0.2;
+    color:#fff;
+}
+
+.wrap .span2 {
+    right: 0
+}
+	 </style>
+	 <script>
+	 
+	 
+function get_c(i) {
+    var len=$('.wrap li').length
+    var i = i>=0?i % len:i%len+len;
+    var wi = Math.floor(((get_px($('.wrap1').css('width')) - get_px($('.wrap').css('width'))) / ($('.wrap li').length - 1)));
+    var j = i - ($('.wrap li').length - 1) / 2;
+
+    return {
+        left: wi * j +parseFloat(400-0.9 ** Math.abs(j)*400)+ 'px',
+        'z-index': -Math.abs(j),
+        opacity: 0.7 ** Math.abs(j),
+        'width':0.9 ** Math.abs(j)*800 + 'px','height':0.9 ** Math.abs(j)*400 + 'px',
+        top:parseFloat(200-0.9 ** Math.abs(j)*200)+ 'px'
+
+    }
+}
+
+function get_px(a) {
+    a = parseFloat(a.slice(0, -2));
+    return a
+}
+
+$(function () {
+    $('.wrap li').each(function (i, e) {
+        $(e).css(get_c(i));
+
+    });
+    var siv=setInterval(function(){ $('.span2').click()},2222);
+
+    $('.wrap1').mouseover(function(){clearInterval(siv)});
+    $('.wrap1').mouseout(function(){siv=setInterval(function(){ $('.span2').click()},2222)});
+
+    $('.span2').click(function () {
+       $('.wrap li').eq(Math.floor($('.wrap li').length/2)-1).css('z-index',2);
+                $('.wrap li').each(function (i, e) {
+            $(e).stop(false,true).animate(get_c(i + 1),666)
+        });
+               var ss=$('.wrap li:last').detach();
+        $('.wrap ul').prepend(ss);
+
+     });
+    $('.span1').click(function () {
+        $('.wrap li').eq(Math.ceil($('.wrap li').length/2)).css('z-index',2);
+                $('.wrap li').each(function (i, e) {
+            $(e).stop(true,true).animate(get_c(i - 1),333)
+        });
+                        var ss=$('.wrap li:first').detach();
+        $('.wrap ul').append(ss);
+    });
+})
+
+
+
+</script>
+</head>
+<body>
+ <div class="wrap1">
+    <div class="wrap">
+
+ <div class="span span1"><</div>
+        <ul>
+            <li><a href="#"><img src="1.jpg"></a></li>
+            <li><a href="#"><img src="2.jpg"></a></li>
+            <li><a href="#"><img src="3.jpg"></a></li>
+            <li><a href="#"><img src="4.jpg"></a></li>
+            <li><a href="#"><img src="5.jpg"></a></li>
+            <li><a href="#"><img src="6.jpg"></a></li>
+            <li><a href="#"><img src="7.jpg"></a></li>
+        </ul> <div class="span span2">></div>
+    </div>
+</div>
+</body>
+</html>
+
+

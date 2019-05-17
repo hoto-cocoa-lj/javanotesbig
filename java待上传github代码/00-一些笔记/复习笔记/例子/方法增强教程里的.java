@@ -66,7 +66,8 @@ public class Demo
 							method.invoke(user, args);
 						}
 						
-						return null;
+						return null;		
+						//这里返回null可能会报空指针(userproxy为空)，最好返回method.invoke(user, args)
 					}
 				});
 		

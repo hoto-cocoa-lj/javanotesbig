@@ -20,7 +20,7 @@ public class BaseServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		try {
-			// this 谁来调用代表谁 userServlet categoryServlet productServlet
+			// this : 谁来调用代表谁 userServlet categoryServlet productServlet
 			Class clazz = this.getClass();
 			// 获取方法  传什么 获取什么
 			// 通过字节码对象获取到类指定的方法

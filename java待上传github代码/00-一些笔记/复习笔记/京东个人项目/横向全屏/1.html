@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script type="text/javascript" src="https://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+    <link href="11.css" type="text/css" rel="stylesheet"></link>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script type="text/javascript" src="11.js"></script>
+    <script src="11cookie.js"></script>
+    <script src="https://cdn.bootcss.com/fullPage.js/2.9.6/jquery.fullpage.extensions.min.js"></script>
+    <link href="https://cdn.bootcss.com/fullPage.js/2.9.6/jquery.fullpage.css" rel="stylesheet">
+	<script>$(function(){
+    $('a').click(function(e){
+        e.preventDefault();
+    })
+    $('.wrap>ul>li').click(function(e,i){
+        var a=$(this).index();
+                console.log(a);
+                // $('.a11').css('margin-left',a*(-100)+'%');
+        $('.a11').animate({'margin-left':a*(-100)+'%'},333);
+    })
+    $('[type=button]').click(function(){
+         $('.a11').slideToggle(333);
+                                     })
+})</script>
+<style>
+
+.wrap{width:80%;margin:15px auto;background:#eee;height:40px;text-align: center;line-height: 40px;}
+ul{list-style-type: none;}
+.wrap>ul>li{float:left;background: #8dad62;border-left:1px solid #fff;}
+body{overflow: hidden;}
+.a11{width:500%;height:300px;border:1px solid #f00;}
+.a22{width:20%;height:300px;border:1px solid #ff0;float:left;box-sizing: border-box;}
+</style>
+</head>
+<body>
+<div class="a11">
+    <div class="a22">a22111</div>
+    <div class="a22">a22222</div>
+    <div class="a22">a22333</div>
+    <div class="a22">a22444</div>
+    <div class="a22">a22555</div>
+</div>
+<div class="wrap">
+    <ul>
+        <li class="a"><a href="">首页</a>
+        <li class="a"></li>
+        <li class="d"><a href="">学习中心</a></li>
+        <li class="a"><a href="">经典案例厅</a></li>
+        <li class="a b"><a href="">关于我们关于我们</a></li>
+        <input type="button" value="hahaha"></input>
+    </ul>
+</div>
+</body>
+</html>
+
+

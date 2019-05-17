@@ -35,7 +35,7 @@ public class Testa {
 	// 动态代理增强方法
 	@Test
 	public void test2() {
-		User u1 = new UserImpl();
+		final User u1 = new UserImpl();
 		User u = (User) Proxy.newProxyInstance(
 				u1.getClass().getClassLoader(),
 				u1.getClass().getInterfaces(),
@@ -47,6 +47,7 @@ public class Testa {
 						}
 						method.invoke(u1, args);
 						return null;
+						//这里返回null可能会报空指针(userproxy为空)，最好返回method.invoke(user, args)
 					}
 				});
 		u.t1();

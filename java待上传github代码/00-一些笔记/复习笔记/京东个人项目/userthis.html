@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>论坛首页</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+	body{
+		background-image: url(bg.gif);
+		/* background-repeat: repeat-y;
+		background-position: center center;
+		 height:100%;*/
+	}
+	table{
+		background-color:white;	
+	}
+
+	@media screen and (max-width: 768px){
+		.nav2{
+			top:296px;
+		}
+		.box{
+			top:456px;
+		}
+	}
+
+	@media screen and (min-width: 768px) {
+		.nav2{
+			top:50px;
+		}
+		.box{
+			top:90px;
+		}
+	}
+	@media screen and (min-width: 1140px) {
+		.nav2{
+			top:50px;
+		}
+		.box{
+			top:90px;
+		}
+		.box,.nav2{
+			width:80% !important;
+			margin-left:10%;
+		}
+	}
+	.nav2{
+		position:fixed;
+	}
+	.box{
+		position:absolute;
+		display:none;
+		width:100%;
+		height:100%;
+	}
+	
+
+	
+	.rollimg{width:100%;}
+	#selectBox li{background-color:white;}
+	#selectBox a{margin-bottom:0;}
+	
+	.clearfix::after {
+		content:"";
+		display:table;
+		clear: both;
+	}
+	.paginationwrap{
+		background-color:white;
+		margin-top:-20px;
+		padding:20px;
+		border-top:2px solid #ddd;
+		border-radius:0 0 6px 6px;
+	}
+	</style>
+	
+	<script>
+		$(function(){
+			$selectBox=$('#selectBox li');
+			$box=$('.box');
+			$($box[0]).css('display','block');
+			$selectBox.click(function(){
+				index=$selectBox.index($(this));
+				$selectBox.removeClass('active');
+				$($selectBox[index]).addClass('active');
+				$box.css('display','none');
+				$($box[index]).css('display','block');
+			
+			})
+			
+			
+			for(i=0;i<19;i++){
+				$('#productList').append('<tr><td>'+i+'</td><td>2产品品</td>			<td>5.69</td><td>12.69</td><td>1234</td><td>129-5123123210</td></tr>')
+			} 
+		
+		
+			colorclasss=['success','warning','active'];
+			$productListTrs=$('#productList tr');
+			for(var i in $productListTrs){
+				$($productListTrs[i]).addClass(colorclasss[i%4]);
+			} 
+		
+		})
+	
+	</script>
+</head>
+<body>
+	<!--导航栏开始-->
+	<nav class="navbar-inverse nav1 navbar-default navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">首页</a>
+			</div>
+			<div>
+				<ul class="nav navbar-nav navbar-right"> 
+
+					<li>			
+						<form class=" navbar-form navbar-left" role="form">
+						  <div class="form-group">
+							<label class="sr-only" for="name">名称</label>
+							<input type="text" class="form-control" id="name" placeholder="请输入名称">
+						  </div>
+						  <button type="submit" class="btn btn-primary">无图搜索</button>
+						  <button type="submit" class="btn btn-danger">有图搜索</button>
+						</form>
+					</li>
+					
+
+
+					<li><a href="#" data-toggle="modal" data-target="#registerModal">
+						<span class="glyphicon glyphicon-log-in"></span> 注册</a></li>
+					<li><a href="#" data-toggle="modal" data-target="#loginModal">
+						<span class="glyphicon glyphicon-log-in"></span> 登录</a></li>
+					<li><a href="#"><span class="glyphicon glyphicon-off"></span> 退出</a></li>
+
+			
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!--导航栏结束-->
+	
+	
+	<!-- 模态框（Modal）开始 -->
+	
+	<!-- 注册 -->
+	<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">注册页面</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" role="form">
+					  <div class="form-group">
+						<label for="lastname" class="col-sm-3 control-label">账号</label>
+						<div class="col-sm-9">
+						  <input type="text" class="form-control" id="lastname" placeholder="请输入账号">
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label for="lastname" class="col-sm-3 control-label">密码</label>
+						<div class="col-sm-9">
+						  <input type="text" class="form-control" id="lastname" placeholder="请输入密码">
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label for="lastname" class="col-sm-3 control-label">确认密码</label>
+						<div class="col-sm-9">
+						  <input type="text" class="form-control" id="lastname" placeholder="请再次输入密码">
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label for="lastname" class="col-sm-3 control-label">邮箱</label>
+						<div class="col-sm-9">
+						  <input type="text" class="form-control" id="lastname" placeholder="请输入邮箱">
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label for="lastname" class="col-sm-3 control-label">验证码</label>						
+						<div class="col-sm-9">
+						  <input type="text" class="form-control" id="lastname" 
+						  placeholder="12 X 7=?">
+						</div>
+					  </div>
+					  <div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+						  <button type="submit" class="btn btn-primary">注册</button>
+						</div>
+					  </div>
+					</form>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	
+	<!-- 登陆 -->
+	<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">登陆</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" role="form">
+					  <div class="form-group">
+						<label for="firstname" class="col-sm-2 control-label">账号</label>
+						<div class="col-sm-10">
+						  <input type="text" class="form-control" id="firstname" placeholder="请输入账号">
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label for="lastname" class="col-sm-2 control-label">密码</label>
+						<div class="col-sm-10">
+						  <input type="text" class="form-control" id="lastname" placeholder="请输入密码">
+						</div>
+					  </div>
+					  <div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+						  <button type="submit" class="btn btn-primary">登录</button>
+						</div>
+					  </div>
+					</form>
+				</div>
+				
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	<!-- 模态框（Modal）结束 -->
+	
+	
+	
+	<!--导航栏2开始-->
+	 <ul class="nav nav-pills nav-justified nav2 navbar-fixed-top" id="selectBox">
+		<li class='active'><a href="#">帖子列表</a></li>
+		<li><a href="#">商品搜索</a></li>
+		<li><a href="#">论坛搜索</a></li>
+		<li><a href="#">我的帖子</a></li>
+	</ul>
+	<!--导航栏2结束-->
+
+	<div class='box box1'>
+		<table class="table table-hover">
+			<thead>
+			  <tr>
+				<th>标题1</th>			
+				<th>作者</th>
+				<th>发布时间</th>
+				<th>回复/亮评/访问</th>
+				<th>最后发表</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  <tr>
+				<td>
+					<div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" 
+                href="#collapseThree">
+                点击我进行展开，再次点击我进行折叠。第 3 部分
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree" class="panel-collapse collapse">
+            <div class="panel-body">
+			
+                Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+                cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+                vice lomo.          Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+                cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+                vice lomo.          Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+                cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+                vice lomo.          Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+                cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+                vice lomo.          Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+                cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+                vice lomo.          Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+                cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+                vice lomo.          Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+                cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+                vice lomo.
+            </div>
+        </div>
+				</td>
+				<td>123</td>
+				<td><a href='http://www.baidu.com'>asd</a></td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+		</table>
+		
+		<div class='clearfix paginationwrap'>
+			<!--分页组件开始-->
+			<ul class="pagination pagination-lg pull-right" style="margin-top:0;">
+				<li class='disabled'><a href="#">&laquo;</a></li>
+				<li><a href="#">1</a></li>
+				<li class='active'><a href="#">2</a></li>
+				<li><a href="#">3</a></li>
+				<li><a href="#">4</a></li>
+				<li><a href="#">5</a></li>
+				<li><a href="#">&raquo;</a></li>
+			</ul>
+			<!--分页组件结束-->			
+		</div>
+	</div>
+
+	
+	
+	<div class='box box2'>
+
+		  <table class="table table-bordered table-hover">
+			<thead>
+			  <tr>
+				<th>id</th>
+				<th>名称</th>			
+				<th>优惠后单价</th>
+				<th>价格</th>
+				<th>促销</th>
+				<th>优惠券</th>
+			  </tr>
+			</thead>
+			<tbody id='productList'>
+			  <tr>
+				<td>123456</td>
+				<td>2产品品品品品品品品品品品品品品品1</td>
+				<td>5.69</td>
+				<td>12.69</td>
+				<td>1234</td>
+				<td>129-50</td>
+			  </tr>
+			</tbody>
+		  </table>
+
+		<div class='clearfix paginationwrap'>
+			<!--分页组件开始-->
+			<ul class="pagination pagination-lg pull-right" style="margin-top:0;">
+				<li class='disabled'><a href="#">&laquo;</a></li>
+				<li><a href="#">1</a></li>
+				<li class='active'><a href="#">2</a></li>
+				<li><a href="#">3</a></li>
+				<li><a href="#">4</a></li>
+				<li><a href="#">5</a></li>
+				<li><a href="#">&raquo;</a></li>
+			</ul>
+			<!--分页组件结束-->			
+		</div>
+	</div>
+	
+		
+		
+		
+		
+	<div class='box box3'>	
+		<table class="table table-hover">
+			<thead>
+			  <tr>
+				<th>标题3</th>			
+				<th>作者</th>
+				<th>发布时间</th>
+				<th>回复/亮评/访问</th>
+				<th>最后发表</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+		</table>
+
+		<div class='clearfix paginationwrap'>
+			<!--分页组件开始-->
+			<ul class="pagination pagination-lg pull-right" style="margin-top:0;">
+				<li class='disabled'><a href="#">&laquo;</a></li>
+				<li><a href="#">1</a></li>
+				<li class='active'><a href="#">2</a></li>
+				<li><a href="#">3</a></li>
+				<li><a href="#">4</a></li>
+				<li><a href="#">5</a></li>
+				<li><a href="#">&raquo;</a></li>
+			</ul>
+			<!--分页组件结束-->			
+		</div>
+	</div>
+	
+
+
+
+
+	<div class='box box4'>
+		<table class="table table-hover">
+			<thead>
+			  <tr>
+				<th>标题4</th>			
+				<th>作者</th>
+				<th>发布时间</th>
+				<th>回复/亮评/访问</th>
+				<th>最后发表</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+		</table>
+	</div>
+	
+</body>
+</html>
+
+
+

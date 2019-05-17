@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>论坛首页</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+	
+	@media screen and (max-width: 768px){
+		.awayFromNav{
+			position:fixed;
+			top:263px;
+		}
+	}
+
+	@media screen and (min-width: 769px) {
+		.awayFromNav{
+			position:fixed;
+			top:50px;
+		}
+		.box{
+			top:100px;
+		}
+	}
+	.box{
+		position:absolute;
+		width:100%;
+		opacity:0;
+	}
+
+	</style>
+	
+	<script>
+		$(function(){
+			$selectBox=$('#selectBox li');
+			$box=$('.box');
+			$($box[0]).css('opacity',100);
+			$selectBox.click(function(){
+				index=$selectBox.index($(this));
+				$selectBox.removeClass('active');
+				$($selectBox[index]).addClass('active');
+				$box.css('opacity',0);
+				$($box[index]).css('opacity',100);
+			
+			})
+		
+		})
+	
+	</script>
+</head>
+<body>
+	<!--导航栏开始-->
+	<nav class="navbar-inverse  navbar-default navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">首页</a>
+			</div>
+			<div>
+				<ul class="nav navbar-nav">
+					<li><a href="#">进入论坛</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right"> 
+
+					<li>			
+						<form class=" navbar-form navbar-left" role="form">
+						  <div class="form-group">
+							<label class="sr-only" for="name">名称</label>
+							<input type="text" class="form-control" id="name" placeholder="请输入名称">
+						  </div>
+						  <button type="submit" class="btn btn-primary">无图搜索</button>
+						  <button type="submit" class="btn btn-danger">有图搜索</button>
+						</form>
+					</li>
+					
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							<span class="glyphicon glyphicon-th-large"></span> 账号
+							<b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="#" class='btn'>
+								<span class="glyphicon glyphicon-user"></span>个人中心</a></li>
+							<li><a href="#" class='btn'>
+								<span class="glyphicon glyphicon-envelope"></span> 消息</a></li>
+							<li class="divider"></li>
+							<li><a href="#" data-toggle="modal" data-target="#registerModal" class='btn'>
+								<span class="glyphicon glyphicon-log-in"></span> 注册</a></li>
+							<li><a href="#" data-toggle="modal" data-target="#loginModal"  class='btn disabled'>
+								<span class="glyphicon glyphicon-log-in"></span> 登录</a></li>
+							<li class="divider"></li>
+							<li><a href="#" class='btn disabled'>
+								<span class="glyphicon glyphicon-off"></span> 退出</a></li>
+						</ul>
+					</li>
+			
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!--导航栏结束-->
+	
+	
+	
+	<!--导航栏开始-->
+	 <ul class="nav nav-pills nav-justified awayFromNav" id="selectBox">
+		<li class='active'><a href="#">最新讨论</a></li>
+		<li><a href="#">最近搜索</a></li>
+		<li><a href="#">搜索论坛</a></li>
+		<li><a href="#">我的帖子</a></li>
+	</ul>
+
+	<div class='box box1'>
+		<table class="table table-hover">
+			<thead>
+			  <tr>
+				<th>标题1</th>			
+				<th>作者</th>
+				<th>发布时间</th>
+				<th>回复/亮评/访问</th>
+				<th>最后发表</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+		</table>
+		<!--分页组件开始-->
+		<ul class="pagination pagination-lg pull-right" style="margin-top:0;">
+			<li class='disabled'><a href="#">&laquo;</a></li>
+			<li><a href="#">1</a></li>
+			<li class='active'><a href="#">2</a></li>
+			<li><a href="#">3</a></li>
+			<li><a href="#">4</a></li>
+			<li><a href="#">5</a></li>
+			<li><a href="#">&raquo;</a></li>
+		</ul>
+		<!--分页组件结束-->
+	</div>
+
+	
+	
+	<div class='box box2'>
+		<table class="table table-hover">
+			<thead>
+			  <tr>
+				<th>标题2</th>			
+				<th>作者</th>
+				<th>发布时间</th>
+				<th>回复/亮评/访问</th>
+				<th>最后发表</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+		</table>
+		<!--分页组件开始-->
+		<ul class="pagination pagination-lg pull-right" style="margin-top:0;">
+			<li class='disabled'><a href="#">&laquo;</a></li>
+			<li><a href="#">1</a></li>
+			<li class='active'><a href="#">2</a></li>
+			<li><a href="#">3</a></li>
+			<li><a href="#">4</a></li>
+			<li><a href="#">5</a></li>
+			<li><a href="#">&raquo;</a></li>
+		</ul>
+		<!--分页组件结束-->
+	</div>
+	
+		
+		
+		
+		
+	<div class='box box3'>	
+		<table class="table table-hover">
+			<thead>
+			  <tr>
+				<th>标题3</th>			
+				<th>作者</th>
+				<th>发布时间</th>
+				<th>回复/亮评/访问</th>
+				<th>最后发表</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+		</table>
+		<!--分页组件开始-->
+		<ul class="pagination pagination-lg pull-right" style="margin-top:0;">
+			<li class='disabled'><a href="#">&laquo;</a></li>
+			<li><a href="#">1</a></li>
+			<li class='active'><a href="#">2</a></li>
+			<li><a href="#">3</a></li>
+			<li><a href="#">4</a></li>
+			<li><a href="#">5</a></li>
+			<li><a href="#">&raquo;</a></li>
+		</ul>
+		<!--分页组件结束-->
+	</div>
+
+
+
+
+	<div class='box box4'>
+		<table class="table table-hover">
+			<thead>
+			  <tr>
+				<th>标题4</th>			
+				<th>作者</th>
+				<th>发布时间</th>
+				<th>回复/亮评/访问</th>
+				<th>最后发表</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+							<tbody>
+			  <tr>
+				<td>这只鹅</td>
+				<td>踩死我了</td>
+				<td>2018-09-09 11:11:22</td>
+				<td>12/2/55</td>
+				<td>大撒旦 2018-09-09 11:11:22</td>
+			  </tr>
+			</tbody>
+		</table>
+	</div>
+	
+</body>
+</html>
+
+
+
