@@ -1,0 +1,90 @@
+判断字符串是否相等一定要用equals，因为Integer a="1",但a=="1"是false。
+
+spring整合junit测试，运行测试方法卡住，原因是没连接数据库(虚拟机没开)。
+
+spring整合redis时，不要一个项目整合两个，之前同时整个了redis.xml和cache.xml，
+里面分别引了jedis和redistemplate。
+
+=================================================================
+
+描述：
+action里设置了某私有属性telphone和set方法，但后台始终获取不到值，
+同样设置的其他属性却能获取到。
+原因是action设置了属性驱动，而且该类有telephone属性，属性重复了。。。
+以后遇到获取不到和有时获取不到都应该考虑是否有重复。
+使用springmvc的话，属性名重复不会出现这个问题，所有的属性都能获得值。
+
+=================================================================
+
+maven项目是pom时，运行会报错找不到applicationContext.xml。
+
+=================================================================
+
+表单里要写value="${item.detail }"，不要写value=${item.detail }，
+因为如果值中间有空格时，前者能显示所有内容，后者只能显示空格前面的内容。
+
+=================================================================
+
+一个xml文件或者properties文件加载多次可能报错，
+之前遇到web的applicationCOntext.xml import了springmvc.xml，
+而springmvc.xml配置了<context:property-placeholder 
+location="classpath:resource.properties"/>，导致该文件被加载两次，
+报错No qualifying bean of type  **** found for。
+
+=================================================================
+
+运行pyg-manager报错：java.nio.channels.ClosedChannelException：
+一开始一直搜索这一行，百度找不到原因，然后搜第二行的错误提示：
+at sun.nio.ch.SocketChannelImpl.shutdownInput：
+很快就找到了原因，centos防火墙没关。
+
+=================================================================
+
+数据库回滚失败：
+
+做pyg项目时，controller层springmvc.xml扫描部分配置如下：
+	<dubbo:annotation package="com.pyg.shop.controller" /> 
+	<dubbo:annotation package="com.pyg.shop.service.impl" /> 
+	
+service层applicationContext-tx.xml事务配置如下(不知道为什么不用配扫描)：
+		<!-- 定义事物管理平台 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- 注解式事物 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+service层相应的类标注了@Service(dubbo的)和@Transactional
+(org.springframework.transaction.annotation.Transactional)，
+然后手动报错1/0后数据库始终不回滚，查看各种配置文件都没问题。debug发现：
+DEBUG DataSourceTransactionManager:851 - Initiating transaction rollback
+DEBUG DataSourceTransactionManager:284 - Rolling back JDBC transaction on Connection [com.mchange.v2.c3p0.impl.NewProxyConnection@1a311b95]，
+百度后发现这似乎表示发生了回滚，后来发现数据库的表的引擎是MyISAM，
+只有InnoDB才支持回滚，修改后问题解决。
+
+=================================================================
+
+https://www.cnblogs.com/softidea/p/4186090.html
+
+maven项目：
+java.lang.IllegalStateException: Failed to read Class-Path attribute from manifest of jar 。。。。
+原因估计是jar包冲突，删掉对应的jar然后maven update
+Failed to read Class-Path attribute from manifest  activemq-broker-5.13.4.jar
+Could not transfer artifact 。。。。。。
+The type  。。。。。。 cannot be resolved
+
+这句话的意思是： 对于这个包从maven中心传输到本地仓库失败，决定不会重新尝试下载jar包，
+直到mavne再改更新索引，或强制更新。
+
+实际的解决办法是：直接去本地仓库（local repository），把这个org.apache.poi存放的目录删除掉（因为包没有下载下来），
+(1)刷新你的项目（在项目上点右键-->刷新）； 
+(2)在你的项目上右击，选择maven--->update（刷新Maven配置）就可以了，
+让maven重新下载；
+(3)编译maven项目。在项目上点右键-->Run As -->Maven build
+
+使用说明：
+如果pom.xml中配置的jar不能下载，提示pom.xml中报错，反复使用（1）和（2）操作；
+如果pom.xml文件没有报错，就使用（3）来处理；
+
+maven-->update会自动下载坏jar包和缺失的jar包。
+
+=================================================================

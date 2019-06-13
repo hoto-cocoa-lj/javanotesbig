@@ -1,0 +1,9 @@
+mybatis的排序方法如下：
+		@Override
+		public List<TbContent> findContentListByCategoryId(Long categoryId) {
+			TbContentExample e=new TbContentExample();
+			Criteria c = e.createCriteria();
+			c.andCategoryIdEqualTo(categoryId).andStatusNotEqualTo("0");
+			e.setOrderByClause("sort_order");
+			return contentMapper.selectByExample(e);
+		}

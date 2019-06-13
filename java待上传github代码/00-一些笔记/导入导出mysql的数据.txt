@@ -1,0 +1,27 @@
+﻿以前直接用workbench的import/export data，不但速度慢，
+而且数据导入有问题时也无法修改要导入的数据，数据量大时文件都打不开。
+可以用mysql的infile和outfile来导入导出的文本文件。
+
+
+unlock tables;		#表可能被锁，用这个解锁
+
+#执行outfile语句时可能报错path无权限，执行下一句可以查看哪些path可以导入导出
+show variables like '%secure%';			
+
+#如果返回null，在my.ini如下配置可以开放path
+[client]的[mysqld]里配置secure_file_priv=''
+
+导入导出代码如下：
+SELECT * FROM jd.products into outfile '1.txt' fields terminated by ',' optionally enclosed by '"'  lines terminated by '\n';
+
+LOAD DATA INFILE '190612.txt' INTO TABLE jd.friend FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
+
+将txt文件内容导入mysql中，出现invalid utf8 character string错误的解决:
+原因是txt不是utf8编码，用notepad打开转成utf8编码保存即可。
+
+怎么只保存部分字段(括号里的不要)：
+SELECT pid,name,price FROM jd.products into outfile '1.txt' 
+(CHARACTER SET gbk)
+fields terminated by ',' optionally enclosed by '"'  lines terminated by '\n';
+
+百度上说CHARACTER SET utf8可以设置txt保存的编码格式，未测试

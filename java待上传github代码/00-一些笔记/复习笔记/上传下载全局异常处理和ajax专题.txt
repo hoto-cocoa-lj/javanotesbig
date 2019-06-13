@@ -314,3 +314,80 @@ springMVC ajax：
 @RequestBody注解：
 用在形参上，把浏览器传来json字符串对应值赋值给形参对象。比如@RequestBody User u的User有user,pw,phone属性，json字符串是"{'user':'a','pw':'b'}"，则u的user=a,pw=b,phone=null，这个参数对传来的json字符串要求非常严格，必须是刚刚的格式。
 https://jingyan.baidu.com/article/624e7459069f4034e8ba5a87.html
+
+===========================================================================
+	
+	$('#releaseComment').click(function(){
+		data={'commentContent':1,"commentTitle":2,'aid':3};
+		$.ajax({
+			url : '/article/releaseComment?aaa=bbb',
+			type : 'post',
+			dataType:'json',
+			data : JSON.stringify(data),
+			contentType : "application/json",
+			success : function(v) {					
+				.....
+			},
+			error:function(v){
+				.....
+			}
+		})
+	})
+
+	上面代码里data里的参数后台必须用@RequestBody接收,比如public void releaseArticleForm(@RequestBody Map map),
+	可以用map接收再转换。aaa写在url里，可以直接接收。
+	
+===========================================================================
+
+补充：用ajax上传文件到springMVC
+
+配置同上，
+	前台代码：
+	$('#saveProfileButton').click(function(){			
+		if($('#profileForm').data("bootstrapValidator").isValid()){			
+
+			var form = new FormData();
+			form.append('nickname',$('input[name="nickname"]').val());
+			form.append('introduction',$('textarea[name="introduction"]').val());
+			form.append('pictureFile',$('input[name="pictureFile"]')[0].files[0]);
+			
+			console.log(form);
+			$.ajax({
+				url:'/user/saveProfile',
+				type:'post',
+                data:form,
+                processData:false,
+                contentType:false,
+				success:function(v){
+					alert(JSON.stringify(v))
+				},
+				error:function(v){
+					alert('ee')
+				}
+			})
+		}
+	})
+	
+	后台代码：
+	public JDSResult saveProfile(MultipartFile pictureFile, HttpSession s, HttpServletRequest request) {
+		try {
+			MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+			String nickname = multipartRequest.getParameter("nickname");
+			String introduction = multipartRequest.getParameter("introduction");
+
+			String fileName = pictureFile.getOriginalFilename();
+			int lastIndexOf = fileName.lastIndexOf(".");
+			String uuidFileName = UUID.randomUUID().toString().replace("-", "");
+
+			if (!new File(filePath).exists()) {
+				new File(filePath).mkdirs();// 如果目录不存在，则创建目录
+			}
+			String filePath1 = uuidFileName + fileName.substring(lastIndexOf);
+			pictureFile.transferTo(new File(filePath + filePath1));
+
+			return new JDSResult(true, "保存成功");
+		} catch (Exception e) {
+			return new JDSResult(false, e.getMessage());
+		}
+
+	}

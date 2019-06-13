@@ -16,4 +16,15 @@
 	<bean id="solrTemplate" class="org.springframework.data.solr.core.SolrTemplate">
 		<constructor-arg ref="solrServer" />
 	</bean>
+	
+	<!-- 配置时遇到很奇怪的bug，applicationContext-service.xml里加入solr配置后就报错
+		Referenced file contains errors (http://www.springframework.org/schema.......，
+		然而applicationContext-service.xml没有这个配置，推测是solr的某处引用了这个xsd但是没有找到，
+		下载到本地在xml catalog进行了配置，再次报错找不到class:RepositoryConfigurationextension，	
+		在http://www.myexception.cn/j2ee/1911201.html找到答案,pom里导入
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
+			<version>1.11.0.RELEASE</version>
+		</dependency>后解决，不过bug产生的原因依旧不明		-->
 </beans>

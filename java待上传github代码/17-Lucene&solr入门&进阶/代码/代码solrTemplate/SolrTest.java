@@ -126,6 +126,11 @@ public class SolrTest {
 		Criteria criteria=new Criteria("item_keywords").is(searchMap.get("keywords"));
 		query.addCriteria(criteria);
 		HighlightPage<TbItem> page = solrTemplate.queryForHighlightPage(query, TbItem.class);
+		
+		//此时item数据没有被高亮，下面的循环用高亮后的字符串替换需要被高亮的字符串，
+		//h包含了要高亮的字段和高亮好的字符串，通过字段查找到后进行替换
+		//需要高亮的字段不能是string，不然高亮无效。需要是自己的设置的type，如text_ik，
+		//如<field name="item_name" type="text_ik" indexed="false" stored="true"/>
 		for(HighlightEntry<TbItem> h: page.getHighlighted()){//循环高亮入口集合
 			TbItem item = h.getEntity();//获取原实体类			
 			if(h.getHighlights().size()>0 && h.getHighlights().get(0).getSnipplets().size()>0){

@@ -47,7 +47,7 @@ Solr core是Solr的一个独立运行实例单位，它可以对外提供索引�
 	</fieldType>
 	
 4、配置域字段。如<field name="username_ik" type="text_ik" indexed="true" stored="true"/>。
-	这表示username_ik字段使用ik分词器分词，这里的type和索引域的name必须一样。
+	这表示username_ik字段使用ik分词器分词，这里的type和索引域(即第3条设置的)的name必须一样。
 	至此可以进行测试。打开ip:port/solr，选择core selector的合适的仓库，
 	选择analysis，Analyse Fieldname/FieldType选择text_ik或者username_ik，输入一句中文进行分析，看分词是否成功。
 	

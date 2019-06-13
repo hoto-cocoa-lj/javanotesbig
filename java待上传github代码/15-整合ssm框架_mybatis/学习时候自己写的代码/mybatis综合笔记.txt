@@ -90,6 +90,7 @@ example类的用法类似hibernate的criteria：
 	List<User> list=userMapper.selectByExample(example);
 
 ==================================================================
+
 排序：
 	UserExample example = new UserExample();
 	Criteria criteria = example.createCriteria();
@@ -100,8 +101,71 @@ example类的用法类似hibernate的criteria：
 相当于：
 select * from user where name = 'joe' and id is null order by name asc,email desc
 
- 
+==================================================================
+
+一、在 SQL 映射文件的 select 标签中添加 useGeneratedKeys="true" 属性与 keyProperty=" " 属性，keyProperty 的值表示的是将获取到的自增主键值赋给 JavaBean 中的某个字段。
+
+    <!-- 
+        useGeneratedKeys 设置为 true
+        keyProperty 表示把获得的自增主键的值赋给 javabean 中的哪个属性，
+        这里表示赋值给 employee 的 id 属性
+    -->
+    <insert id="addEmp" parameterType="employee" 
+            useGeneratedKeys="true" keyProperty="id">
+        insert into t_employee(username, gender, email) values (#{username}, #{gender}, #{email})
+    </insert>
+
+二、 测试，通过 javabean 的get()方法即可获得自增主键的值。
+
+    @Test
+    public void addEmpTest() throws IOException {
+        // MyBatis 全局配置文件的路径
+        String resource = "mybatis-config.xml";
+        InputStream is = Resources.getResourceAsStream(resource);
+
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);
+        // 注意在这里设置为自动提交数据
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        EmployeeMapper employeeMapper = sqlSession.getMapper(EmployeeMapper.class);
+        Employee employee = new Employee(null, "Jas", '1', "gdfg@foxmail.com");
+
+        employeeMapper.addEmp(employee);
+
+        System.out.println(employee.getId());
+    }    
 
 ==================================================================
 
+insertSelective和insert的区别：
+insert会把对象的null项也插入，导致数据库设置默认值的项会出现null。
+比如user有个字段createTime是DATETIME属性，默认值是CURRENT_TIMESTAMP，
+插入新数据时不设置此属性，用insert表里是null，insertSelective是当前时间。
+
+==================================================================
+
+自己写的分页：
+
+	<!-- mapper.xml部分 -->
+		<!-- BaseResultMap部分 -->
+		<resultMap id="BaseResultMap" type="cn.slq.pojo.Article" >
+			<id column="id" property="id" jdbcType="INTEGER" />
+			<result column="userid" property="userid" jdbcType="INTEGER" />
+			..........................
+		</resultMap>
+
+		<select id="selectByPage" parameterType="map" resultMap="BaseResultMap">
+			select * from article where forumid=#{forumid} 
+				order by createtime desc limit #{currIndex} , #{pageSize}
+		</select>
+
+	<!-- serviceimpl.xml部分 -->
+		public List<Article> findPage(Integer page, Integer rows, int fid) {
+			Map data = new HashMap();
+			data.put("forumid", fid);
+			data.put("currIndex", page);
+			data.put("pageSize", rows);
+			List<Article> list = articleMapper.selectByPage(data);
+			return list;
+		}
+	
 ==================================================================

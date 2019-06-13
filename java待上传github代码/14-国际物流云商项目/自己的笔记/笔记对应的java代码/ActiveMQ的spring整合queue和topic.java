@@ -126,7 +126,7 @@ public class SpringMQ1 {
     </bean>
 	
     
-     <!-- Spring JmsTemplate 的消息生产者 start-->
+     <!-- Spring JmsTemplate 的消息消费者 start-->
     <jms:listener-container  destination-type="queue" container-type="default" connection-factory="connectionFactory">
        <jms:listener destination="itcast_spring_queue" ref="queue1"/>
     </jms:listener-container>
@@ -141,7 +141,7 @@ public class SpringMQ1 {
 
 ---------------------------------------------------------
 上面被扫描的包cn.itcast.jms里，有如下类：
-基本版的代码里，是用消费者创建监听(tMessageListener)时要传一个MessageListener对象，
+基本版的代码里，使用消费者创建监听(tMessageListener)时要传一个MessageListener对象，
 new这个对象时要实现onMessage方法来对收到信息进行处理。类似的，
 <jms:listener destination="itcast_spring_queue" ref="queue1"/>表示：
 用"itcast_spring_queue"生成queue对象q，用q生成消费者c，
@@ -149,17 +149,14 @@ new这个对象时要实现onMessage方法来对收到信息进行处理。类�
 
 
 package cn.itcast.jms;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
-
 import org.springframework.stereotype.Component;
 
 @Component(value="queue1")
 public class QueueListener implements MessageListener{
-
 	@Override
 	public void onMessage(Message arg0) {
 		TextMessage m=(TextMessage)arg0;
@@ -172,17 +169,14 @@ public class QueueListener implements MessageListener{
 }
 
 package cn.itcast.jms;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
-
 import org.springframework.stereotype.Component;
 
 @Component(value="topicConsumer1")			//还有个topicConsumer2，不写了
 public class TopicListener1 implements MessageListener{
-
 	@Override
 	public void onMessage(Message arg0) {
 		TextMessage m=(TextMessage)arg0;

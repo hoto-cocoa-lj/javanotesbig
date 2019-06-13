@@ -110,3 +110,13 @@ springmvc的注解写法：@CrossOrigin默认设置了	allowCredentials = "true"
 	  <url-pattern>/*</url-pattern>
 	</filter-mapping> 
 如果是maven的tomcat,这个文件的路径是 target/tomcat/conf/web/xml
+
+
+
+跨域获取cookie：
+页面a的ip是192.168.11.11，端口11；web项目b的ip是192.168.11.22，端口22；
+a用ajax请求b，b给response add cookie，会发现浏览器能获取到cookie，但是cookie的域名是b的ip，
+直接用$.cookie获取不到；需要作如下配置才能让该cookie能被$.cookie获取：
+1、给a配置域名www.jds.com，给b域名b.jds.com(jds.com应该也可以，没有测试)
+2、b相应的方法里setDomain(".jds.com")
+3、a请求b的地址必须用b的域名，不能用b的ip

@@ -57,6 +57,7 @@
 	所以我们需要使用动态域来实现。需要实现的
 		<dynamicField name="item_spec_*" type="string" indexed="true" stored="true" />	
 
+	似乎修改域后需要清空索引并重新生成，否则无效。
 4、配置pojo类和solr字段的映射，见 TbItem.java
 	 @Field 注解
 	创建 cn.itcast.pojo 包，将品优购的TbItem实体类拷入本工程  ,属性使用@Field注解标识 。   如果属性与配置文件定义的域名称不一致，需要在注解中指定域名称。
@@ -64,3 +65,39 @@
 5、spring配置文件见 applicationContext-solr.xml
 
 6、各自代码见 SolrTest.java
+
+7、classes文件夹里的文件放在tomcat对应位置，里面的ext加入了一些电商的常见词，
+	stopword加入7000个常见汉字，目的是避免查询单个汉字。
+	
+8、性能优化：
+
+    尽量将所有仅用于搜索，而不用于实际返回的字段设置stored="false"；
+
+  - 尽量将所有仅用于返回，而不用于搜索的字段设置indexed="false"；
+
+  - 去掉所有不需要的copyField 语句；
+
+  - 为了达到最佳的索引大小和搜索性能,对所有的文本字段设置indexed="false"，
+
+    使用copyField将他们拷贝到“整合字段”name="text"的字段中，使用整合字段进行搜索；
+
+  - 使用server模式来运行JVM,同时将log级别调高, 避免输出所有请求的日志。
+	 注意: 为了节省空间,这个字段默认不被索引, 因使用copyField被拷贝到了名为text的字段中 ，用于内容返回和高亮。搜索时使用text字段
+
+	 <fieldname="content" type="text_general"indexed="false"  stored="true"multiValued="true"/>
+
+	  整合字段(copyfiled ), 包含其他可搜索的字段，当整合字段包含多个需要被索引的字段时multiValued="true“必须设置为true
+
+	<field name="text" type="text_general"indexed="true"  stored="false"multiValued="true"/>
+
+	  拷贝需要索引的字段到整合字段中
+
+	     <copyField source="title" dest="text"/>
+	   <copyField source="author" dest="text"/>
+	   <copyField source="description"dest="text"/>
+	   <copyField source="keywords"dest="text"/>
+	   <copyField source="content"dest="text"/>
+
+	原文：https://blog.csdn.net/u011066470/article/details/52047433 
+
+

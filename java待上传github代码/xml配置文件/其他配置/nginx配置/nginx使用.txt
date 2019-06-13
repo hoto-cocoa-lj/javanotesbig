@@ -5,12 +5,40 @@ server的root表示根路径,默认html,即 http://ip:端口 请求 html文件�
 (不是/usr/local/nginx/html),复制粘贴一个新的server修改root为cart和端口即可。
 
 2、
+cd /usr/local/nginx/sbin
 运行./nginx
 重启./nginx -s reload
 关闭./nginx -s stop
 
+解决nginx重启“var/run/nginx/nginx.pid" no such file or directory问题 https://blog.csdn.net/tangxingILoveyou/article/details/73330622
+重启虚拟机后，再次重启nginx会报错“/var/run/nginx/nginx.pid” no such file or directory。
+
+方法一（已试过可行）： 
+到/var/run下看没有nginx这个目录，创建/var/run/nginx，再启动。
+
+重启虚拟机，这个目录会被删掉。 
+方法二： 
+不过在nginx.conf看到被注释掉的地方：
+
+pid logs/nginx.pid;
+若是在nginx下创建logs目录，再把上面的注释去掉，或许也可以。
+
 ================================================
 
+	server {
+        listen       80;
+        location / {
+            root   /usr/local/nginx/html/test;
+            index  1.html;
+        }
+	}
+
+这样配置可以通过http://ip:80 访问 /usr/local/nginx/html/test/1.html,
+也可以通过http://ip:80/a/b.html 访问 /usr/local/nginx/html/test/a/b.html。
+如果同时配置两个listen 80，第二个配置无效
+================================================
+	
+	
 配置域名访问：
 本地测试可以修改hosts文件C:\Windows\System32\drivers\etc,也可以用SwitchHosts软件,如下修改:
 192.168.153.130 www.a.com

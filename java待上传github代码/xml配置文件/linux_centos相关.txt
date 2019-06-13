@@ -35,13 +35,7 @@ chmod -R 777 ./     #修改命令，注意中间是大写的R，不是小写
 
 =========================================================================
 
-安装python3：
 
-
-
-=========================================================================
-
-=========================================================================
 
 安装zookeeper：
 将zookeeper-3.4.5.tar.gz解压后上传到linux服务器，conf下zoo_sample.cfg改名为zoo.cfg，
@@ -57,11 +51,13 @@ cd /usr/local/rjb/registry-zookeeper/bin-->./zkServer.sh start。
 
 =========================================================================
 
-启动dubbo：
+启动dubbo的tomcat：
 把dubbo-damin解压后的文件复制到tomcat的webapps下，如果报错
 com.alibaba.citrus.service.uribroker.impl.URIBrokerServiceImpl$URIBrokerInfo
 说明jdk版本是1.8不能运行这个，需要改成1.7的。改完后，重启。
 如果报错 Starting ZkClient event thread说明 zookeeper没有启动，启动即可。
+或者是配置有问题，比如修改了zookeeper的端口，需要去
+/usr/local/rjb/apache-tomcat-7.0.57/webapps/dubbo/WEB-INF的dubbo.properties修改。
 如果报错端口占用，查询端口的pid关闭即可，经常是java占用了。
 
 =========================================================================
@@ -158,6 +154,8 @@ sh startup.sh
 war文件会不封装java文件保证源码安全
 配置tomcat后，用workbench导出导入数据库即可，导入时需要先建数据库，选定后再导入
 tail -f logs/catalina.out 查看tomcat日志(当前路径tomcat根目录)
+
+关闭tomcat：./shutdown.sh
 
 
 将war放在tomcat的webapps下，tomcat会自动解压并运行，但是删除war包项目也会被删除。
