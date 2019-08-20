@@ -1,0 +1,130 @@
+CountDownLatch 的作用和 Thread.join() 方法类似，可用于一组线程和另外一组线程的协作。
+
+例如：主线程在做一项工作之前需要一系列的准备工作，只有这些准备工作都完成，主线程才能继续它的工作,这些准备工作彼此独立,所以可以并发执行以提高速度。在这个场景下就可以使用 CountDownLatch 协调线程之间的调度了。
+
+在直接创建线程的年代(Java 5.0 之前),我们可以使用 Thread.join().在 JUC 出现后，因为线程池中的线程不能直接被引用，所以就必须使用 CountDownLatch 了。
+
+CountDownLatch 是能使一组线程等另一组线程都跑完了再继续跑 ,
+CountDownLatch.await() 方法在倒计数为0之前会阻塞当前线程.
+
+countDownLatch.countDown必须放在run/call方法里面(位置1)，放在位置2无效，主线程不等待线程池完成。
+原因应该是如果写在finally，那么主线程开启一个子线程后马上-1而不等待子线程完成，
+减到0就直接打印了。写在子线程里就不会有这个情况，一定要所有子线程都执行到countdown才会=0.
+
+	@Test
+	public void testS() throws InterruptedException, ExecutionException {
+		final ArrayList list = new ArrayList();
+		int size = 30000;
+		ExecutorService pool = Executors.newFixedThreadPool(400);
+		final CountDownLatch countDownLatch = new CountDownLatch(size);
+		for (int i = 0; i < size; i++) {
+			try {
+				pool.execute(new Runnable() {
+					@Override
+					public void run() {
+						list.add(1);
+						// countDownLatch.countDown();		//位置1
+					}
+				});
+			} finally {
+				countDownLatch.countDown();					//位置2
+			}
+		}
+		countDownLatch.await();
+		System.out.println(list.size());
+		pool.shutdown();
+	}
+	
+	
+同上。如果去掉Thread.sleep(4)可以放外面，原因可能是执行速度很快？
+这里是测试 StringBuilder线程不安全，StringBuffer线程安全。
+	@Test
+	public void testStringBuilderAndStringBuffer() throws InterruptedException {
+		new Hashtable();
+		final StringBuilder a = new StringBuilder();
+		final StringBuffer b = new StringBuffer();
+		int times = 1000;
+		final CountDownLatch c1 = new CountDownLatch(times);
+		final CountDownLatch c2 = new CountDownLatch(times);
+		for (int i = 0; i < times; i++) {
+			try {
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						a.append(1);
+						b.append(1);
+						try {
+							Thread.sleep(4);
+						} catch (InterruptedException e) {
+						}
+						c1.countDown();							//位置1
+						c2.countDown();
+					}
+				}).start();
+			} finally {
+																//位置2
+			}
+
+		}
+		c1.await();
+		c2.await();
+		System.out.println(a.length() + "\t" + b.length());
+	}
+
+============================================================================	
+
+线程池的另一种等待方法： shutdown + awaitTermination
+
+	@Test
+	public void testS1() throws InterruptedException, ExecutionException {
+		final ArrayList list = new ArrayList();
+		int size = 10000;
+		ExecutorService pool = Executors.newFixedThreadPool(1000);
+		for (int i = 0; i < size; i++) {
+			pool.execute(new Runnable() {
+				@Override
+				public void run() {
+					list.add(1);
+				}
+			});
+		}
+		pool.shutdown();
+		pool.awaitTermination(4, TimeUnit.SECONDS);
+		System.out.println(list.size());
+	}
+	
+shutdown()将线程池状态置为SHUTDOWN,并不会立即停止：
+停止接收外部submit的任务
+内部正在跑的任务和队列里等待的任务，会执行完
+等到第二步完成后，才真正停止
+
+
+shutdownNow()将线程池状态置为STOP。企图立即停止，事实上不一定：
+跟shutdown()一样，先停止接收外部提交的任务
+忽略队列里等待的任务
+尝试将正在跑的任务interrupt中断
+返回未执行的任务列表
+它试图终止线程的方法是通过调用Thread.interrupt()方法来实现的，但是大家知道，这种方法的作用有限，如果线程中没有sleep 、wait、Condition、定时锁等应用, interrupt()方法是无法中断当前的线程的。所以，ShutdownNow()并不代表线程池就一定立即就能退出，它也可能必须要等待所有正在执行的任务都执行完成了才能退出。
+但是大多数时候是能立即退出的
+
+
+awaitTermination(long timeOut, TimeUnit unit)当前线程阻塞，直到
+等所有已提交的任务（包括正在跑的和队列中等待的）执行完
+或者等超时时间到
+或者线程被中断，抛出InterruptedException
+然后返回true（shutdown请求后所有任务执行完毕）或false（已超时）
+
+实验发现，shuntdown()和awaitTermination()效果差不多，方法执行之后，都要等到提交的任务全部执行完才停。
+
+shutdown()和shutdownNow()的区别
+从字面意思就能理解，shutdownNow()能立即停止线程池，正在跑的和正在等待的任务都停下了。这样做立即生效，但是风险也比较大；
+shutdown()只是关闭了提交通道，用submit()是无效的；而内部该怎么跑还是怎么跑，跑完再停。
+
+
+shutdown()和awaitTermination()的区别
+shutdown()后，不能再提交新的任务进去；但是awaitTermination()后，可以继续提交。
+awaitTermination()是阻塞的，返回结果是线程池是否已停止（true/false）；shutdown()不阻塞。
+
+	
+============================================================================	
+

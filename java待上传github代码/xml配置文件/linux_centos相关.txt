@@ -22,6 +22,9 @@ xftp右键可修改。如果报错/lib/ld-linux.so.2: bad ELF interpreter: 没�
 递归修改，改为统一的权限777：
 chmod -R 777 ./     #修改命令，注意中间是大写的R，不是小写
 
+linux中文件内容太多，屏幕不能一下全部显示出来，怎样查看被掩盖的上部分的内容？
+上翻 Shift+PageUp，向下是Shift+PageDown
+
 =========================================================================
 
 网络相关：虚拟机ifconfig不显示127.0.0.0以外的ip：
@@ -264,7 +267,13 @@ docker search 镜像名称(redis)
 	1、docker rmi $IMAGE_ID：删除指定镜像(iamge_id可以通过docker images查看)
 	2、docker rmi `docker images -q`：删除所有镜像
 
+========================================================================
 容器操作：
+	查看正在运行容器：docker ps
+	查看所有的容器（启动过的历史容器）：docker ps –a
+	查看最后一次运行的容器：docker ps –l
+	查看停止的容器：docker ps -f status=exited
+
 创建容器命令：docker run
 	-i：表示运行容器
 	-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。
@@ -273,8 +282,9 @@ docker search 镜像名称(redis)
 	-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。
 	-p：表示端口映射，前者是宿主机端口，后者是容器内的映射端口。可以使用多个－p做多个端口映射
 
-docker run -it --name=mycentos centos:7 /bin/bash 表示前台打开centos,tag=7,
-names是mycentos(在docker ps里可以看到),使用exit命令退出当前容器
+docker run -it --name=mycentos centos:7 /bin/bash 其中centos:7表示前台打开centos,tag=7,
+names是mycentos(在docker ps里可以看到),使用exit命令退出当前容器,/bin/bash是进入命令行需要的。
+
 
 docker run -di --name=mycentos2 centos:7 表示守护式容器方式，即后台打开
 登录守护式容器方式是
@@ -283,10 +293,19 @@ docker exec -it container_name(或者container_id)  /bin/bash（exit退出时，
 停止与启动容器
 停止正在运行的容器：docker stop $CONTAINER_NAME/ID
 启动已运行过的容器：docker start $CONTAINER_NAME/ID
+重启容器
+	docker restart pinyougou_nginx
+
+文件拷贝
+	如果我们需要将文件拷贝到容器内可以使用cp命令
+	docker cp 需要拷贝的文件或目录 容器名称:容器目录
+	docker cp nnn.tar mynginx:/  表示把当前文件夹的nnn.tar移动到容器名mynginx的根目录。
+	也可以将文件从容器内拷贝出来
+	docker cp 容器名称:容器目录 需要拷贝的文件或目录
 
 
 目录挂载
-	我们可以在创建容器的时候，将宿主机的目录与容器内的目录进行映射，这样我们就可以通过修改宿主机某个目录的文件从而去影响容器。
+	我们可以在创建容器的时候，将宿主机的目录与容器内的目录进行映射，这样我们就可以通过修改宿主机某个目录的文件从而去影响容器。否则每次修改都需要更新整个容器。
 	创建容器 添加-v参数 后边为   宿主机目录:容器目录
 	docker run -di -v /usr/local/myhtml:/usr/local/myhtml --name=mycentos2 centos:7
 	如果你共享的是多级的目录，可能会出现权限不足的提示,新建文件也会提示。
@@ -305,10 +324,18 @@ docker exec -it container_name(或者container_id)  /bin/bash（exit退出时，
 删除镜像：
 	docker rmi nginx2
 	
+	
+	
+创建MySQL容器
+docker run -di --name pinyougou_mysql -p 33306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
+-p 代表端口映射，格式为  宿主机映射端口:容器运行端口
+-e 代表添加环境变量  MYSQL_ROOT_PASSWORD是root用户的登陆密码
+
 
 创建tomcat容器
 docker run -id --name=mytomcat -v /usr/local/myhtml:/usr/local/tomcat/webapps --privileged=true -p 9000:8080 tomcat:7-jre7 
 9000:8080表示项目的端口是9000(即项目地址是主机ip:9000),8080是该tomcat的端口.
+
 
 创建Nginx容器
 docker run -di --name=pinyougou_nginx -p 80:80  nginx/bin/bash
@@ -338,15 +365,24 @@ docker run -di --name=pinyougou_nginx -p 80:80  nginx/bin/bash
 	192.168.247.135 passport.pinyougou.com 
 	浏览器测试：http://passport.pinyougou.com/cas/login
 
+	
 创建Redis容器
 	docker run -di --name=pinyougou_redis -p 6379:6379 redis
 	找到redis-cli的目录,redis-cli -h 192.168.247.135即可远程连接redis
 	
-	
-镜像生成容器后可能要修改配置文件,可以用修改后的容器生成镜像,
-方法是docker commit mynginx nginx2(用mynginx2生成REPOSITORY=nginx2的镜像),
-生成镜像文件到宿主机: docker save -o /nnn.tar nginx2(o表示output),
-用镜像文件生成镜像:docker load -i nnn.tar(i表示input),
-再用此镜像生成容器,可以发现配置文件都有保存
 
+怎么把自己的容器给别人用：
+1、用自己的容器生成镜像
+	镜像生成容器后可能要修改配置文件,可以用修改后的容器生成镜像,
+	方法是docker commit mynginx2 nginx2(用name=mynginx2的容器生成REPOSITORY=nginx2的镜像)
+2、把镜像导出成镜像文件，此文件可以传给别人使用
+	生成镜像文件到宿主机: docker save -o /nnn.tar nginx2(o表示output)
+3、用镜像文件生成镜像:docker load -i nnn.tar(i表示input),再用此镜像生成容器,可以发现配置文件都有保存
+
+========================================================================
+
+cd /usr/local/nginx/sbin
+运行./nginx
+重启./nginx -s reload
+关闭./nginx -s stop
 ========================================================================
