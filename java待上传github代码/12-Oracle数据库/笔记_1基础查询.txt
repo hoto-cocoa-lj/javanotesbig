@@ -141,14 +141,28 @@ select nvl2('null',1,2) from dual	-->1
 
 --条件表达式
 --1.查询员工的job内容并转成显示,下面是把job这一列的'CLERK'转'sb','SALESMAN'转'傻逼',其他的全部转'else'
+
 ----decode方式，
 select ename,decode(job,'CLERK','sb','SALESMAN','傻逼','else') from emp
+
+
 ----case when then end方式
-select ename,case job when 'CLERK' then 'sb' when 'SALESMAN' then '傻逼' else 'else' end from emp
-         
-		 
-		 
-		 
+select ename,	
+	case job 
+		when 'CLERK' then 'sb' 
+		when 'SALESMAN' then '傻逼' 
+		else 'else' 
+	end 
+from emp	 
+
+end后面可以加上别名，别名必须加双引号，不能用单引号(好像是)
+select ename,	
+	case job 
+		when 'CLERK' then 'sb' 
+		when 'SALESMAN' then '傻逼' 
+		else 'else' 
+	end "中文名字"
+from emp	
 
 --===========多行函数
 --1.查询所有员工记录数--关键字count
@@ -167,6 +181,7 @@ select sum(sal) from emp where deptno=20;
 
 执行顺序：where ==》group by ==》 having ==》 order by		 
 ======分组函数，group by后面必须加上需要查询的所有的普通字段。即select后面要查询的非聚合字段。
+聚合函数会忽略空值，如null/2/1的平均值是1.5而不是1
 --1.查询部门编号及人数--分组查询关键字group by
 select deptno,count(*) from emp group by deptno;
 --2.查询每个部门编号及平均工资
@@ -180,6 +195,9 @@ select dname,dept.deptno,avg(sal) from dept,emp where dept.deptno=emp.deptno
 group by dept.deptno,dname having avg(sal)>2000	 
 
 
+查询名字含有%的员工，escape用来转义
+select * from em where ename like '%\%%' escape "\";
+select * from em where ename like '%#%%' escape "%";
 
 
 

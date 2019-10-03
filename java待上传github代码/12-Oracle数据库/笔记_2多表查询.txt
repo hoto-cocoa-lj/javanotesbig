@@ -77,7 +77,9 @@ select max(decode(t,1980,h)) "1980",max(decode(t,1981,h)) "1981",
 
 
 
---===========分页查询(rownum不能做大于查询，可以做小于）
+--===========分页查询(rownum不能做大于查询，可以做小于，
+原因是每次查到第一条数据rownum=1，不满足rownum>a，删除后下一条rownum还是=1，
+rownum和order by一起用rownum顺序被打乱是因为rownum在order by之前执行）
 --1.查询员工表，将员工工资进行降序查询，并进行分页取出第一页，一页三条记录
 select * from (select rownum r,e.* from (select * from 表名 order by 列名 desc) e ) 
        where r between pagenum*pagesize-pagesize and pagenum*pagesize
@@ -124,7 +126,8 @@ select * from emp where empno not in (select nvl(mgr,0) from emp)							--②
 select * from emp where empno not in (select mgr from emp where mgr is not null)			--③
 
 注意：select mgr from emp这句查询，由于mgr有null值，上面的②作in判断会出现异常（不报错）；
-所以用select nvl(mgr,0) from emp把null值转换。更好的办法是③，用is not null。
+所以用select nvl(mgr,0) from emp把null值转换。更好的办法是③，用is not null。貌似加上distinct更好。
+
 
 https://www.cnblogs.com/beijingstruggle/p/5885137.html
 exists对外表用loop逐条查询，每次查询都会查看exists的条件语句，
@@ -133,7 +136,17 @@ exists对外表用loop逐条查询，每次查询都会查看exists的条件语�
 exists的条件就像一个bool条件，当能返回结果集则为true，不能返回结果集则为 false
 
 
+all 和 any：
 
+查询工资大于10部门所有员工的工资的员工
+select * from emp where sal>all(select sal from emp where deptno=10 and sal is not null);
+
+
+查询工资大于10部门某一员工（即该部门最低工资员工的工资）的工资的员工
+select * from emp where sal>any(select sal from emp where deptno=10 and sal is not null);
+
+使用in和any，如果子查询里有null值，会对非null进行处理，所有null不影响结果；
+如果用all，会和null进行比较，会出bug。
 
 
 
